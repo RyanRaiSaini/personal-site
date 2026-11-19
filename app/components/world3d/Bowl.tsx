@@ -9,6 +9,7 @@ import Sky from "./atmosphere/Sky";
 import { sceneOf } from "./spots";
 import AdBoards from "./stadium/AdBoards";
 import Goals from "./stadium/Goals";
+import GroundLit from "./stadium/GroundLit";
 import Pitch from "./stadium/Pitch";
 import PitchSide from "./stadium/PitchSide";
 import StadiumModel from "./stadium/StadiumModel";
@@ -39,11 +40,13 @@ export default function Bowl({ children }: { children?: React.ReactNode }) {
         <Loaded />
       </Suspense>
       <Pitch />
-      <Goals />
-      <PitchSide />
-      <AdBoards />
+      <GroundLit>
+        <Goals />
+        <PitchSide />
+        <AdBoards />
+        <Cast />
+      </GroundLit>
       <Precipitation />
-      <Cast />
       {children}
     </group>
   );
