@@ -157,6 +157,8 @@ Everything 3D is in `app/components/world3d/`. Sizes are in metres. The pitch is
 | Sky colours for day, night, dusk, cloud | the colour constants at the top | `app/components/world3d/atmosphere/AtmosphereDriver.tsx` |
 | How bright the sun, floodlights and sky light are | | `app/components/world3d/atmosphere/Lights.tsx` |
 | Clouds, stars, the sun disc | | `app/components/world3d/atmosphere/Sky.tsx` |
+| The glow round bright lights (strength, what glows) | `intensity`, `luminanceThreshold` | `app/components/world3d/atmosphere/Effects.tsx` |
+| Rain and snow (how much, how fast) | `COUNT`, `fall` | `app/components/world3d/atmosphere/Precipitation.tsx` |
 | The city used for time and weather | `now.homeCity` | `app/data/portfolio.ts` |
 | The second clock (Madrid) | `now.awayCity` | `app/data/portfolio.ts` |
 | When the roof closes by itself (night, rain, snow) | "The roof, and with it the colour theme" | `app/components/world/LiveData.tsx` |
