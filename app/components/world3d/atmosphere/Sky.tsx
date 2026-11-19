@@ -63,10 +63,16 @@ const fragment = /* glsl */ `
     color += uSunColor * (pow(toSun, 600.0) * 6.0 + pow(toSun, 24.0) * 0.35) * uDaylight * clearSky;
 
     // Stars, only at night and only where the sky is clear
-    vec2 cell = floor(dir.xz / max(dir.y + 0.35, 0.05) * 90.0);
+    // The sky is divided into a fine grid; about one cell in thirty
+    // holds a star, drawn as a small soft dot somewhere inside it
+    vec2 grid = dir.xz / max(dir.y + 0.35, 0.05) * 150.0;
+    vec2 cell = floor(grid);
     float star = hash(cell);
+    vec2 offset = vec2(hash(cell + 17.0), hash(cell + 43.0)) - 0.5;
+    float dist = length(fract(grid) - 0.5 - offset * 0.6);
     float twinkle = 0.7 + 0.3 * sin(uTime * (1.0 + star * 3.0) + star * 40.0);
-    float stars = smoothstep(0.992, 1.0, star) * twinkle;
+    float size = 0.05 + 0.09 * hash(cell + 91.0);
+    float stars = step(0.968, star) * smoothstep(size, 0.0, dist) * twinkle;
     color += vec3(0.85, 0.9, 1.0) * stars * (1.0 - uDaylight) * clearSky * smoothstep(0.05, 0.4, up);
 
     // Clouds drifting slowly across
