@@ -5,6 +5,7 @@ import { Canvas } from "@react-three/fiber";
 import AtmosphereDriver from "./atmosphere/AtmosphereDriver";
 import Lights from "./atmosphere/Lights";
 import Sky from "./atmosphere/Sky";
+import Crowd from "./stadium/Crowd";
 import Pitch from "./stadium/Pitch";
 import Roof from "./stadium/Roof";
 import Stands from "./stadium/Stands";
@@ -17,6 +18,7 @@ export default function World3D() {
       <Sky />
       <Lights />
       <Stands />
+      <Crowd />
       <Pitch />
       <Roof />
       <OrbitControls target={[0, 4, 0]} />
