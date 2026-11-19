@@ -130,7 +130,7 @@ function Case({ x, z, turn, index }: { x: number; z: number; turn: number; index
   const award = awards[index];
   return (
     <group position={[x, 0, z]} rotation={[0, turn, 0]}>
-      <Box size={[0.9, 1.0, 0.9]} position={[0, 0.5, 0]} color="#0c0e13" roughness={0.25} metalness={0.3} />
+      <Box size={[0.9, 1.0, 0.9]} position={[0, 0.5, 0]} color="#2a2118" roughness={0.35} metalness={0.2} />
       <Box size={[0.92, 0.04, 0.92]} position={[0, 1.02, 0]} color={GOLD} roughness={0.3} metalness={0.9} />
       {/* light in the plinth, shining up at the trophy */}
       <Glow size={[0.5, 0.01, 0.5]} position={[0, 1.045, 0]} color={[1.8, 1.6, 1.2]} />
@@ -285,11 +285,11 @@ export default function TrophyRoom() {
 
   return (
     <group>
-      <ambientLight intensity={0.22} color="#ffe9c9" />
+      <ambientLight intensity={0.5} color="#ffe9c9" />
       {places.map((p, i) => (
-        <pointLight key={i} position={[p.x, 3.1, p.z + 0.9]} intensity={9} distance={5.5} decay={1.6} color="#ffe6bd" />
+        <pointLight key={i} position={[p.x, 3.0, p.z + 1.1]} intensity={22} distance={7} decay={1.5} color="#ffe6bd" />
       ))}
-      <pointLight position={[0, 2.6, 3.4]} intensity={7} distance={12} decay={1.6} color="#ffe0b0" />
+      <pointLight position={[0, 2.8, 3.6]} intensity={20} distance={14} decay={1.5} color="#ffe0b0" />
 
       <Shell width={12} depth={12} back={4.5} height={3.6} floor="#0a0b0f" wall="#15120e" ceiling="#070709" floorMap={marble} floorRoughness={0.14} floorMetalness={0.35} />
 
