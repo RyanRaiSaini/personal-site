@@ -69,13 +69,13 @@ export const SPOTS: Record<Exclude<SectionId, "home">, Spot> = {
     scene: "bowl",
     pose: { position: [0, 22, 40], target: [0, 15, -66], fov: 56 },
     narrow: { position: [0, 22, 34], target: [0, 21, -66], fov: 66 },
-    anchor: [0, 23.5, -71],
+    anchor: [0, 20.5, -66],
   },
   live: {
     scene: "bowl",
     pose: { position: [0, 5, 20], target: [0, 43, -40], fov: 52 },
     narrow: { position: [0, 5, 22], target: [0, 52, -40], fov: 60 },
-    anchor: [0, 49.5, -38],
+    anchor: [0, 50, -37.5],
   },
   skills: {
     scene: "dressing",
@@ -87,19 +87,19 @@ export const SPOTS: Record<Exclude<SectionId, "home">, Spot> = {
     scene: "trophy",
     pose: { position: inRoom("trophy", [0.8, 1.75, 6.9]), target: inRoom("trophy", [-0.6, 1.4, -2]), fov: 60 },
     narrow: { position: inRoom("trophy", [0, 1.8, 6.6]), target: inRoom("trophy", [0, 2.0, -2]), fov: 64 },
-    anchor: [26, 12.2, -59.6],
+    anchor: [26, 14.4, -58.2],
   },
   news: {
     scene: "press",
     pose: { position: inRoom("press", [1.6, 1.75, 6.4]), target: inRoom("press", [-1.5, 1.4, -2]), fov: 54 },
     narrow: { position: inRoom("press", [0, 1.8, 6.8]), target: inRoom("press", [0, 2.0, -2]), fov: 66 },
-    anchor: [-26, 12.2, -59.6],
+    anchor: [-26, 14.4, -58.2],
   },
   resume: {
     scene: "tickets",
     pose: { position: inRoom("tickets", [0, 1.7, 7]), target: inRoom("tickets", [0, 1.7, -2]), fov: 46 },
     narrow: { position: inRoom("tickets", [0, 1.8, 7.6]), target: inRoom("tickets", [0, 2.3, -2]), fov: 62 },
-    anchor: [57, 10.5, -39],
+    anchor: [66, 9.6, -44],
   },
   contact: {
     scene: "mixed",
@@ -109,26 +109,34 @@ export const SPOTS: Record<Exclude<SectionId, "home">, Spot> = {
   },
 };
 
-// The view of the whole stadium: the camera rides an oval track above
-// the lower tiers. `azimuth` is the angle round the track in radians;
-// PI / 2 is the middle of the east stand, looking at the main stand.
+// The view of the whole stadium. The camera rides a track that follows
+// the front of the third tier, like a television camera slung under the
+// upper deck: a rectangle with well-rounded corners, a little above the
+// tier's front wall. `azimuth` is the angle round the track in radians;
+// PI / 4 is the north-east corner, looking across at the main stand.
+//
+// A longer lens (a smaller `fov`) keeps the building's lines straight;
+// wide lenses are what make a large stadium look like a toy.
 export const ORBIT = {
-  radiusX: 76,
-  radiusZ: 64,
-  height: 23.5,
-  targetHeight: 9.5,
-  fov: 52,
-  narrowFov: 70,
-  startAzimuth: Math.PI / 2,
+  radiusX: 83, // half the track's length, along the pitch
+  radiusZ: 63, // half its width
+  height: 26,
+  targetHeight: 5,
+  fov: 48,
+  narrowFov: 64,
+  startAzimuth: Math.PI / 4,
 };
 
 export function orbitPose(azimuth: number, narrow: boolean): Pose {
-  const x = Math.cos(azimuth) * ORBIT.radiusX;
-  const z = Math.sin(azimuth) * ORBIT.radiusZ;
-  // Look past the centre spot toward the far stand
+  // a "squircle": straight along the sides and ends, round at the corners
+  const c = Math.cos(azimuth);
+  const s = Math.sin(azimuth);
+  const x = Math.sign(c) * Math.sqrt(Math.abs(c)) * ORBIT.radiusX;
+  const z = Math.sign(s) * Math.sqrt(Math.abs(s)) * ORBIT.radiusZ;
+  // Look just past the centre spot, toward the far side
   return {
     position: [x, ORBIT.height, z],
-    target: [-x * 0.28, ORBIT.targetHeight, -z * 0.3],
+    target: [-x * 0.14, ORBIT.targetHeight, -z * 0.15],
     fov: narrow ? ORBIT.narrowFov : ORBIT.fov,
   };
 }
