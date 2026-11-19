@@ -65,20 +65,19 @@ export default function SectionPanel({ id, children }: { id: SectionId; children
       <article
         ref={panel}
         aria-labelledby="section-title"
-        className="glass panel-in pointer-events-auto flex max-h-[64dvh] w-full flex-col rounded-t-3xl lg:mb-4 lg:mr-4 lg:mt-[4.75rem] lg:max-h-none lg:w-[min(34rem,44vw)] lg:rounded-3xl"
+        className="panel panel-in pointer-events-auto flex max-h-[64dvh] w-full flex-col rounded-t-2xl lg:mb-4 lg:mr-4 lg:mt-[4.75rem] lg:max-h-none lg:w-[min(34rem,44vw)] lg:rounded-2xl"
       >
         <header className="flex items-start justify-between gap-4 border-b border-line px-5 pb-4 pt-5 sm:px-7">
           <div className="min-w-0">
-            <p className="kicker flex items-center gap-2">
-              <PlaceIcon id={id} className="h-4 w-4" />
-              <span>
-                {info.place} · {info.kicker}
-              </span>
+            <p className="sign">
+              <PlaceIcon id={id} className="h-[1.125rem] w-[1.125rem] flex-none text-gold" />
+              <span className="sign-place">{info.place}</span>
+              <span className="sign-what">{info.kicker}</span>
             </p>
-            <h1 id="section-title" ref={heading} tabIndex={-1} className="mt-1 font-display text-4xl font-bold uppercase leading-none tracking-wide outline-none sm:text-5xl">
+            <h1 id="section-title" ref={heading} tabIndex={-1} className="mt-1.5 font-display text-[2.75rem] font-bold uppercase leading-[0.95] tracking-[0.01em] sm:text-[3.25rem]">
               {info.title}
             </h1>
-            {info.intro && <p className="mt-2 text-sm text-ink-soft">{info.intro}</p>}
+            {info.intro && <p className="mt-2 text-[0.9375rem] text-ink-soft">{info.intro}</p>}
           </div>
           <Link href="/" className="icon-btn flex-none" aria-label="Back to the stadium" title="Back to the stadium (Esc)">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
