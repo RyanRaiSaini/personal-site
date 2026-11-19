@@ -98,3 +98,54 @@ A record of what was built and what was decided. Newest at the bottom. For where
 
 - In Mbappé's close-up, the "GOOOOOOL!" banner sits over his head.
 - On the home view, name tags can drift across the name and the opening lines at some camera angles.
+
+## 2026-11-19, the realism redesign
+
+Ryan's verdict on the first build was "cartoony". This pass rebuilt the stadium to look like a real building, cut what it costs to run, and restyled the page's own text. The write-ups are in [redesign/](redesign/): why it looked cartoonish ([FINDINGS](redesign/FINDINGS.md)), the two Sketchfab models ([MODELS](redesign/MODELS.md)), every asset and licence ([ASSETS](redesign/ASSETS.md)), the pictures ([COMPARE](redesign/COMPARE.md)), the interface ([INTERFACE](redesign/INTERFACE.md)) and the measurements ([PERFORMANCE](redesign/PERFORMANCE.md)).
+
+### Before starting
+
+- The old site was photographed from 14 fixed spots (`npm run shots`, pictures in `redesign/before/`) and tagged `checkpoint-before-realism`.
+- Both Sketchfab models were downloaded, opened in Blender and measured. Neither became the stadium: one is three million loose points, the other is the old ground with club lettering on it. The scan's outer measurements were used; its author is credited.
+
+### The stadium
+
+- **Built in Blender from Python scripts** (`blender/`): four tiers with real steps (24, 16, 16 and 17 rows), aisles, entrances cut into the upper tiers, tier fronts with glass, a truss roof with ten sliding panels, a ring of screens and a ring of floodlights. 63,322 seats, each placed.
+- **Packed to 1.7 MB** (`scripts/pack-stadium.mjs`). The seats are drawn as 152 blocks of copies, with a detailed seat near the camera and a plain one far away.
+- **Light worked out in Blender.** Every corner of the model, every seat and every half-metre of the ground carries how much sky it sees, how much sunlit pitch, and whether the sun reaches it. The site reads those numbers (`stadium/bakedLight.ts`), so the roof's shadow and the gloom under the tiers cost nothing while the page runs.
+- **One daylight.** A photographed sky from Poly Haven lights the bowl and shows through the roof. The clock in Brampton now decides only day or night.
+- **Photographed surfaces** on concrete, painted walls, the roof deck and the pitch, at life size.
+- **The pitch** has mowing stripes that change with the viewing angle, wear, and blade detail.
+- **No sponsors anywhere.** The boards round the pitch are blank and the ring of screens is dark except during a goal or the fireworks. The scrolling text is gone.
+- **Night** is a ring of lamps under the roof, a bright pitch and lit blue stands.
+- **Pitch side:** the dugouts are rows of high-backed bench seats under a ribbed canopy; the boards open in front of them; the tunnel is dim.
+- **Cameras:** the overview rides a track along the third tier; About, Projects, Experience and GitHub use long lenses from further back.
+
+### Two bugs found on the way
+
+- The packing step was throwing away the model's texture positions, so the photographed surfaces showed as one flat colour. Found while asking why the floodlights would not light up. Fixed in the packer.
+- The floodlight glass had been modelled facing the stands, not the pitch.
+
+### What it costs to run
+
+- **It no longer draws when nothing is happening** (`world3d/FrameGovernor.tsx`): full rate while something moves or the visitor is active, 30 a second for a while after, then nothing until the next input, and never while the tab is hidden.
+- **The biggest single cost was not 3D at all:** the ten floating name tags. Their pulsing pins made the browser restyle the page on every frame, and moving ten of them cost about 6 ms a frame. They now move in whole pixels, only when a frame is drawn, and the pins are still.
+- Fourteen see-through materials were being re-checked twice a frame by three.js (`forceSinglePass` fixes it).
+- Frosted glass is gone from the interface: blurring a moving 3D picture behind every panel is work for the graphics chip on every frame.
+- Quality levels were set from measurements on this laptop's built-in graphics, not guesses. The glow pass is "high" only.
+- A simpler material for the seats was tried and thrown away: the saving was inside the noise and the seats looked like toys.
+
+### The interface
+
+- One type family (Barlow) in two widths, solid plates, a name caption in the corner of the home screen, and Projects, Experience, Résumé and Contact in the top bar.
+- Name tags are one short line and keep clear of the page's text and of each other.
+- A loading bar with a percentage; after 12 seconds an offer of the flat view; if the 3D breaks, the flat view opens.
+- "Number 8" is on the shirt and nowhere else.
+
+### Not done in this pass
+
+- The player figure and the five rooms are still the earlier code-drawn versions.
+- The stadium is empty. A believable crowd is a job of its own.
+- The outside of the stadium is not modelled, because no camera goes there.
+- Ryan's content decisions from the same day (dropping Skills and Now, folding GitHub into Projects, the formal rewrite, the start screen in the tunnel, the résumé from his LaTeX original, moving Trent's egg) are waiting for his go.
+- In Mbappé's close-up, the "GOOOOOOL!" banner still sits over his head.
