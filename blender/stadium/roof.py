@@ -83,9 +83,12 @@ def build_floodlights(lamps, walls, steel):
     """A continuous bar of lamps under the roof edge, tipped down toward the pitch."""
     F = P.FLOODS
     d, y = F["d"], F["y"]
-    sweep(lamps, (d - 0.32, y), (d + 0.22, y + 0.46), "FloodLens", (-0.65, -0.76))
-    sweep(walls, (d + 0.22, y + 0.46), (d + 0.5, y + 0.1), "FloodHousing", (0.8, 0.6))
-    sweep(walls, (d - 0.32, y), (d + 0.5, y + 0.1), "FloodHousing", (0.1, -1))
+    # the glass: its lower edge is the one nearer the stands, so it looks down at the pitch
+    sweep(lamps, (d + 0.22, y), (d - 0.32, y + 0.46), "FloodLens", (-0.65, -0.76))
+    # the casing behind it: top, back and underside
+    sweep(walls, (d - 0.32, y + 0.46), (d + 0.5, y + 0.46), "FloodHousing", (0, 1))
+    sweep(walls, (d + 0.5, y + 0.46), (d + 0.5, y), "FloodHousing", (1, 0))
+    sweep(walls, (d + 0.22, y), (d + 0.5, y), "FloodHousing", (0, -1))
     for piece, t in truss_positions():
         _x, _z, nx, nz = piece.at(t, 0.0)
         side = (-nz, 0.0, nx)
