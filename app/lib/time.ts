@@ -66,3 +66,13 @@ export function parseClock(text: string): { hour: number; minute: number } | nul
   if (hour > 23 || minute > 59) return null;
   return { hour, minute };
 }
+
+// "Now", or the moment the ?time=HH:MM test switch asks for (read as
+// a clock time in the given city)
+export function currentInstant(timeOverride: string | null, timeZone: string): Date {
+  if (timeOverride) {
+    const clock = parseClock(timeOverride);
+    if (clock) return instantAtLocalTime(clock.hour, clock.minute, timeZone);
+  }
+  return new Date();
+}
