@@ -77,15 +77,22 @@ async function main() {
   const list = SHOTS.filter((shot) => !wanted || wanted.has(shot.name));
   await mkdir(folder, { recursive: true });
 
-  const browser = await puppeteer.launch({
-    executablePath,
-    headless: true,
-    args: ["--ignore-gpu-blocklist", "--enable-gpu", "--hide-scrollbars", "--mute-audio"],
-    defaultViewport: DESKTOP,
-  });
+  const launch = () =>
+    puppeteer.launch({
+      executablePath,
+      headless: true,
+      args: ["--ignore-gpu-blocklist", "--enable-gpu", "--hide-scrollbars", "--mute-audio"],
+      defaultViewport: DESKTOP,
+    });
+  let browser = await launch();
 
   const problems = [];
-  for (const shot of list) {
+  // A shot is tried twice: now and then the browser gives up part-way
+  // through a long run, and a fresh one carries on
+  const queue = list.map((shot) => ({ shot, tries: 0 }));
+  while (queue.length) {
+    const { shot, tries } = queue.shift();
+    if (!browser.connected) browser = await launch();
     const page = await browser.newPage();
     const errors = [];
     page.on("pageerror", (error) => errors.push(String(error.message).slice(0, 200)));
@@ -119,14 +126,19 @@ async function main() {
       console.log(`${shot.name.padEnd(20)} ${seconds}s${errors.length ? `  (${errors.length} console errors)` : ""}`);
       if (errors.length) problems.push({ shot: shot.name, errors: [...new Set(errors)].slice(0, 4) });
     } catch (error) {
-      console.log(`${shot.name.padEnd(20)} FAILED: ${String(error.message).slice(0, 160)}`);
-      // what the page itself complained about usually explains the failure
-      problems.push({ shot: shot.name, errors: [String(error.message).slice(0, 200), ...new Set(errors)].slice(0, 6) });
+      if (tries === 0) {
+        console.log(`${shot.name.padEnd(20)} trying again: ${String(error.message).slice(0, 80)}`);
+        queue.unshift({ shot, tries: 1 });
+      } else {
+        console.log(`${shot.name.padEnd(20)} FAILED: ${String(error.message).slice(0, 160)}`);
+        // what the page itself complained about usually explains the failure
+        problems.push({ shot: shot.name, errors: [String(error.message).slice(0, 200), ...new Set(errors)].slice(0, 6) });
+      }
     }
-    await page.close();
+    await page.close().catch(() => {});
   }
 
-  await browser.close();
+  await browser.close().catch(() => {});
   if (problems.length) {
     console.log("\nProblems:");
     for (const problem of problems) console.log(` ${problem.shot}: ${problem.errors.join(" | ")}`);
