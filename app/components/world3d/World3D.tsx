@@ -5,6 +5,7 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { useEffect } from "react";
 import { useWorld } from "../../lib/store";
 import AtmosphereDriver from "./atmosphere/AtmosphereDriver";
+import Effects from "./atmosphere/Effects";
 import Bowl from "./Bowl";
 import CameraRig from "./camera/CameraRig";
 import Intro from "./camera/Intro";
@@ -96,6 +97,7 @@ export default function World3D() {
       </Bowl>
       <Rooms>{(room) => <RoomSaini room={room} />}</Rooms>
       <Hotspots />
+      <Effects />
       <Ready />
       <DevTools />
     </Canvas>
