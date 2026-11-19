@@ -1,18 +1,17 @@
 "use client";
 
-import { useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
-import { BufferGeometry, DoubleSide, Float32BufferAttribute, type MeshBasicMaterial } from "three";
-import { now as nowData } from "../../../data/portfolio";
-import { atmo } from "../atmosphere/state";
-import { ledStrip, useDisplayFont } from "../textures/text";
+import { useEffect, useMemo } from "react";
+import { BufferGeometry, DoubleSide, Float32BufferAttribute } from "three";
 import { AD_BOARD, PITCH, TUNNEL } from "./dims";
 
-// The LED boards round the pitch. They scroll the lines in
-// `now.ticker` (app/data/portfolio.ts).
+// The boards round the pitch. They are switched off: plain dark screens
+// with no words and no sponsors on them, catching a little of the light
+// like any glossy panel does.
+//
+// To put something on them later, give the `boards` mesh a picture
+// (a `map`) in place of its plain colour.
 
 const H = AD_BOARD.height;
-const PIXELS_PER_METRE = 84;
 
 type Run = { from: [number, number]; to: [number, number] };
 
@@ -36,21 +35,14 @@ function runs(): Run[] {
 
 function boardGeometry() {
   const positions: number[] = [];
-  const uvs: number[] = [];
   const indices: number[] = [];
-  let travelled = 0;
   for (const { from, to } of runs()) {
-    const length = Math.hypot(to[0] - from[0], to[1] - from[1]);
     const base = positions.length / 3;
-    positions.push(from[0], 0, from[1], to[0], 0, to[1], from[0], H, from[1], to[0], H, to[1]);
-    // Reading left to right while facing the board from the pitch
-    uvs.push(travelled + length, 0, travelled, 0, travelled + length, 1, travelled, 1);
+    positions.push(from[0], 0.04, from[1], to[0], 0.04, to[1], from[0], H, from[1], to[0], H, to[1]);
     indices.push(base, base + 2, base + 1, base + 2, base + 3, base + 1);
-    travelled += length;
   }
   const geometry = new BufferGeometry();
   geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
-  geometry.setAttribute("uv", new Float32BufferAttribute(uvs, 2));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
   return geometry;
@@ -86,19 +78,7 @@ function casingGeometry() {
 }
 
 export default function AdBoards() {
-  const family = useDisplayFont();
-  const material = useRef<MeshBasicMaterial>(null);
-
   const geometry = useMemo(() => ({ boards: boardGeometry(), casing: casingGeometry() }), []);
-
-  const texture = useMemo(() => {
-    if (!family) return null;
-    const palette = ["#ffffff", "#f2cf6b", "#ffffff", "#8fb4ff"];
-    const segments = nowData.ticker.map((text, i) => ({ text, color: palette[i % palette.length] }));
-    const made = ledStrip(family, segments, { height: Math.round(H * PIXELS_PER_METRE), pixelsPerUnit: PIXELS_PER_METRE, weight: 700, gap: 1.6 });
-    made.texture.repeat.set(1 / made.worldLength, 1);
-    return made.texture;
-  }, [family]);
 
   useEffect(() => {
     return () => {
@@ -107,22 +87,11 @@ export default function AdBoards() {
     };
   }, [geometry]);
 
-  useEffect(() => {
-    return () => texture?.dispose();
-  }, [texture]);
-
-  useFrame((_, delta) => {
-    if (texture) texture.offset.x = (texture.offset.x + delta * 0.035) % 1;
-    if (material.current) material.current.color.setScalar(1.0 + 0.9 * atmo.floodlights - 0.15 * atmo.outdoor);
-  });
-
   return (
     <group>
-      {texture && (
-        <mesh geometry={geometry.boards}>
-          <meshBasicMaterial ref={material} map={texture} toneMapped={false} />
-        </mesh>
-      )}
+      <mesh geometry={geometry.boards} castShadow>
+        <meshStandardMaterial color="#090b10" roughness={0.32} metalness={0.15} />
+      </mesh>
       <mesh geometry={geometry.casing}>
         <meshStandardMaterial color="#0d0f14" roughness={0.7} side={DoubleSide} />
       </mesh>
