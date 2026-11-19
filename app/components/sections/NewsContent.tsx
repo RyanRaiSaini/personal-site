@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { makeAWish, news, pressRoom } from "../../data/portfolio";
 import { album } from "../../data/photos";
 import { useWorld } from "../../lib/store";
@@ -149,7 +150,11 @@ export default function NewsContent() {
         <figcaption className="mt-2 text-sm text-ink-faint">{makeAWish.quote.source}</figcaption>
       </figure>
 
-      {photo && viewing !== null && (
+      {/* The large photo is attached to the page itself, not to the
+          panel, so it can fill the whole screen */}
+      {photo &&
+        viewing !== null &&
+        createPortal(
         <div ref={dialog} role="dialog" aria-modal="true" aria-label={`Photo ${viewing + 1} of ${album.length}: ${photo.alt}`} tabIndex={-1} data-overlay-open className="fixed inset-0 z-[60] flex flex-col bg-black/92 outline-none backdrop-blur-sm" onClick={close}>
           <div className="flex items-center justify-between gap-4 px-4 py-3 text-white sm:px-6">
             <p className="font-display text-lg font-semibold uppercase tracking-wide">
@@ -190,8 +195,9 @@ export default function NewsContent() {
               →
             </button>
           </div>
-        </div>
-      )}
+        </div>,
+          document.body,
+        )}
     </div>
   );
 }
