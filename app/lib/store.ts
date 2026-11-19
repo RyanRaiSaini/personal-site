@@ -25,10 +25,19 @@ export type Show =
   | { kind: "fifteen"; startedAt: number }
   | { kind: "trent"; startedAt: number };
 
-// How the site is being viewed: the 3D tour or the flat match view
-export type ViewMode = "tour" | "match";
+// How the site is being viewed: the 3D tour or the flat match view.
+// "pending" is the moment before the page has looked at the device.
+export type Mode = "pending" | "tour" | "flat";
+
+// A show as it is asked for; the store stamps the start time itself
+export type ShowRequest =
+  | { kind: "goal"; scorer: "jude" | "mbappe" | "saini"; label: string }
+  | { kind: "fireworks"; label: string }
+  | { kind: "fifteen" }
+  | { kind: "trent" };
 
 type State = {
+  mode: Mode;
   // The section the 3D world is showing. It trails the address bar by
   // a moment when the view has to cut to a room.
   section: SectionId;
@@ -71,6 +80,7 @@ type State = {
   // Which project, shirt, trophy or photo is picked in the open section
   selection: Record<string, string | number | null>;
 
+  setMode: (mode: Mode) => void;
   setSection: (section: SectionId, cut?: boolean) => void;
   setCurtain: (curtain: boolean) => void;
   setNarrow: (narrow: boolean) => void;
@@ -88,12 +98,13 @@ type State = {
   setOverrides: (time: string | null, weather: string | null) => void;
   findEgg: (id: EggId) => void;
   loadEggs: (ids: EggId[]) => void;
-  startShow: (show: Show | null) => void;
+  startShow: (show: ShowRequest | null) => void;
   cheer: () => void;
   select: (key: string, value: string | number | null) => void;
 };
 
 export const useWorld = create<State>((set, get) => ({
+  mode: "pending",
   section: "home",
   cuts: 0,
   curtain: false,
@@ -118,6 +129,9 @@ export const useWorld = create<State>((set, get) => ({
   cheerAt: 0,
   selection: {},
 
+  setMode: (mode) => {
+    if (get().mode !== mode) set({ mode });
+  },
   setSection: (section, cut = false) => set({ section, cuts: get().cuts + (cut ? 1 : 0) }),
   setCurtain: (curtain) => set({ curtain }),
   setNarrow: (narrow) => {
@@ -152,7 +166,7 @@ export const useWorld = create<State>((set, get) => ({
     }
   },
   loadEggs: (eggsFound) => set({ eggsFound }),
-  startShow: (show) => set({ show }),
+  startShow: (show) => set({ show: show ? ({ ...show, startedAt: performance.now() } as Show) : null }),
   cheer: () => set({ cheerAt: performance.now() }),
   select: (key, value) => set({ selection: { ...get().selection, [key]: value } }),
 }));
