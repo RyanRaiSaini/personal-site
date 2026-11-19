@@ -72,11 +72,11 @@ A record of what was built and what was decided. Newest at the bottom. For where
 - Crowd, roar, thump and whistle synthesised in the browser (`lib/audio.ts`); off until the visitor turns it on.
 - The home text no longer swallows clicks meant for the pitch.
 - Stars redrawn as points, the trophy room brightened, several camera framings widened.
+- A glow pass (bloom) added for the two higher quality levels, so floodlights, the big screen and lit signs shine. Measured at the browser's 30 frames-a-second cap on an Intel Iris Xe laptop.
 
 ### Known gaps and things to look at next
 
 - The résumé PDF was checked for length (one page) but not viewed as an image on this machine; open it once and check the layout.
 - The notes under two awards ("Leader of Tomorrow…", "John Plater…") are general wording; replace with the exact criteria if wanted.
-- No bloom or glow post-processing yet. It would make the floodlights and LED boards shine more, at some cost on laptops.
 - The 3D tour on a phone works (lighter crowd, bottom sheet) but has had only a quick look.
 - A friendlier address (for example `ryansaini.vercel.app`) can be added in Vercel's project settings; then update `profile.siteUrl`.
