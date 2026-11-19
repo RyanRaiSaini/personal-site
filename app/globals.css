@@ -1,26 +1,105 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ------------------------------------------------------------------
+   Colour tokens. Every colour on the site comes from these variables.
+   "dark" is the roof-closed, floodlit look. "light" is roof open, day.
+   The theme is set on <html data-theme="..."> before first paint by
+   the inline script in app/layout.tsx.
+------------------------------------------------------------------- */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #05070d;
+  --bg-raised: #0b101c;
+  --panel: rgba(9, 13, 24, 0.78);
+  --panel-solid: #0b101c;
+  --ink: #f5f2ea;
+  --ink-soft: #b8bdcb;
+  --ink-faint: #7d8497;
+  --line: rgba(255, 255, 255, 0.12);
+  --line-strong: rgba(255, 255, 255, 0.24);
+  --gold: #e6c56c;
+  --gold-ink: #12100a;
+  --royal: #7aa2ff;
+  --pitch: #2f9e57;
+  --danger: #ff5a5f;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
 }
+
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f0e8;
+  --bg-raised: #fffdf8;
+  --panel: rgba(255, 253, 248, 0.86);
+  --panel-solid: #fffdf8;
+  --ink: #10131c;
+  --ink-soft: #454b5e;
+  --ink-faint: #71788b;
+  --line: rgba(16, 19, 28, 0.12);
+  --line-strong: rgba(16, 19, 28, 0.26);
+  --gold: #8f6a08;
+  --gold-ink: #fffdf8;
+  --royal: #1f4fd6;
+  --pitch: #1f7a40;
+  --danger: #c8242b;
+  --shadow: 0 24px 80px rgba(16, 19, 28, 0.22);
+}
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-bg: var(--bg);
+  --color-bg-raised: var(--bg-raised);
+  --color-panel: var(--panel);
+  --color-panel-solid: var(--panel-solid);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-gold: var(--gold);
+  --color-gold-ink: var(--gold-ink);
+  --color-royal: var(--royal);
+  --color-pitch: var(--pitch);
+  --color-danger: var(--danger);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-barlow);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--bg);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  transition:
+    background-color 0.6s ease,
+    color 0.6s ease;
+}
+
+/* Keyboard focus is always visible */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--gold-ink);
+}
+
+/* Visitors who ask their device for less motion get none */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
