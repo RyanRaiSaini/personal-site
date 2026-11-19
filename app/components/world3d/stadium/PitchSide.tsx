@@ -141,7 +141,7 @@ function Dugout({ x }: { x: number }) {
         <meshStandardMaterial vertexColors roughness={0.62} />
       </mesh>
       <mesh geometry={geometry.clear}>
-        <meshStandardMaterial color="#a9b8ca" transparent opacity={0.2} roughness={0.06} metalness={0.1} side={DoubleSide} depthWrite={false} />
+        <meshStandardMaterial color="#a9b8ca" transparent opacity={0.2} roughness={0.06} metalness={0.1} side={DoubleSide} forceSinglePass depthWrite={false} />
       </mesh>
     </group>
   );

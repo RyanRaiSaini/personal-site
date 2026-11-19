@@ -215,7 +215,7 @@ const Player = forwardRef<PlayerHandle, { kit: Kit; shadow?: boolean }>(function
           {print && (
             <mesh position={[0, 0.29, -0.118]} rotation={[0.03, Math.PI, 0]}>
               <planeGeometry args={[0.3, 0.34]} />
-              <meshStandardMaterial map={print} transparent alphaTest={0.3} roughness={0.8} side={DoubleSide} />
+              <meshStandardMaterial map={print} transparent alphaTest={0.3} roughness={0.8} side={DoubleSide} forceSinglePass />
             </mesh>
           )}
           <mesh geometry={parts.neck} material={parts.skin} position={[0, 0.6, 0]} />

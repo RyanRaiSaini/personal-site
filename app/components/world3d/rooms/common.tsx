@@ -122,7 +122,7 @@ export function Sign({ lines, width, height, position, rotation, background = NA
   return (
     <mesh position={position} rotation={rotation}>
       <planeGeometry args={[width, height]} />
-      {glow ? <meshBasicMaterial map={texture} toneMapped={false} color={[glow, glow, glow]} transparent={!background} side={DoubleSide} /> : <meshStandardMaterial map={texture} roughness={0.6} transparent={!background} side={DoubleSide} />}
+      {glow ? <meshBasicMaterial map={texture} toneMapped={false} color={[glow, glow, glow]} transparent={!background} side={DoubleSide} forceSinglePass /> : <meshStandardMaterial map={texture} roughness={0.6} transparent={!background} side={DoubleSide} forceSinglePass />}
     </mesh>
   );
 }

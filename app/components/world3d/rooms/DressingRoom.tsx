@@ -112,7 +112,7 @@ function Shirt({ name, number, position, rotation, index }: { name: string; numb
         </mesh>
         <mesh position={[0, -0.46, 0]}>
           <planeGeometry args={[0.8, 0.9]} />
-          <meshStandardMaterial map={texture} transparent alphaTest={0.4} side={DoubleSide} roughness={0.9} />
+          <meshStandardMaterial map={texture} transparent alphaTest={0.4} side={DoubleSide} forceSinglePass roughness={0.9} />
         </mesh>
       </group>
     </group>

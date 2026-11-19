@@ -63,7 +63,7 @@ function Goal({ side }: { side: 1 | -1 }) {
     net.current.scale.set(1 + bulge, 1, 1);
   });
 
-  const netMaterial = (map: typeof assets.back) => <meshBasicMaterial map={map} transparent side={DoubleSide} color="#e9edf2" depthWrite={false} />;
+  const netMaterial = (map: typeof assets.back) => <meshBasicMaterial map={map} transparent side={DoubleSide} forceSinglePass color="#e9edf2" depthWrite={false} />;
 
   return (
     // The goal is built facing +X, then turned for the south end

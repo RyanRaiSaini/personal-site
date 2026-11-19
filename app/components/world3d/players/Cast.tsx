@@ -97,7 +97,7 @@ function HintRing({ x, z }: { x: number; z: number }) {
   return (
     <mesh ref={ring} position={[x, 0.03, z]} rotation={[-Math.PI / 2, 0, 0]}>
       <ringGeometry args={[0.62, 0.72, 40]} />
-      <meshBasicMaterial color={[1.6, 1.3, 0.5]} transparent opacity={0.6} depthWrite={false} side={DoubleSide} toneMapped={false} />
+      <meshBasicMaterial color={[1.6, 1.3, 0.5]} transparent opacity={0.6} depthWrite={false} side={DoubleSide} forceSinglePass toneMapped={false} />
     </mesh>
   );
 }
