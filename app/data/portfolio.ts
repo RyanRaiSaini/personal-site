@@ -104,6 +104,8 @@ export const profile = {
   linkedinHandle: "in/ryanraisaini",
   resumeUrl: "/resume/Ryan-Saini-Resume.pdf",
   siteRepoUrl: "https://github.com/RyanRaiSaini/personal-site",
+  // The address the site is served from (used for link previews and the sitemap)
+  siteUrl: "https://personal-site-olive-tau.vercel.app",
 } as const;
 
 // ------------------------------------------------------------------
