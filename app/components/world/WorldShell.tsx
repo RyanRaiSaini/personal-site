@@ -1,0 +1,155 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import type { EggId, RoofMode } from "../../lib/store";
+import { useWorld } from "../../lib/store";
+import { detectQuality, hasWebGL, isNarrowScreen, isPhone } from "../../lib/quality";
+import { sectionForPath } from "../../sections/registry";
+import { sceneOf } from "../world3d/spots";
+import LiveData from "./LiveData";
+
+// ------------------------------------------------------------------
+// The page shell around the 3D world. It decides whether this visitor
+// gets the 3D tour or the flat match view, loads the 3D world after
+// the page's text, keeps the 3D world in step with the address bar,
+// and draws the curtain when the view cuts to a room.
+// ------------------------------------------------------------------
+
+// The 3D world is browser-only and heavy, so it loads after the text
+const World3D = dynamic(() => import("../world3d/World3D"), { ssr: false });
+
+// How long the curtain takes to close before the view cuts, in ms
+const CURTAIN_MS = 330;
+
+function finishIntro() {
+  document.documentElement.dataset.intro = "done";
+  useWorld.getState().setIntroDone(true);
+}
+
+export default function WorldShell() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const mode = useWorld((s) => s.mode);
+  const worldReady = useWorld((s) => s.worldReady);
+  const curtain = useWorld((s) => s.curtain);
+
+  const target = sectionForPath(pathname);
+  const onTourRoute = target !== null;
+
+  // Start-up: read the device, the saved choices and any test switches
+  useEffect(() => {
+    const store = useWorld.getState();
+    store.setNavigate((href) => router.push(href));
+
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const narrow = window.matchMedia("(max-width: 1023px)");
+    const syncMotion = () => useWorld.getState().setReducedMotion(motion.matches);
+    const syncNarrow = () => useWorld.getState().setNarrow(narrow.matches || isNarrowScreen());
+    syncMotion();
+    syncNarrow();
+    motion.addEventListener("change", syncMotion);
+    narrow.addEventListener("change", syncNarrow);
+
+    store.setQuality(detectQuality());
+
+    const params = new URLSearchParams(window.location.search);
+    store.setOverrides(params.get("time"), params.get("weather"));
+
+    try {
+      const saved = params.get("roof") ?? localStorage.getItem("roof");
+      if (saved === "open" || saved === "closed" || saved === "auto") store.setRoofMode(saved as RoofMode);
+      const eggs = JSON.parse(localStorage.getItem("eggs") ?? "[]");
+      if (Array.isArray(eggs)) store.loadEggs(eggs as EggId[]);
+    } catch {
+      // Private browsing: start fresh
+    }
+
+    // Phones, and browsers without WebGL, get the flat match view
+    // unless the visitor has asked for the 3D tour
+    let view: string | null = null;
+    try {
+      view = params.get("view") ?? localStorage.getItem("view");
+    } catch {
+      view = null;
+    }
+    const canTour = hasWebGL();
+    const wantsTour = view === "tour" || (view !== "match" && !isPhone());
+    store.setMode(canTour && wantsTour ? "tour" : "flat");
+
+    return () => {
+      motion.removeEventListener("change", syncMotion);
+      narrow.removeEventListener("change", syncNarrow);
+    };
+  }, [router]);
+
+  // In flat mode the tour's addresses lead to the same section of the match view
+  useEffect(() => {
+    if (mode !== "flat" || !target) return;
+    finishIntro();
+    router.replace(target.id === "home" ? "/match" : `/match#${target.id}`);
+  }, [mode, target, router]);
+
+  // The walk-out only plays on the home page, once per visit. The
+  // inline script in layout.tsx has already decided; mirror it here.
+  useEffect(() => {
+    if (mode === "pending") return;
+    const playing = document.documentElement.dataset.intro === "play";
+    if (!playing || mode !== "tour" || !onTourRoute) {
+      finishIntro();
+      return;
+    }
+    // If the 3D world never arrives, show the page anyway
+    const failsafe = window.setTimeout(finishIntro, 14_000);
+    return () => window.clearTimeout(failsafe);
+  }, [mode, onTourRoute]);
+
+  // Keep the 3D world in step with the address bar
+  const targetId = target?.id ?? null;
+  useEffect(() => {
+    if (!targetId) return;
+    const store = useWorld.getState();
+    if (store.section === targetId) return;
+    const needsCut = sceneOf(store.section) !== sceneOf(targetId);
+    if (!store.worldReady || store.reducedMotion) {
+      store.setSection(targetId, true);
+      return;
+    }
+    if (!needsCut) {
+      store.setSection(targetId);
+      return;
+    }
+    // Into or out of a room: close the curtain, cut, open it again
+    store.setCurtain(true);
+    let opening = 0;
+    const cutting = window.setTimeout(() => {
+      useWorld.getState().setSection(targetId, true);
+      opening = window.setTimeout(() => useWorld.getState().setCurtain(false), 90);
+    }, CURTAIN_MS);
+    return () => {
+      window.clearTimeout(cutting);
+      window.clearTimeout(opening);
+      useWorld.getState().setCurtain(false);
+    };
+  }, [targetId]);
+
+  const showWorld = mode === "tour" && onTourRoute;
+
+  return (
+    <>
+      <LiveData />
+      {showWorld && (
+        <div className="world-canvas fixed inset-0 z-0" data-ready={worldReady}>
+          <World3D />
+        </div>
+      )}
+      {showWorld && !worldReady && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-10 z-20 flex justify-center" role="status">
+          <p className="kicker glass rounded-full px-4 py-2">Opening the gates…</p>
+        </div>
+      )}
+      <div className="curtain" data-drawn={curtain} aria-hidden="true" />
+    </>
+  );
+}
