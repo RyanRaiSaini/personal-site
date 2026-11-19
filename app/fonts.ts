@@ -1,18 +1,18 @@
-import { Barlow_Condensed, Geist, Geist_Mono } from "next/font/google";
+import { Barlow, Barlow_Condensed } from "next/font/google";
 
-// Body text
-export const sans = Geist({
-  variable: "--font-geist-sans",
+// The whole site is set in one family, Barlow, in two widths. It was
+// drawn from road and number-plate lettering, which is the same world
+// as stadium signs and shirt names.
+
+// Body text: the regular width
+export const sans = Barlow({
+  variable: "--font-barlow-text",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
-// Numbers, clocks and small technical labels
-export const mono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-// Headings, shirt names and scoreboard text: a condensed athletic face
+// Headings, buttons, shirt names, clocks and scoreboard text: the
+// condensed width
 export const display = Barlow_Condensed({
   variable: "--font-barlow",
   subsets: ["latin"],

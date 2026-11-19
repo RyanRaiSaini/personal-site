@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import SiteHeader from "./components/ui/SiteHeader";
 import WorldShell from "./components/world/WorldShell";
 import { profile } from "./data/portfolio";
-import { display, mono, sans } from "./fonts";
+import { display, sans } from "./fonts";
 import { section } from "./sections/registry";
 import "./globals.css";
 
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: dark)", color: "#05070d" },
-    { media: "(prefers-color-scheme: light)", color: "#f3f0e8" },
+    { media: "(prefers-color-scheme: light)", color: "#eef0f3" },
   ],
 };
 
@@ -52,7 +52,7 @@ d.setAttribute("data-intro",play?"play":"done")}catch(e){document.documentElemen
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" data-theme="dark" data-intro="done" suppressHydrationWarning className={`${sans.variable} ${mono.variable} ${display.variable} h-full antialiased`}>
+    <html lang="en" data-theme="dark" data-intro="done" suppressHydrationWarning className={`${sans.variable} ${display.variable} h-full antialiased`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>

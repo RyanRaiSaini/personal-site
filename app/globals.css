@@ -10,17 +10,20 @@
 [data-theme="dark"] {
   color-scheme: dark;
   --bg: #05070d;
-  --bg-raised: #0b101c;
-  --panel: rgba(9, 13, 24, 0.78);
-  --panel-solid: #0b101c;
-  --ink: #f5f2ea;
-  --ink-soft: #b8bdcb;
-  --ink-faint: #7d8497;
+  --bg-raised: #0d1322;
+  /* Surfaces that sit on the 3D picture are nearly solid. They used to
+     be frosted glass, which the graphics card had to re-blur on every
+     frame the stadium moved. */
+  --panel: rgba(8, 12, 22, 0.93);
+  --panel-solid: #0a0f1b;
+  --ink: #f4f6f8;
+  --ink-soft: #b9bfcc;
+  --ink-faint: #8089a0;
   --line: rgba(255, 255, 255, 0.12);
-  --line-strong: rgba(255, 255, 255, 0.24);
+  --line-strong: rgba(255, 255, 255, 0.26);
   --gold: #e6c56c;
   --gold-ink: #12100a;
-  --royal: #7aa2ff;
+  --royal: #8fb0ff;
   --pitch: #2f9e57;
   --danger: #ff5a5f;
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
@@ -28,18 +31,20 @@
 
 [data-theme="light"] {
   color-scheme: light;
-  --bg: #f3f0e8;
-  --bg-raised: #fffdf8;
-  --panel: rgba(255, 253, 248, 0.86);
-  --panel-solid: #fffdf8;
-  --ink: #10131c;
-  --ink-soft: #454b5e;
-  --ink-faint: #71788b;
-  --line: rgba(16, 19, 28, 0.12);
-  --line-strong: rgba(16, 19, 28, 0.26);
-  --gold: #8f6a08;
-  --gold-ink: #fffdf8;
-  --royal: #1f4fd6;
+  /* Daylight: the cool white of a matchday programme, with the navy of
+     the seats for links */
+  --bg: #eef0f3;
+  --bg-raised: #ffffff;
+  --panel: rgba(250, 251, 252, 0.95);
+  --panel-solid: #fafbfc;
+  --ink: #0e1424;
+  --ink-soft: #3f4759;
+  --ink-faint: #677085;
+  --line: rgba(14, 20, 36, 0.12);
+  --line-strong: rgba(14, 20, 36, 0.3);
+  --gold: #8a6508;
+  --gold-ink: #ffffff;
+  --royal: #22398a;
   --pitch: #1f7a40;
   --danger: #c8242b;
   --shadow: 0 24px 80px rgba(16, 19, 28, 0.22);
@@ -62,8 +67,9 @@
   --color-royal: var(--royal);
   --color-pitch: var(--pitch);
   --color-danger: var(--danger);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-barlow-text);
+  /* numbers and clocks use the condensed width, with every digit the same width */
+  --font-mono: var(--font-barlow);
   --font-display: var(--font-barlow);
 }
 
@@ -74,7 +80,8 @@ html {
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-barlow-text), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   transition:
     background-color 0.6s ease,
     color 0.6s ease;
@@ -85,6 +92,12 @@ body {
   outline: 2px solid var(--gold);
   outline-offset: 3px;
   border-radius: 4px;
+}
+
+/* A heading that is only given focus so a screen reader starts there
+   needs no ring round it */
+[tabindex="-1"]:focus-visible {
+  outline: none;
 }
 
 ::selection {
@@ -108,22 +121,29 @@ body {
    Shared building blocks
 ------------------------------------------------------------------- */
 
-/* Frosted panel that sits over the 3D world */
+/* A solid surface that sits over the 3D world: menus, notes, the clock */
 .glass {
   background: var(--panel);
   border: 1px solid var(--line);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  backdrop-filter: blur(18px) saturate(140%);
   box-shadow: var(--shadow);
 }
 
-/* Small gold label above a heading: "GOALS SCORED" */
+/* A plate: the small dark signs the top bar and the home screen are
+   made of. Always dark, in either theme, because they sit on the
+   stadium picture the way a broadcast caption does. */
+.plate {
+  background: rgba(7, 11, 20, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  color: #f4f6f8;
+}
+
+/* Small gold line above a heading: "Goals scored" */
 .kicker {
   font-family: var(--font-barlow), sans-serif;
   font-weight: 600;
-  font-size: 0.8125rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
   color: var(--gold);
 }
 
@@ -133,18 +153,16 @@ body {
   justify-content: center;
   gap: 0.5rem;
   min-height: 2.75rem;
-  padding: 0.55rem 1.1rem;
-  border-radius: 999px;
+  padding: 0.5rem 1.05rem;
+  border-radius: 8px;
   border: 1px solid var(--line-strong);
-  background: var(--panel);
+  background: var(--panel-solid);
   color: var(--ink);
   font-family: var(--font-barlow), sans-serif;
   font-weight: 600;
-  font-size: 1rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  font-size: 1.125rem;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
   transition:
     transform 0.18s ease,
     background-color 0.18s ease,
@@ -172,12 +190,10 @@ body {
   place-items: center;
   width: 2.75rem;
   height: 2.75rem;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid var(--line);
-  background: var(--panel);
+  background: var(--panel-solid);
   color: var(--ink);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
   transition:
     border-color 0.18s ease,
     color 0.18s ease,
@@ -195,8 +211,8 @@ body {
 .chip {
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
   border: 1px solid var(--line);
   font-size: 0.8125rem;
   color: var(--ink-soft);
@@ -247,26 +263,28 @@ body {
     0 0 0 4px rgba(242, 207, 107, 0.22),
     0 0 12px rgba(242, 207, 107, 0.55);
 }
+/* A tag that would sit on top of another is raised on a longer stem
+   (Tags.tsx sets --lift to 0, 1 or 2) */
 .tag-stem {
   position: absolute;
   left: -0.5px;
   bottom: 4px;
   width: 1px;
-  height: 22px;
+  height: calc(22px + var(--lift, 0) * 34px);
   background: linear-gradient(to top, rgba(242, 207, 107, 0.9), rgba(242, 207, 107, 0.15));
 }
 .tag-label {
   position: absolute;
   left: 0;
-  bottom: 26px;
+  bottom: calc(26px + var(--lift, 0) * 34px);
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.8rem 0.4rem 0.55rem;
-  border-radius: 999px;
+  gap: 0.4rem;
+  padding: 0.28rem 0.65rem 0.3rem 0.45rem;
+  border-radius: 6px;
   white-space: nowrap;
-  color: #f5f2ea;
+  color: #f4f6f8;
   /* Solid, not frosted: blurring the moving stadium behind ten labels
      was work for the graphics card on every frame */
   background: rgba(7, 10, 20, 0.86);
@@ -291,26 +309,258 @@ body {
   outline-offset: 3px;
 }
 .tag-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   color: #f2cf6b;
   flex: none;
 }
-.tag-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.05;
+/* one line: the section's name, like a sign over a door */
+.tag-title {
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
 }
-.tag-place {
+
+/* ------------------------------------------------------------------
+   The top bar (app/components/ui/SiteHeader.tsx)
+------------------------------------------------------------------- */
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.9rem;
   font-family: var(--font-barlow), sans-serif;
   font-weight: 700;
-  font-size: 0.95rem;
-  letter-spacing: 0.08em;
+  font-size: 1.3rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: border-color 0.18s ease;
+}
+.wordmark:hover {
+  border-color: #e6c56c;
+}
+.top-links {
+  display: none;
+  align-items: stretch;
+  min-height: 2.75rem;
+  padding: 0 0.35rem;
+}
+@media (min-width: 1100px) {
+  .top-links {
+    display: flex;
+  }
+}
+.top-links a {
+  display: flex;
+  align-items: center;
+  padding: 0 0.7rem;
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 600;
+  font-size: 1.125rem;
+  letter-spacing: 0.02em;
+  color: rgba(244, 246, 248, 0.82);
+  /* the line under the page you are on */
+  box-shadow: inset 0 -2px 0 transparent;
+  transition:
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.top-links a:hover {
+  color: #ffffff;
+}
+.top-links a[aria-current="page"] {
+  color: #ffffff;
+  box-shadow: inset 0 -2px 0 #e6c56c;
+}
+/* The bar's own buttons are plates too, whatever the theme */
+.site-bar .btn,
+.site-bar .icon-btn {
+  background: rgba(7, 11, 20, 0.9);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #f4f6f8;
+}
+.site-bar .btn:hover,
+.site-bar .icon-btn:hover,
+.site-bar .icon-btn[aria-pressed="true"] {
+  border-color: #e6c56c;
+  color: #e6c56c;
+}
+
+/* ------------------------------------------------------------------
+   The home screen (app/page.tsx): a caption in the corner of the
+   picture, the way a broadcast names a player
+------------------------------------------------------------------- */
+.home-plate {
+  width: min(100%, 30rem);
+  padding: 0.95rem 1.2rem 1.05rem;
+  background: rgba(7, 11, 20, 0.9);
+  border-left: 4px solid #e6c56c;
+  border-radius: 0 12px 12px 0;
+  color: #f4f6f8;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+}
+.home-where {
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 600;
+  font-size: 1.125rem;
+  letter-spacing: 0.03em;
+  color: #e6c56c;
+}
+.home-name {
+  margin-top: 0.15rem;
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.5rem, 4.4vw, 3.75rem);
+  line-height: 0.92;
+  letter-spacing: -0.005em;
   text-transform: uppercase;
 }
-.tag-title {
-  font-size: 0.72rem;
-  color: #b8bdcb;
+.home-line {
+  margin-top: 0.55rem;
+  max-width: 27rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: rgba(244, 246, 248, 0.84);
+}
+.home-plate .btn {
+  min-height: 2.5rem;
+  padding: 0.4rem 0.9rem;
+  font-size: 1.0625rem;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #f4f6f8;
+}
+.home-plate .btn:hover {
+  border-color: #e6c56c;
+}
+/* buttons a phone has no room for (the row of places has them) */
+@media (max-width: 639px) {
+  .home-plate .btn-wide {
+    display: none;
+  }
+}
+.home-plate .btn-primary {
+  background: #e6c56c;
+  border-color: #e6c56c;
+  color: #12100a;
+}
+.home-links a {
+  color: rgba(244, 246, 248, 0.78);
+  text-decoration: underline;
+  text-decoration-color: rgba(244, 246, 248, 0.3);
+  text-underline-offset: 4px;
+}
+.home-links a:hover {
+  color: #e6c56c;
+  text-decoration-color: #e6c56c;
+}
+/* The opposite corner: one line of help, and the small print folded
+   away behind a button so it does not sit on the pitch */
+.home-note {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+@media (min-width: 1024px) {
+  .home-note {
+    align-items: flex-end;
+  }
+}
+.home-hint {
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: 0.02em;
+  color: #f4f6f8;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 0 14px rgba(0, 0, 0, 0.6);
+}
+.home-credits {
+  max-width: 22rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: rgba(244, 246, 248, 0.76);
+}
+.home-credits summary {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  letter-spacing: 0.02em;
+  color: #f4f6f8;
+}
+.home-credits summary::-webkit-details-marker {
+  display: none;
+}
+/* a small plus that becomes a minus when the note is open */
+.home-credits summary::before {
+  content: "+";
+  width: 0.8rem;
+  color: #e6c56c;
+  font-weight: 700;
+}
+.home-credits[open] summary::before {
+  content: "\2212";
+}
+.home-credits p {
+  padding: 0 0.75rem 0.65rem;
+}
+/* the row of places on a phone, where there are no name tags */
+.home-places a {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(7, 11, 20, 0.9);
+  color: #f4f6f8;
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: 0.02em;
+}
+
+/* ------------------------------------------------------------------
+   A section's panel (app/components/ui/SectionPanel.tsx)
+------------------------------------------------------------------- */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--gold);
+  box-shadow: var(--shadow);
+}
+/* Where in the stadium this section is, set like a sign: the place,
+   a rule, then what happens there */
+.sign {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+.sign-place {
+  color: var(--gold);
+}
+.sign-place::first-letter {
+  text-transform: uppercase;
+}
+.sign-what {
+  padding-left: 0.6rem;
+  border-left: 1px solid var(--line-strong);
+  color: var(--ink-faint);
 }
 
 /* ------------------------------------------------------------------
@@ -544,6 +794,13 @@ html[data-show]:not([data-show=""]) .after-intro {
   background: radial-gradient(ellipse at 50% 46%, transparent 52%, rgba(2, 4, 10, 0.5) 100%);
 }
 [data-theme="light"] .world-vignette {
-  background: radial-gradient(ellipse at 50% 46%, transparent 58%, rgba(2, 4, 10, 0.28) 100%);
+  background: radial-gradient(ellipse at 50% 46%, transparent 60%, rgba(2, 4, 10, 0.26) 100%);
 }
+
+/* The 3D view keeps the page's own text sharp: no selecting the picture */
+.world-canvas canvas {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 
