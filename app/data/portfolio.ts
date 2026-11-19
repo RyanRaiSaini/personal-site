@@ -478,6 +478,18 @@ export const eggs: Egg[] = [
 ];
 
 // ------------------------------------------------------------------
+// Words on the page's own controls
+// ------------------------------------------------------------------
+
+export const shell = {
+  loading: "Opening the gates",
+  // shown if the stadium has not appeared after a while
+  loadingSlow: "Taking a while? Everything here is in the flat view too.",
+  openFlat: "Open the flat view",
+  skipIntro: "Skip the walk-out",
+};
+
+// ------------------------------------------------------------------
 // Small print
 // ------------------------------------------------------------------
 

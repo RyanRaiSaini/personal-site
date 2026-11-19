@@ -314,6 +314,47 @@ body {
 }
 
 /* ------------------------------------------------------------------
+   Loading: shown until the stadium has downloaded
+------------------------------------------------------------------- */
+.loading {
+  min-width: 15rem;
+  padding: 0.7rem 1rem 0.8rem;
+  border-radius: 0.75rem;
+  background: rgba(7, 10, 20, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  text-align: center;
+}
+.loading .kicker {
+  color: #f2cf6b;
+}
+.loading-bar {
+  margin-top: 0.55rem;
+  height: 3px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.16);
+  overflow: hidden;
+}
+.loading-bar span {
+  display: block;
+  height: 100%;
+  background: #f2cf6b;
+  transform-origin: left center;
+  transition: transform 0.3s ease;
+}
+.loading-slow {
+  max-width: 26rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.75rem;
+  background: rgba(7, 10, 20, 0.86);
+  color: #f5f2ea;
+  font-size: 0.875rem;
+  text-align: center;
+}
+.loading-slow .link {
+  color: #f2cf6b;
+}
+
+/* ------------------------------------------------------------------
    The 3D canvas, the curtain and the walk-out
 ------------------------------------------------------------------- */
 .world-canvas {

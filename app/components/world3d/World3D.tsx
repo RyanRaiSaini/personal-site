@@ -1,6 +1,6 @@
 "use client";
 
-import { Environment, Lightformer } from "@react-three/drei";
+import { Environment, Lightformer, useProgress } from "@react-three/drei";
 import { Canvas, useThree } from "@react-three/fiber";
 import { Suspense, useEffect } from "react";
 import { useWorld } from "../../lib/store";
@@ -58,6 +58,16 @@ function Ready() {
     id = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(id);
   }, [setWorldReady]);
+  return null;
+}
+
+// Tells the page how much of the stadium (the model, its textures, the
+// sky) has downloaded, for the loading bar
+function LoadWatcher() {
+  const progress = useProgress((s) => s.progress);
+  useEffect(() => {
+    useWorld.getState().setLoadProgress(Math.min(1, progress / 100));
+  }, [progress]);
   return null;
 }
 
@@ -119,6 +129,7 @@ export default function World3D() {
       <Hotspots />
       <Effects />
       <Ready />
+      <LoadWatcher />
       <DevTools />
     </Canvas>
   );

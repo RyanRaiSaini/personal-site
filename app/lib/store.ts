@@ -56,6 +56,8 @@ type State = {
 
   // The 3D world has loaded and drawn its first frame
   worldReady: boolean;
+  // How much of the stadium has downloaded so far, from 0 to 1
+  loadProgress: number;
   // The walk out of the tunnel has finished (or was skipped)
   introDone: boolean;
   quality: Quality;
@@ -90,6 +92,7 @@ type State = {
   setNavigate: (navigate: (href: string) => void) => void;
   setReducedMotion: (reduced: boolean) => void;
   setWorldReady: (ready: boolean) => void;
+  setLoadProgress: (progress: number) => void;
   setIntroDone: (done: boolean) => void;
   setQuality: (quality: Quality) => void;
   setRoofMode: (mode: RoofMode) => void;
@@ -117,6 +120,7 @@ export const useWorld = create<State>((set, get) => ({
   },
   reducedMotion: false,
   worldReady: false,
+  loadProgress: 0,
   introDone: false,
   quality: "medium",
   roofMode: "auto",
@@ -147,6 +151,9 @@ export const useWorld = create<State>((set, get) => ({
   setNavigate: (navigate) => set({ navigate }),
   setReducedMotion: (reducedMotion) => set({ reducedMotion }),
   setWorldReady: (worldReady) => set({ worldReady }),
+  setLoadProgress: (loadProgress) => {
+    if (get().loadProgress !== loadProgress) set({ loadProgress });
+  },
   setIntroDone: (introDone) => set({ introDone }),
   setQuality: (quality) => set({ quality }),
   setRoofMode: (roofMode) => set({ roofMode }),
