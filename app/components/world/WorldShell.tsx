@@ -10,6 +10,8 @@ import { sectionForPath } from "../../sections/registry";
 import { sceneOf } from "../world3d/spots";
 import LiveData from "./LiveData";
 import ShowOverlay from "./ShowOverlay";
+import SoundEngine from "./SoundEngine";
+import Tags from "./Tags";
 
 // ------------------------------------------------------------------
 // The page shell around the 3D world. It decides whether this visitor
@@ -148,9 +150,16 @@ export default function WorldShell() {
   return (
     <>
       <LiveData />
+      {/* Until the stadium has loaded there is a dark ground behind the
+          page, in either theme, so the home screen's white text can
+          always be read */}
+      {onTourRoute && mode !== "flat" && <div aria-hidden="true" className="fixed inset-0 z-0 bg-[#05070d]" />}
       {showWorld && (
         <div className="world-canvas fixed inset-0 z-0" data-ready={worldReady}>
           <World3D />
+          {/* darkened corners, like a camera lens */}
+          <div aria-hidden="true" className="world-vignette" />
+          <Tags />
         </div>
       )}
       {showWorld && !worldReady && (
@@ -166,6 +175,7 @@ export default function WorldShell() {
         </div>
       )}
       <ShowOverlay />
+      <SoundEngine />
       <div className="curtain" data-drawn={curtain} aria-hidden="true" />
     </>
   );
