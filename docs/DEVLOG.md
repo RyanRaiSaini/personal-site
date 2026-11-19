@@ -60,7 +60,7 @@ A record of what was built and what was decided. Newest at the bottom. For where
 - A jointed player figure with poses for running, shooting and three celebrations.
 - Seven eggs: Jude's penalty, Mbappé's corner-flag goal, the "hala" fireworks (also the classic cheat code), the VAR 404 page, the fifteenth click on the trophy cabinet, the basketball, and locker 66.
 - Opening a project replays a goal by number 8.
-- All seven were triggered with real clicks or key presses during testing.
+- Five were set off with real clicks that night: Jude's ball, locker 66, the basketball, the trophy cabinet and the VAR page. Mbappé's corner flag and the "hala" fireworks were only started from code; both were set off for real the next morning (see below).
 
 ### Phase 8: match view, 404, extras
 
@@ -79,4 +79,22 @@ A record of what was built and what was decided. Newest at the bottom. For where
 - The résumé PDF was checked for length (one page) but not viewed as an image on this machine; open it once and check the layout.
 - The notes under two awards ("Leader of Tomorrow…", "John Plater…") are general wording; replace with the exact criteria if wanted.
 - The 3D tour on a phone works (lighter crowd, bottom sheet) but has had only a quick look.
-- A friendlier address (for example `ryansaini.vercel.app`) can be added in Vercel's project settings; then update `profile.siteUrl`.
+
+## 2026-11-19, the morning after
+
+### The address
+
+- `ryansaini.vercel.app` added to the Vercel project and set as `profile.siteUrl`, so the sitemap and link previews use it. The README and the repo's website link point to it too.
+- The first address, `personal-site-olive-tau.vercel.app`, still works.
+
+### Easter eggs, checked again
+
+- **Mbappé:** a real click on the south-east corner flag starts the goal. From the normal overview the flag was a small moving target (about 14 pixels wide from across the stadium, and off the bottom of the screen when the camera is near it), so the test click was made with the camera parked beside it.
+- **"hala":** real key presses (h, a, l, a) start the fireworks.
+- **Bigger targets:** the invisible click targets on the ball and the corner flag were enlarged (`players/Cast.tsx`), and a click at the end of a drag no longer counts.
+- Not tried with real keys: the cheat code (up up down down left right left right B A).
+
+### Seen while testing, not yet changed
+
+- In Mbappé's close-up, the "GOOOOOOL!" banner sits over his head.
+- On the home view, name tags can drift across the name and the opening lines at some camera angles.
