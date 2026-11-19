@@ -41,6 +41,11 @@
   margin-top: 0.5cqw;
 }
 
+/* the bars between the contact details */
+.resume-contact span[aria-hidden="true"] {
+  padding: 0 0.55em;
+}
+
 .resume-heading {
   font-size: 2.3cqw;
   font-variant: small-caps;

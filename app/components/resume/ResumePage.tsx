@@ -27,7 +27,7 @@ export default function ResumePage() {
         <p className="resume-contact">
           {resume.contact.map((item, i) => (
             <span key={item.text}>
-              {i > 0 && <span aria-hidden="true"> | </span>}
+              {i > 0 && <span aria-hidden="true">|</span>}
               {item.href ? <a href={item.href}>{item.text}</a> : item.text}
             </span>
           ))}
