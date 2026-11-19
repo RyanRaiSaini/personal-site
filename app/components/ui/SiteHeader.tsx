@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { profile } from "../../data/portfolio";
 import { useWorld } from "../../lib/store";
 import { places, sectionForPath } from "../../sections/registry";
+import EggList from "./EggList";
 import PlaceIcon from "./PlaceIcon";
 
 // The bar across the top of every page: my name (back to the stadium),
@@ -125,6 +126,9 @@ export default function SiteHeader() {
                   );
                 })}
               </ul>
+              <div className="mt-2">
+                <EggList compact />
+              </div>
             </div>
           )}
         </div>
