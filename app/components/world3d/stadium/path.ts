@@ -22,22 +22,23 @@ export type PathPoint = {
 export type Piece = {
   index: number;
   kind: "straight" | "corner";
-  // Which side of the ground this piece is on
+  // Which side of the ground this piece is on. North is +X, east is +Z.
   side: "east" | "south" | "west" | "north" | "corner";
   length: (d: number) => number;
   at: (t: number, d: number) => PathPoint;
 };
 
-// Piece indices, by name. The main stand is the west side (-Z).
+// Piece indices, by name. North is +X and east is +Z, so the main stand
+// (-Z) is the west stand.
 export const PIECE = {
   east: 0, // +Z side, opposite the main stand
-  cornerSE: 1,
-  south: 2, // +X end
-  cornerSW: 3,
+  cornerNE: 1,
+  north: 2, // +X end
+  cornerNW: 3,
   west: 4, // -Z side: the main stand
-  cornerNW: 5,
-  north: 6, // -X end
-  cornerNE: 7,
+  cornerSW: 5,
+  south: 6, // -X end
+  cornerSE: 7,
 } as const;
 
 function straight(index: number, side: Piece["side"], x0: number, z0: number, x1: number, z1: number, nx: number, nz: number): Piece {
@@ -77,11 +78,11 @@ export function bowlPieces(bowl: { hx: number; hz: number; r: number } = BOWL): 
   return [
     straight(0, "east", -sx, hz, sx, hz, 0, 1),
     corner(1, sx, sz, r, H, 0),
-    straight(2, "south", hx, sz, hx, -sz, 1, 0),
+    straight(2, "north", hx, sz, hx, -sz, 1, 0),
     corner(3, sx, -sz, r, 0, -H),
     straight(4, "west", sx, -hz, -sx, -hz, 0, -1),
     corner(5, -sx, -sz, r, -H, -2 * H),
-    straight(6, "north", -hx, -sz, -hx, sz, -1, 0),
+    straight(6, "south", -hx, -sz, -hx, sz, -1, 0),
     corner(7, -sx, sz, r, -2 * H, -3 * H),
   ];
 }
@@ -100,6 +101,9 @@ export type BandOptions = {
   skip?: (piece: Piece, t0: number, t1: number) => boolean;
   // Restrict to some pieces
   only?: number[];
+  // Keep the texture running continuously round the whole bowl instead
+  // of restarting on each piece (for the scrolling screens)
+  continuousU?: boolean;
 };
 
 // One strip of surface between two rings of the cross-section, all the
@@ -126,10 +130,13 @@ export function sweepBand(a: Ring, b: Ring, options: BandOptions = {}): BufferGe
   const nd = -dy / profileLen;
   const ny = dd / profileLen;
   const dMid = (a.d + b.d) / 2;
+  let travelled = 0;
 
   for (const piece of pieces) {
-    if (options.only && !options.only.includes(piece.index)) continue;
     const len = piece.length(dMid);
+    const start = options.continuousU ? travelled : 0;
+    travelled += len;
+    if (options.only && !options.only.includes(piece.index)) continue;
     const n = piece.kind === "corner" ? cornerSegs : Math.max(1, Math.ceil(len / segLen));
     for (let i = 0; i < n; i++) {
       const t0 = i / n;
@@ -141,7 +148,7 @@ export function sweepBand(a: Ring, b: Ring, options: BandOptions = {}): BufferGe
         const pb = piece.at(t, b.d);
         positions.push(pa.x, a.y, pa.z, pb.x, b.y, pb.z);
         for (let k = 0; k < 2; k++) normals.push(nd * pa.nx, ny, nd * pa.nz);
-        const u = (t * len) / uSize;
+        const u = (start + t * len) / uSize;
         uvs.push(u, 0, u, profileLen / vSize);
       }
       // a0, b0, a1, b1
@@ -197,6 +204,11 @@ export function sweepBands(bands: { a: Ring; b: Ring }[], options: BandOptions =
 // A flat ring-shaped floor or ceiling between two offsets at one height
 export function sweepFlat(dInner: number, dOuter: number, y: number, facing: "up" | "down", options: BandOptions = {}): BufferGeometry {
   return facing === "up" ? sweepBand({ d: dInner, y }, { d: dOuter, y }, options) : sweepBand({ d: dOuter, y }, { d: dInner, y }, options);
+}
+
+// The distance all the way round the bowl at offset `d`
+export function perimeter(d: number): number {
+  return PIECES.reduce((sum, piece) => sum + piece.length(d), 0);
 }
 
 // The outline of the bowl at offset `d`, as points (for flat shapes
