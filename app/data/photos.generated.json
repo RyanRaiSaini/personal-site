@@ -1,0 +1,77 @@
+{
+  "allstar-team-stars": {
+    "width": 1600,
+    "height": 1066,
+    "blur": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAADQAQCdASoQAAsAA4BaJZwAAgNXAMyB4AD+3Wm3ljnCiXQT6hpN3CoDksahU3mSv3I+JQf++6Od8mA4geABKlRvufDAoUdNtSHUcAAA"
+  },
+  "allstar-team-world": {
+    "width": 1600,
+    "height": 1068,
+    "blur": "data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAADwAQCdASoQAAsAA4BaJZwAAlmITtnYMMAA/tDWG45O9Hb43visYxX/78qOwujLGvbFhcdgH9Xce3WUdJNojeBBRcRYO1+wAAA="
+  },
+  "allstar-team-stripes": {
+    "width": 1600,
+    "height": 1066,
+    "blur": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAADwAQCdASoQAAsAA4BaJQBOgBMiy1fYRYAA/tBTUEvlKHymqd3EbiG0dloDghFM+8ZE92SsPtn4xPIewwyOwyIcXyQS8Jt9pws79qvk8nlf4JNAAAA="
+  },
+  "media-day-autograph": {
+    "width": 1200,
+    "height": 1600,
+    "blur": "data:image/webp;base64,UklGRnYAAABXRUJQVlA4IGoAAAAwAgCdASoMABAAA4BaJZgCdAYsPakxvCq4AAD2tcqNhYphJ/A1pQ+CdrZjx+VhOO7JdAIesynDvjj9sn6r+upKTiSD70AntbxtifsS+BKTg1m0cLyCUHZPa5f+Ouxc8THI1gYNXjgJmZAA"
+  },
+  "media-day-1": {
+    "width": 1200,
+    "height": 1600,
+    "blur": "data:image/webp;base64,UklGRngAAABXRUJQVlA4IGwAAABQAgCdASoMABAAA4BaJbACdAYtfSWEsiG05AAA/hnjPaUqpeBZTzOnR1fVbuMEA789g2jjd9aafY18HQoD7nTwPl9FRZTVZgnC71iLpKnP2yqqStZEkwyvtPPtRGKHilUUV+nK+zhej7gAAAA="
+  },
+  "media-day-2": {
+    "width": 1200,
+    "height": 1600,
+    "blur": "data:image/webp;base64,UklGRnYAAABXRUJQVlA4IGoAAAAQAgCdASoMABAAA4BaJagCdAYrTbY84K/AAP7p6l1LFG6kXQWLjvUd8ELNA3LrhJxNXCXNSnUyu0ZKkoKVg5ouytK9uk/FkTc2zpDAW/SnlEBDFOQWsSnTgVrPC7YWkdzgbN0VIsBJkAAA"
+  },
+  "media-day-3": {
+    "width": 1200,
+    "height": 1600,
+    "blur": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAAAQAgCdASoMABAAA4BaJQBOgMXmugu96ZogAP6p40BZ4Yv52bUUerx6KbIBWrfWjbcbD9gHpWGArh0NeugwKYGCz6gBUkLmgGLpVTiZyZQ3Q5r2pUF443tbQJ+Tm80PJFkUcAAA"
+  },
+  "arena": {
+    "width": 1600,
+    "height": 1200,
+    "blur": "data:image/webp;base64,UklGRnYAAABXRUJQVlA4IGoAAAAwAgCdASoQAAwAA4BaJZgCdAEVK9aFYOhwAAD+9ZdgrJdUuER9sqUUrEH7xp/DHP00zFQhWyrgWmFFONm4AJrdbBqks+Rjmoky8CcKw74PeqNv5Cv4vZPcuNH5TXpdA90gSoD8SbFWgAAA"
+  },
+  "rising-stars-1": {
+    "width": 1600,
+    "height": 1600,
+    "blur": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAAAwAgCdASoQABAAA4BaJbACdAYuHTeGECS1DAD+8dfPDFmHKppIUpURot1wHHHTaXdN3XL8s7l9tBfObuaaOuIQpB8PgiygQJjyNH89oWibBK7gba+Lm0jLaJg+iujAOx7hAvz9UIqclbY3/rgQ1DKCf3ViihJIVVcwAAbVbrQg2XDQAegprQVi2kjm4Ew0AAA="
+  },
+  "rising-stars-2": {
+    "width": 1600,
+    "height": 1600,
+    "blur": "data:image/webp;base64,UklGRpQAAABXRUJQVlA4IIgAAABwAgCdASoQABAAA4BaJaACdAYtfnXrtFGtbJaAAP6ZWM44CPM69znBuvgunqySgZNE9iJN2mjNsFGSq/OrgE6bzfTpzFcRXXaJT7ikwOW2+/5ZMt4edNpqwFod5Bvqfs8FroR6VZMTsxKzQY0Zqajdbu/TegMM78hZGE/cBMwcK6suMtIsAAAA"
+  },
+  "rising-stars-3": {
+    "width": 1600,
+    "height": 1600,
+    "blur": "data:image/webp;base64,UklGRpIAAABXRUJQVlA4IIYAAAAQAgCdASoQABAAA4BaJbACdAYrnaCLtToAAOJ9sMTbj94PofB+Qvu4PaG3PE6i4nCZTnTaZgsBxdcimH2DZYKWsZpmT3B6XsTMy3Oh07fZtwr05J8kZQU7SMiaTFz0N1HtJB0qvph/VoGKB2fpM2De/LVGzYZIA3Dsj6Ch18Jv4mDk3AAAAA=="
+  },
+  "rising-stars-4": {
+    "width": 1600,
+    "height": 1600,
+    "blur": "data:image/webp;base64,UklGRpoAAABXRUJQVlA4II4AAACQAgCdASoQABAAA4BaJagCdG1/Dx/NYnUNHW4RQAD30nFD+nFQZux+7+Damgk4TwoPQgitm2S8g/dKSPp99BQifD8nVyUFoi2CfhpMd91umrPyywvvsP7DO+WdpTmdOBlIsq8BnuGBg1BC+pndI0B30mz66e7yV9kTD46Vs92rPFivgYZmk/G82+kdEAAA"
+  },
+  "allstar-lounge": {
+    "width": 1200,
+    "height": 1600,
+    "blur": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAADQAQCdASoMABAAA4BaJQBWAB8v8HGawAD9jwxYXYv3bNVuRnYbnbT298Z6XLIrPA0fTPHy+S9pJW7oT7JNwiVNvxAMxGAqWZcKKN4AU5AAAA=="
+  },
+  "headshot": {
+    "width": 460,
+    "height": 460,
+    "blur": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAABwAgCdASoQABAAA4BaJYwCsH8AgkDF0VAu7igAAP7TlDouLFfxvqRhHA8XRGZhjiZvCbH0zicf9PZ6oGTsoo9VfTNLD2QQG5/iks3GCSMjy1tFwSCPsD+NCnyu7mddn4386QaAAAA="
+  },
+  "starboard-ryan": {
+    "width": 600,
+    "height": 600,
+    "blur": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAABwAgCdASoQABAAA4BaJYwCxC8Agmy3AmstmfGgAP7Tg/kQX67rltdVjW2xiIqNaA+053Nu5OUbM4Arsv2uJ779uQ2acx7Y3a+v73/jk4q0zdHWZV5PLN52VztiWKBDjv907cvhiOAAAA=="
+  }
+}
