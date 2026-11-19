@@ -92,15 +92,16 @@ export default function SiteHeader() {
   };
 
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-3 px-4 py-3 sm:px-6">
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-6">
       <Link href={inMatch ? "/match" : "/"} className="pointer-events-auto group flex items-center gap-2.5 rounded-full py-1 pr-3" aria-label={`${profile.name}, home`}>
         <span className="grid h-10 w-10 place-items-center rounded-full border border-line-strong bg-panel font-display text-xl font-bold text-gold backdrop-blur-md transition-colors group-hover:border-gold">{profile.shirtNumber}</span>
-        <span className="font-display text-xl font-bold uppercase tracking-[0.12em] [text-shadow:0_1px_12px_rgba(0,0,0,0.5)]">{profile.shortName}</span>
+        {/* on a phone there is only room for the number */}
+        <span className="hidden font-display text-xl font-bold uppercase tracking-[0.12em] [text-shadow:0_1px_12px_rgba(0,0,0,0.5)] sm:inline">{profile.shortName}</span>
       </Link>
 
-      <nav className="pointer-events-auto flex items-center gap-2" aria-label="Site">
+      <nav className="pointer-events-auto flex items-center gap-1.5 sm:gap-2" aria-label="Site">
         <div className="relative">
-          <button ref={button} type="button" className="btn !min-h-11 !px-4 !text-sm" aria-expanded={open} aria-controls="places-menu" onClick={() => setOpen((o) => !o)}>
+          <button ref={button} type="button" className="btn !min-h-11 !px-3.5 !text-sm sm:!px-4" aria-expanded={open} aria-controls="places-menu" onClick={() => setOpen((o) => !o)}>
             <PlaceIcon id="home" className="h-5 w-5 text-gold" />
             <span>Places</span>
           </button>
@@ -141,8 +142,9 @@ export default function SiteHeader() {
             <SoundIcon on={sound} />
           </button>
         )}
-        <button type="button" className="btn !min-h-11 !px-4 !text-sm" onClick={switchView} title={inMatch ? "Switch to the 3D stadium tour" : "Switch to the flat match view"}>
-          {inMatch ? "3D tour" : "Match view"}
+        <button type="button" className="btn !min-h-11 !px-3.5 !text-sm sm:!px-4" onClick={switchView} title={inMatch ? "Switch to the 3D stadium tour" : "Switch to the flat match view"} aria-label={inMatch ? "Switch to the 3D stadium tour" : "Switch to the flat match view"}>
+          {inMatch ? "3D" : "Flat"}
+          <span className="hidden sm:inline">{inMatch ? " tour" : " view"}</span>
         </button>
       </nav>
     </header>
