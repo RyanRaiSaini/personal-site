@@ -148,7 +148,7 @@ export const sections: Section[] = [
     href: "/github",
     title: "GitHub",
     place: "The stands",
-    kicker: "Crowd display",
+    kicker: "Seat mosaic",
     summary: "My contributions, picked out in the seats.",
     intro: "The seats of the main stand show a year of my GitHub contributions.",
     scene: "bowl",
