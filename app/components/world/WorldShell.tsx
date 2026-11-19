@@ -9,6 +9,7 @@ import { detectQuality, hasWebGL, isNarrowScreen, isPhone } from "../../lib/qual
 import { sectionForPath } from "../../sections/registry";
 import { sceneOf } from "../world3d/spots";
 import LiveData from "./LiveData";
+import ShowOverlay from "./ShowOverlay";
 
 // ------------------------------------------------------------------
 // The page shell around the 3D world. It decides whether this visitor
@@ -24,6 +25,11 @@ const World3D = dynamic(() => import("../world3d/World3D"), { ssr: false });
 const CURTAIN_MS = 330;
 
 function finishIntro() {
+  try {
+    sessionStorage.setItem("intro", "1");
+  } catch {
+    // Private browsing: it will just play again next time
+  }
   document.documentElement.dataset.intro = "done";
   useWorld.getState().setIntroDone(true);
 }
@@ -34,6 +40,7 @@ export default function WorldShell() {
   const mode = useWorld((s) => s.mode);
   const worldReady = useWorld((s) => s.worldReady);
   const curtain = useWorld((s) => s.curtain);
+  const introDone = useWorld((s) => s.introDone);
 
   const target = sectionForPath(pathname);
   const onTourRoute = target !== null;
@@ -111,6 +118,8 @@ export default function WorldShell() {
     if (!targetId) return;
     const store = useWorld.getState();
     if (store.section === targetId) return;
+    // Leaving a place ends whatever show was playing there
+    if (store.show) store.startShow(null);
     const needsCut = sceneOf(store.section) !== sceneOf(targetId);
     if (!store.worldReady || store.reducedMotion) {
       store.setSection(targetId, true);
@@ -149,6 +158,14 @@ export default function WorldShell() {
           <p className="kicker glass rounded-full px-4 py-2">Opening the gates…</p>
         </div>
       )}
+      {showWorld && worldReady && !introDone && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-8 z-20 flex justify-center">
+          <button type="button" className="btn pointer-events-auto !border-white/30 !bg-black/40 !text-white" onClick={finishIntro}>
+            Skip the walk-out
+          </button>
+        </div>
+      )}
+      <ShowOverlay />
       <div className="curtain" data-drawn={curtain} aria-hidden="true" />
     </>
   );
