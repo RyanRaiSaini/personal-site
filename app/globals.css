@@ -500,3 +500,14 @@ html[data-show]:not([data-show=""]) .after-intro {
   animation: card-up 0.9s cubic-bezier(0.2, 0.9, 0.25, 1) both;
 }
 
+/* Darkened corners over the 3D view, like a camera lens */
+.world-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 46%, transparent 52%, rgba(2, 4, 10, 0.5) 100%);
+}
+[data-theme="light"] .world-vignette {
+  background: radial-gradient(ellipse at 50% 46%, transparent 58%, rgba(2, 4, 10, 0.28) 100%);
+}
+
