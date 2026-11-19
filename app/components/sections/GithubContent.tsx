@@ -5,8 +5,8 @@ import { LEVEL_HEX, LEVEL_HEX_LIGHT } from "../../lib/github";
 import { useWorld } from "../../lib/store";
 import { Arrow, ExternalLink, Stats } from "./parts";
 
-// GitHub: the stands. The same contribution grid the crowd is holding
-// up in the main stand, as a normal chart. The data comes from
+// GitHub: the stands. The same contribution grid the seats of the main
+// stand show, as a normal chart. The data comes from
 // app/api/contributions/route.ts.
 
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -29,7 +29,7 @@ export default function GithubContent() {
   return (
     <div className="space-y-6">
       <p className="leading-relaxed text-ink-soft">
-        <span className="text-ink">Every square is a day.</span> The greener it is, the more I committed. Across the pitch, the fans in the main stand are holding up the same picture.
+        <span className="text-ink">Every square is a day.</span> The greener it is, the more I committed. Across the pitch, the seats of the main stand show the same picture.
       </p>
 
       {data ? (

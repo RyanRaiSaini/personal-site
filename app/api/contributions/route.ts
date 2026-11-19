@@ -4,7 +4,7 @@ import { profile } from "../../data/portfolio";
 import type { Contributions } from "../../lib/github";
 import { parseContributions } from "../../lib/githubParse";
 
-// A year of my GitHub contributions, for the crowd card display and
+// A year of my GitHub contributions, for the picture in the seats and
 // the GitHub section. Read from GitHub's public profile calendar and
 // kept for an hour. If GitHub can't be reached, the copy saved in
 // app/data/contributions.snapshot.json is sent instead.

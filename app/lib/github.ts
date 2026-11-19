@@ -1,4 +1,4 @@
-// A year of GitHub contributions, as the crowd card display and the
+// A year of GitHub contributions, as the picture in the seats and the
 // GitHub section use it. Fetched by app/api/contributions/route.ts.
 
 export type Contributions = {
