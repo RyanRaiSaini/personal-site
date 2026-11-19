@@ -1,20 +1,38 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { MeshStandardMaterial, PlaneGeometry, Shape, ShapeGeometry, Vector2 } from "three";
+import { MeshStandardMaterial, PlaneGeometry, RepeatWrapping, Shape, ShapeGeometry, TextureLoader, Vector2 } from "three";
 import { canvasTexture, grain } from "../textures/canvas";
+import { withBakedLight } from "./bakedLight";
 import { PITCH } from "./dims";
 import { outline } from "./path";
 
-// The pitch. The grass, the mowing stripes and every white line are
-// drawn by a small shader, so the lines stay perfectly sharp however
-// close the camera gets.
+// ------------------------------------------------------------------
+// The pitch.
+//
+// The grass colour, the mowing pattern and every white line are drawn
+// by a small shader, so the lines stay sharp however close the camera
+// gets. The fine relief of the blades is a photographed surface from
+// Poly Haven ("Sparse Grass", CC0).
+//
+// A mower lays the blades one way on one pass and the other way on the
+// next. That is all a mowing stripe is: the same grass seen with or
+// against the lean. So the stripes here are strongest looking along the
+// pitch, fade as you look across it, and swap over from the other end,
+// as real ones do.
+//
+// To change the grass colour, change `base` in pitchColor.
+// To make the stripes stronger or fainter, change STRIPE.
+// ------------------------------------------------------------------
 
 const MARGIN_X = 6.5; // grass beyond the goal lines
 const MARGIN_Z = 5; // grass beyond the touchlines
+const STRIPE = 0.1; // how much lighter and darker the mown bands look, at most
+const BLADES = 1.5; // metres of pitch covered by one copy of the blade relief
 
 const pitchShader = /* glsl */ `
   varying vec2 vPitch;
+  varying vec2 vToCamera;
 
   float hash21(vec2 p) {
     p = fract(p * vec2(123.34, 456.21));
@@ -52,24 +70,41 @@ const pitchShader = /* glsl */ `
     return 1.0 - smoothstep(-aa, aa, d);
   }
 
-  vec3 pitchColor(vec2 p) {
+  vec3 pitchColor(vec2 p, vec2 toCamera) {
     float HL = ${PITCH.halfLength.toFixed(2)};
     float HW = ${PITCH.halfWidth.toFixed(2)};
 
-    // Mowing stripes across the pitch, with a fainter set along it
-    float bandX = step(0.5, fract((p.x + HL) / 10.5));
-    float bandZ = step(0.5, fract((p.y + HW) / 13.6));
-    vec3 light = vec3(0.118, 0.300, 0.072);
-    vec3 dark = vec3(0.084, 0.232, 0.056);
-    vec3 grass = mix(dark, light, bandX);
-    grass *= mix(0.94, 1.04, bandZ);
+    vec3 base = vec3(0.060, 0.190, 0.038);
+    vec3 grass = base;
 
-    // Patchy variation, then fine blades that fade out with distance
-    float patches = noise2(p * 0.18) * 0.6 + noise2(p * 0.9) * 0.4;
-    grass *= 0.9 + patches * 0.2;
-    float fine = noise2(p * 14.0);
-    float fade = 1.0 - smoothstep(0.02, 0.25, fwidth(p.x) + fwidth(p.y));
-    grass *= 1.0 + (fine - 0.5) * 0.22 * fade;
+    // Mown bands across the pitch, twenty of them, and a fainter set
+    // along it. Each band leans one way; how light it looks depends on
+    // which way it leans relative to the camera.
+    vec2 view = normalize(toCamera + vec2(0.0001));
+    float bandX = step(0.5, fract((p.x + HL) / 10.5)) * 2.0 - 1.0;
+    float bandZ = step(0.5, fract((p.y + HW) / 11.34)) * 2.0 - 1.0;
+    grass *= 1.0 + ${STRIPE.toFixed(3)} * bandX * view.x;
+    grass *= 1.0 + ${(STRIPE * 0.3).toFixed(3)} * bandZ * view.y;
+
+    // No lawn is one colour: broad patches, smaller mottling, and a few
+    // drier, yellower areas
+    float broad = noise2(p * 0.06) * 0.55 + noise2(p * 0.27) * 0.3 + noise2(p * 1.1) * 0.15;
+    grass *= 0.87 + broad * 0.26;
+    float dry = smoothstep(0.58, 0.92, noise2(p * 0.043 + 11.0));
+    grass = mix(grass, grass * vec3(1.16, 1.05, 0.78), dry * 0.3);
+
+    // A little wear where the play is heaviest: both goal mouths and the centre
+    float wear = 0.0;
+    wear = max(wear, 1.0 - smoothstep(1.5, 7.5, length((p - vec2(HL - 3.5, 0.0)) * vec2(1.0, 0.7))));
+    wear = max(wear, 1.0 - smoothstep(1.5, 7.5, length((p + vec2(HL - 3.5, 0.0)) * vec2(1.0, 0.7))));
+    wear = max(wear, (1.0 - smoothstep(0.5, 5.0, length(p))) * 0.5);
+    wear *= 0.5 + 0.5 * noise2(p * 0.9);
+    grass = mix(grass, grass * vec3(1.14, 1.06, 0.84), wear * 0.28);
+
+    // Individual blades up close, fading out with distance
+    float fine = noise2(p * 26.0) * 0.6 + noise2(p * 61.0) * 0.4;
+    float close = 1.0 - smoothstep(0.015, 0.2, fwidth(p.x) + fwidth(p.y));
+    grass *= 1.0 + (fine - 0.5) * 0.3 * close;
 
     // The lines
     float inside = step(abs(p.x), HL + 0.06) * step(abs(p.y), HW + 0.06);
@@ -99,19 +134,37 @@ const pitchShader = /* glsl */ `
       }
     }
 
-    vec3 paint = vec3(0.86, 0.88, 0.84);
-    return mix(grass, paint, m * 0.92);
+    // Paint sits on the blades, so a little green shows through it
+    vec3 paint = vec3(0.80, 0.82, 0.78);
+    return mix(grass, paint, m * (0.84 + 0.1 * fine));
   }
 `;
 
 function grassMaterial() {
-  const material = new MeshStandardMaterial({ color: "#ffffff", roughness: 0.92, metalness: 0 });
+  const loader = new TextureLoader();
+  const relief = loader.load("/stadium/textures/sparse_grass_nor.webp");
+  const finish = loader.load("/stadium/textures/sparse_grass_arm.webp");
+  const length = PITCH.length + MARGIN_X * 2;
+  const width = PITCH.width + MARGIN_Z * 2;
+  for (const texture of [relief, finish]) {
+    texture.wrapS = texture.wrapT = RepeatWrapping;
+    texture.repeat.set(length / BLADES, width / BLADES);
+    texture.anisotropy = 8;
+  }
+  const material = new MeshStandardMaterial({ color: "#ffffff", roughness: 1, metalness: 0, normalMap: relief, roughnessMap: finish });
+  material.normalScale.setScalar(0.75);
   material.onBeforeCompile = (shader) => {
-    shader.vertexShader = shader.vertexShader.replace("#include <common>", "#include <common>\nvarying vec2 vPitch;").replace("#include <begin_vertex>", "#include <begin_vertex>\nvPitch = position.xz;");
-    shader.fragmentShader = shader.fragmentShader.replace("#include <common>", `#include <common>\n${pitchShader}`).replace("#include <color_fragment>", "#include <color_fragment>\ndiffuseColor.rgb = pitchColor(vPitch);");
+    shader.vertexShader = shader.vertexShader
+      .replace("#include <common>", "#include <common>\nvarying vec2 vPitch;\nvarying vec2 vToCamera;")
+      .replace("#include <begin_vertex>", "#include <begin_vertex>\nvPitch = position.xz;\nvToCamera = cameraPosition.xz - ( modelMatrix * vec4( position, 1.0 ) ).xz;");
+    shader.fragmentShader = shader.fragmentShader
+      .replace("#include <common>", `#include <common>\n${pitchShader}`)
+      .replace("#include <color_fragment>", "#include <color_fragment>\ndiffuseColor.rgb = pitchColor(vPitch, vToCamera);");
   };
-  material.customProgramCacheKey = () => "pitch-grass-v1";
-  return material;
+  material.customProgramCacheKey = () => "pitch-grass-v2";
+  material.userData.textures = [relief, finish];
+  // lit like the ground it is: the roof's shadow and the open sky above come from the ground picture
+  return withBakedLight(material, "ground");
 }
 
 export default function Pitch() {
@@ -119,19 +172,20 @@ export default function Pitch() {
     const grass = new PlaneGeometry(PITCH.length + MARGIN_X * 2, PITCH.width + MARGIN_Z * 2, 1, 1);
     grass.rotateX(-Math.PI / 2);
 
-    // The run-off between the grass and the front wall
+    // The run-off between the grass and the front wall: darker artificial turf
     const shape = new Shape(outline(0.4, 14).map((p) => new Vector2(p.x, -p.z)));
     const apron = new ShapeGeometry(shape, 1);
     apron.rotateX(-Math.PI / 2);
 
     const apronMap = canvasTexture(128, 128, (ctx, w, h) => {
-      ctx.fillStyle = "#1d4a2c";
+      ctx.fillStyle = "#234a2b";
       ctx.fillRect(0, 0, w, h);
-      grain(ctx, w, h, 10, 21);
+      grain(ctx, w, h, 12, 21);
     });
-    apronMap.repeat.set(0.25, 0.25);
+    apronMap.repeat.set(0.5, 0.5);
+    const apronMaterial = withBakedLight(new MeshStandardMaterial({ map: apronMap, roughness: 0.96 }), "ground");
 
-    return { grass, apron, apronMap, material: grassMaterial() };
+    return { grass, apron, apronMap, apronMaterial, material: grassMaterial() };
   }, []);
 
   useEffect(() => {
@@ -139,15 +193,15 @@ export default function Pitch() {
       assets.grass.dispose();
       assets.apron.dispose();
       assets.apronMap.dispose();
+      assets.apronMaterial.dispose();
+      for (const texture of assets.material.userData.textures) texture.dispose();
       assets.material.dispose();
     };
   }, [assets]);
 
   return (
     <group>
-      <mesh geometry={assets.apron} position={[0, -0.03, 0]} receiveShadow>
-        <meshStandardMaterial map={assets.apronMap} roughness={0.95} />
-      </mesh>
+      <mesh geometry={assets.apron} material={assets.apronMaterial} position={[0, -0.03, 0]} receiveShadow />
       <mesh geometry={assets.grass} material={assets.material} receiveShadow />
     </group>
   );
