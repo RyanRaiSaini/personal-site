@@ -1,4 +1,5 @@
 import { DoubleSide, MeshBasicMaterial, MeshStandardMaterial, RepeatWrapping, SRGBColorSpace, TextureLoader, type Material, type Texture } from "three";
+import { withBakedLight } from "./bakedLight";
 
 // ------------------------------------------------------------------
 // The stadium's materials.
@@ -8,20 +9,10 @@ import { DoubleSide, MeshBasicMaterial, MeshStandardMaterial, RepeatWrapping, SR
 // and so on. This file decides what each name looks like. To change a
 // surface's colour or shine, change its line in LOOKS.
 //
-// The model also carries three numbers on every corner, measured in
-// Blender: how much sky that spot can see, how much of the sunlit
-// pitch, and how boxed-in it is. `withBakedLight` makes a material use
-// them, so the space under the roof and between the tiers is dim and
-// the open seats are bright. To make the shade deeper or lighter,
-// change the numbers in `bake`.
+// The model also carries four numbers on every corner, measured in
+// Blender, saying how much light reaches that spot. bakedLight.ts
+// makes a material use them.
 // ------------------------------------------------------------------
-
-export const bake = {
-  sky: { value: 1.0 }, // light from the open sky
-  bounce: { value: 0.42 }, // light bounced up off the pitch
-  floor: { value: 0.085 }, // so that nothing is ever fully black
-  contact: { value: 0.75 }, // how dark tight corners get, 0 to 1
-};
 
 // The photographed surfaces, all from Poly Haven (CC0). `size` is how
 // many metres of real surface one copy of the picture covers.
@@ -53,12 +44,14 @@ export const LOOKS: Record<string, Look> = {
   Fascia: { color: "#262a31", roughness: 0.9, surface: "paint", relief: 0.6 },
   Soffit: { color: "#454a53", roughness: 1, surface: "paint" },
   Hoarding: { color: "#16254c", roughness: 0.8, surface: "paint", relief: 0.5 },
-  BoxGlass: { color: "#0d1118", roughness: 0.09, reflect: 1.3 },
+  BoxGlass: { color: "#0d1118", roughness: 0.2, reflect: 1.1 },
   Ribbon: { color: "#05070a", roughness: 0.3 },
+  // The ring of screens when it is switched off: matt black panels
+  Screen: { color: "#07090c", roughness: 0.9, reflect: 0.22 },
   ScreenBack: { color: "#15181d", roughness: 0.7 },
   RoofDeck: { color: "#4a4f57", roughness: 1, metalness: 1, surface: "sheet", relief: 0.8 },
   RoofTop: { color: "#b9bec6", roughness: 0.5, metalness: 0.5 },
-  RingBeam: { color: "#d4d8dc", roughness: 0.52, metalness: 0.1 },
+  RingBeam: { color: "#c3c7cc", roughness: 0.6, metalness: 0.1 },
   Steel: { color: "#dfe2e6", roughness: 0.48, metalness: 0.1 },
   SteelDark: { color: "#2a2d33", roughness: 0.5, metalness: 0.6 },
   FloodHousing: { color: "#15171b", roughness: 0.6, metalness: 0.4 },
@@ -87,37 +80,7 @@ function picture(surface: Surface, map: "diff" | "nor" | "arm"): Texture | null 
 
 // The seats' plastic. Each seat's own colour is set where the seats
 // are placed (Seats.tsx), so this stays white.
-export const SEAT_COLOR = "#1c3070";
-
-type Shader = Parameters<NonNullable<Material["onBeforeCompile"]>>[0];
-
-// Makes a material dim where the model says light does not reach.
-// `source` is where the three numbers come from: "corner" for the
-// model's own surfaces, "seat" for the seats, which carry one set each.
-export function withBakedLight<T extends MeshStandardMaterial>(material: T, source: "corner" | "seat" = "corner"): T {
-  material.onBeforeCompile = (shader: Shader) => {
-    shader.uniforms.uBakeSky = bake.sky;
-    shader.uniforms.uBakeBounce = bake.bounce;
-    shader.uniforms.uBakeFloor = bake.floor;
-    shader.uniforms.uBakeContact = bake.contact;
-    const attribute = source === "seat" ? "attribute vec3 aBake;" : "attribute vec4 color;";
-    const read = source === "seat" ? "aBake" : "color.rgb";
-    shader.vertexShader = shader.vertexShader
-      .replace("#include <common>", `#include <common>\n${attribute}\nvarying vec3 vBake;`)
-      .replace("#include <begin_vertex>", `#include <begin_vertex>\nvBake = ${read};`);
-    shader.fragmentShader = shader.fragmentShader
-      .replace("#include <common>", "#include <common>\nvarying vec3 vBake;\nuniform float uBakeSky;\nuniform float uBakeBounce;\nuniform float uBakeFloor;\nuniform float uBakeContact;")
-      .replace(
-        "#include <aomap_fragment>",
-        `#include <aomap_fragment>
-        float bakedLight = (uBakeSky * vBake.r + uBakeBounce * vBake.g + uBakeFloor) * mix(1.0, vBake.b, uBakeContact);
-        reflectedLight.indirectDiffuse *= bakedLight;
-        reflectedLight.indirectSpecular *= mix(1.0, min(1.0, bakedLight * 1.6), 0.9);`,
-      );
-  };
-  material.customProgramCacheKey = () => `baked-light-${source}`;
-  return material;
-}
+export const SEAT_COLOR = "#22398a";
 
 export type StadiumMaterials = Record<string, Material>;
 
@@ -141,7 +104,7 @@ export function makeMaterials(): StadiumMaterials {
   // Doorways into the dark: no light of their own, no reflections
   made.Void = new MeshBasicMaterial({ color: "#030304" });
   // Clear glass guards along the tier fronts and round the entrances
-  made.Glass = new MeshStandardMaterial({ color: "#d5e3ee", roughness: 0.06, metalness: 0, transparent: true, opacity: 0.16, side: DoubleSide, depthWrite: false, envMapIntensity: 1.4 });
+  made.Glass = new MeshStandardMaterial({ color: "#d5e3ee", roughness: 0.08, metalness: 0, transparent: true, opacity: 0.12, side: DoubleSide, depthWrite: false, envMapIntensity: 0.55 });
   // The sliding roof panels: white fabric that glows with the daylight behind it
   made.Membrane = new MeshStandardMaterial({ color: "#eef1f4", roughness: 0.85, metalness: 0, side: DoubleSide, emissive: "#f4f7fb", emissiveIntensity: 0.1 });
   // The floodlights' lamps: brighter than white, so they read as a light source
