@@ -61,6 +61,9 @@ type State = {
   // The walk out of the tunnel has finished (or was skipped)
   introDone: boolean;
   quality: Quality;
+  // Even the lightest quality level was too slow (a laptop on battery,
+  // say): draw the picture at three-quarter size. Softer, but it moves.
+  lean: boolean;
 
   // The roof. "auto" follows Brampton: shut at night and in rain or snow.
   roofMode: RoofMode;
@@ -95,6 +98,7 @@ type State = {
   setLoadProgress: (progress: number) => void;
   setIntroDone: (done: boolean) => void;
   setQuality: (quality: Quality) => void;
+  setLean: (lean: boolean) => void;
   setRoofMode: (mode: RoofMode) => void;
   setRoofClosed: (closed: boolean) => void;
   setSound: (on: boolean) => void;
@@ -123,6 +127,7 @@ export const useWorld = create<State>((set, get) => ({
   loadProgress: 0,
   introDone: false,
   quality: "medium",
+  lean: false,
   roofMode: "auto",
   roofClosed: true,
   sound: false,
@@ -156,6 +161,7 @@ export const useWorld = create<State>((set, get) => ({
   },
   setIntroDone: (introDone) => set({ introDone }),
   setQuality: (quality) => set({ quality }),
+  setLean: (lean) => set({ lean }),
   setRoofMode: (roofMode) => set({ roofMode }),
   setRoofClosed: (roofClosed) => {
     if (get().roofClosed !== roofClosed) set({ roofClosed });

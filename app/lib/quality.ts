@@ -9,7 +9,8 @@ import type { Quality } from "./store";
 //   high    shadows, glow round the lamps, a sharper picture
 //
 // The 3D world also steps down by itself if it measures a low frame
-// rate (see world3d/FrameGovernor.tsx).
+// rate (see world3d/FrameGovernor.tsx). If "low" is still too slow, as
+// it can be on a laptop running on battery, it draws a smaller picture.
 
 export function isNarrowScreen(): boolean {
   return window.matchMedia("(max-width: 767px), (max-height: 520px) and (pointer: coarse)").matches;

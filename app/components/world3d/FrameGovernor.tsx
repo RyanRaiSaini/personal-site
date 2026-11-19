@@ -20,7 +20,8 @@ import { rig } from "./camera/CameraRig";
 //            Also whenever the tab is hidden.
 //
 // It also watches the frame rate while at "full", and steps the quality
-// level down if the machine cannot keep up.
+// level down if the machine cannot keep up: high, medium, low, and
+// last a smaller picture (`lean` in the store).
 //
 // To change how long the stadium keeps moving when left alone, change
 // REST_AFTER.
@@ -63,7 +64,7 @@ export default function FrameGovernor() {
     let fullFrames = 0;
     let fullTime = 0;
     let slowSpells = 0;
-    let judgeAfter = performance.now() + 5000;
+    let judgeAfter = performance.now() + 4000;
 
     const judge = (now: number) => {
       if (lastFull && now - lastFull < 250 && now > judgeAfter) {
@@ -71,16 +72,18 @@ export default function FrameGovernor() {
         fullTime += now - lastFull;
       }
       lastFull = now;
-      if (fullTime < 2500) return;
+      if (fullTime < 2000) return;
       const rate = (fullFrames * 1000) / fullTime;
       fullFrames = 0;
       fullTime = 0;
       slowSpells = rate < SLOW ? slowSpells + 1 : 0;
       if (slowSpells < 2) return;
       slowSpells = 0;
-      const { quality, setQuality } = useWorld.getState();
-      if (quality === "low") return;
-      setQuality(quality === "high" ? "medium" : "low");
+      const { quality, lean, setQuality, setLean } = useWorld.getState();
+      if (quality === "low") {
+        if (lean) return;
+        setLean(true);
+      } else setQuality(quality === "high" ? "medium" : "low");
       // changing level makes the picture stutter for a moment; do not count that
       judgeAfter = now + 4000;
     };

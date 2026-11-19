@@ -113,9 +113,12 @@ function Surroundings() {
 // them is what costs a built-in graphics chip the most, so only the
 // "high" level goes near it.
 const DPR: Record<string, [number, number]> = { low: [1, 1], medium: [1, 1.25], high: [1, 1.75] };
+// The last resort when "low" is still too slow: fewer dots than the page has
+const LEAN_DPR = 0.75;
 
 export default function World3D() {
   const quality = useWorld((s) => s.quality);
+  const lean = useWorld((s) => s.lean);
 
   return (
     <Canvas
@@ -123,7 +126,7 @@ export default function World3D() {
       // as what is on screen needs
       frameloop="demand"
       shadows={quality !== "low"}
-      dpr={DPR[quality]}
+      dpr={lean ? LEAN_DPR : DPR[quality]}
       gl={{ antialias: true, powerPreference: "high-performance" }}
       camera={{ position: [0, ORBIT.height, ORBIT.radiusZ], fov: ORBIT.fov, near: 0.3, far: 2000 }}
       role="img"
