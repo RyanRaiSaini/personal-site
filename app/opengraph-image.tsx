@@ -25,7 +25,7 @@ export default function OpengraphImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <div style={{ width: 76, height: 76, borderRadius: 38, border: "3px solid #e6c56c", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 44, fontWeight: 800, color: "#e6c56c" }}>{profile.shirtNumber}</div>
+          <div style={{ width: 10, height: 44, background: "#e6c56c" }} />
           <div style={{ fontSize: 26, letterSpacing: 8, color: "#e6c56c", fontWeight: 700 }}>{profile.location.toUpperCase()}</div>
         </div>
 

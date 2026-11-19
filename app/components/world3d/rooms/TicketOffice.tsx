@@ -78,7 +78,6 @@ export default function TicketOffice() {
             { text: " ", size: 0.04 },
             { text: profile.firstName.toUpperCase(), size: 0.2, color: CREAM, weight: 800 },
             { text: "SAINI", size: 0.26, color: CREAM, weight: 800 },
-            { text: `NUMBER ${profile.shirtNumber}`, size: 0.08, color: GOLD, weight: 700, spacing: 0.35 },
             { text: " ", size: 0.05 },
             { text: "THE RÉSUMÉ ISSUE", size: 0.1, color: "#ffffff", weight: 700, spacing: 0.2 },
             { text: "MATHEMATICS · AI · SOFTWARE", size: 0.06, color: "#9db8ff", weight: 600, spacing: 0.2 },

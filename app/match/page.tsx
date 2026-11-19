@@ -57,9 +57,7 @@ export default function MatchPage() {
 
       <div className="relative mx-auto max-w-3xl px-5 pb-28 pt-28 sm:px-8 sm:pt-36">
         <header className="pb-14 sm:pb-20">
-          <p className="kicker">
-            Number {profile.shirtNumber} · {profile.location}
-          </p>
+          <p className="kicker">{profile.location}</p>
           <h1 className="mt-2 font-display text-6xl font-extrabold uppercase leading-[0.9] tracking-tight sm:text-8xl">{profile.name}</h1>
           <p className="mt-4 max-w-xl text-lg text-ink-soft">{profile.headline}</p>
           <p className="mt-2 max-w-xl text-ink-soft">{profile.seeking}</p>

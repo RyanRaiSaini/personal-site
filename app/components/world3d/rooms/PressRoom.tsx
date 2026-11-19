@@ -219,7 +219,7 @@ export default function PressRoom() {
       <Sign
         lines={[
           { text: profile.shortName.toUpperCase(), size: 0.62, color: NAVY, weight: 800 },
-          { text: `NUMBER ${profile.shirtNumber}`, size: 0.34, color: "#8a6a12", weight: 600, spacing: 0.2 },
+          { text: profile.location.toUpperCase(), size: 0.3, color: "#8a6a12", weight: 600, spacing: 0.2 },
         ]}
         width={0.62}
         height={0.2}
