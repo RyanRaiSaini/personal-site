@@ -5,13 +5,26 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { profile } from "../../data/portfolio";
 import { useWorld } from "../../lib/store";
-import { places, sectionForPath } from "../../sections/registry";
+import { places, sectionForPath, type SectionId } from "../../sections/registry";
 import EggList from "./EggList";
 import PlaceIcon from "./PlaceIcon";
 
 // The bar across the top of every page: my name (back to the stadium),
-// the list of places, and three switches: the roof (which is the
-// light / dark theme), the sound, and 3D tour / flat match view.
+// straight links to the four sections most visitors want, the full
+// list of places, and three switches: the roof (which is the light /
+// dark theme), the sound, and 3D tour / flat match view.
+//
+// It is made of small dark plates rather than one solid strip, so the
+// stadium shows between them.
+
+// The sections that get a link of their own in the bar, in this order
+const DIRECT: SectionId[] = ["projects", "experience", "resume", "contact"];
+const direct = DIRECT.map((id) => places.find((place) => place.id === id)).filter((place) => place !== undefined);
+
+const initials = profile.shortName
+  .split(" ")
+  .map((word) => word[0])
+  .join("");
 
 function RoofIcon({ closed }: { closed: boolean }) {
   return (
@@ -92,28 +105,40 @@ export default function SiteHeader() {
   };
 
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-6">
-      <Link href={inMatch ? "/match" : "/"} className="pointer-events-auto group flex items-center gap-2.5 rounded-full py-1 pr-3" aria-label={`${profile.name}, home`}>
-        <span className="grid h-10 w-10 place-items-center rounded-full border border-line-strong bg-panel font-display text-xl font-bold text-gold backdrop-blur-md transition-colors group-hover:border-gold">{profile.shirtNumber}</span>
-        {/* on a phone there is only room for the number */}
-        <span className="hidden font-display text-xl font-bold uppercase tracking-[0.12em] [text-shadow:0_1px_12px_rgba(0,0,0,0.5)] sm:inline">{profile.shortName}</span>
+    <header className="site-bar pointer-events-none fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-5">
+      <Link href={inMatch ? "/match" : "/"} data-tag-avoid className="plate wordmark pointer-events-auto" aria-label={`${profile.name}, home`}>
+        {/* on a phone there is only room for the initials */}
+        <span aria-hidden="true" className="sm:hidden">
+          {initials}
+        </span>
+        <span className="hidden sm:inline">{profile.shortName}</span>
       </Link>
 
-      <nav className="pointer-events-auto flex items-center gap-1.5 sm:gap-2" aria-label="Site">
+      <nav data-tag-avoid className="pointer-events-auto flex items-center gap-1.5 sm:gap-2" aria-label="Site">
+        {/* straight to the usual four; on a narrower screen they are in the Places menu */}
+        <ul role="list" className="plate top-links">
+          {direct.map((place) => (
+            <li key={place.id} className="flex">
+              <Link href={inMatch ? `/match#${place.id}` : place.href} aria-current={current?.id === place.id ? "page" : undefined}>
+                {place.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
         <div className="relative">
-          <button ref={button} type="button" className="btn !min-h-11 !px-3.5 !text-sm sm:!px-4" aria-expanded={open} aria-controls="places-menu" onClick={() => setOpen((o) => !o)}>
+          <button ref={button} type="button" className="btn !min-h-11 !px-3 !text-[1.0625rem] sm:!px-3.5" aria-expanded={open} aria-controls="places-menu" onClick={() => setOpen((o) => !o)}>
             <PlaceIcon id="home" className="h-5 w-5 text-gold" />
             <span>Places</span>
           </button>
           {open && (
-            <div ref={menu} id="places-menu" className="glass panel-in absolute right-0 top-[calc(100%+0.6rem)] w-[min(22rem,calc(100vw-2rem))] rounded-2xl p-2">
+            <div ref={menu} id="places-menu" className="glass panel-in absolute right-0 top-[calc(100%+0.6rem)] w-[min(22rem,calc(100vw-2rem))] rounded-xl p-2 text-ink">
               <ul role="list" className="scroll-area max-h-[70vh] overflow-y-auto">
                 {places.map((place) => {
                   const href = inMatch ? `/match#${place.id}` : place.href;
                   const active = current?.id === place.id;
                   return (
                     <li key={place.id}>
-                      <Link href={href} onClick={() => setOpen(false)} aria-current={active ? "page" : undefined} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-line ${active ? "bg-line" : ""}`}>
+                      <Link href={href} onClick={() => setOpen(false)} aria-current={active ? "page" : undefined} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-line ${active ? "bg-line" : ""}`}>
                         <PlaceIcon id={place.id} className="h-6 w-6 flex-none text-gold" />
                         <span className="min-w-0">
                           <span className="flex items-baseline gap-2">
@@ -142,7 +167,7 @@ export default function SiteHeader() {
             <SoundIcon on={sound} />
           </button>
         )}
-        <button type="button" className="btn !min-h-11 !px-3.5 !text-sm sm:!px-4" onClick={switchView} title={inMatch ? "Switch to the 3D stadium tour" : "Switch to the flat match view"} aria-label={inMatch ? "Switch to the 3D stadium tour" : "Switch to the flat match view"}>
+        <button type="button" className="btn !min-h-11 !px-3 !text-[1.0625rem] sm:!px-3.5" onClick={switchView} title={inMatch ? "Switch to the 3D stadium tour" : "Switch to the flat match view"} aria-label={inMatch ? "Switch to the 3D stadium tour" : "Switch to the flat match view"}>
           {inMatch ? "3D" : "Flat"}
           <span className="hidden sm:inline">{inMatch ? " tour" : " view"}</span>
         </button>
