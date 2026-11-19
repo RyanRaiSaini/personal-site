@@ -50,6 +50,10 @@ const SHOTS = [
   { name: "night-pitch-level", path: "/", query: NIGHT, look: [-30, 1.7, 0, 40, 9, -6, 55], scene: true },
   { name: "day-roof-closed", path: "/", query: DAY.replace("roof=open", "roof=closed"), look: [58, 26, 46, 0, 8, 0, 50], scene: true },
   { name: "about-panel", path: "/about", query: DAY },
+  { name: "projects-panel", path: "/projects", query: DAY },
+  { name: "experience-panel", path: "/experience", query: DAY },
+  { name: "github-panel", path: "/github", query: DAY },
+  { name: "live-panel", path: "/live", query: DAY },
   { name: "phone-match", path: "/match", query: "", viewport: PHONE, flat: true },
   { name: "phone-tour", path: "/", query: `view=tour&${DAY}`, viewport: PHONE },
 ];
