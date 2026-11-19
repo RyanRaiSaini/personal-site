@@ -4,6 +4,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { PerspectiveCamera, Vector3 } from "three";
 import { useWorld } from "../../../lib/store";
+import { stir } from "../activity";
 import { atmo } from "../atmosphere/state";
 import { ORBIT, orbitPose, poseOf, type Pose } from "../spots";
 
@@ -157,6 +158,7 @@ export default function CameraRig() {
       c.fov += (rig.override.fov - c.fov) * k;
       f.active = false;
       wasOverridden.current = true;
+      stir();
     } else {
       if (wasOverridden.current) {
         // The show is over: fly back to where the page says we are
@@ -171,6 +173,8 @@ export default function CameraRig() {
         c.target.lerpVectors(f.fromTarget, scratchTarget.set(...f.to.target), e);
         c.fov = f.fromFov + (f.to.fov - f.fromFov) * e;
         if (f.t >= 1) f.active = false;
+        // in flight: every frame counts
+        stir();
       } else {
         // Resting: hold the spot, with a slow drift or a pointer lean
         const home = state.section === "home";

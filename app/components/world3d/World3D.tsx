@@ -1,6 +1,6 @@
 "use client";
 
-import { Environment, Lightformer, PerformanceMonitor } from "@react-three/drei";
+import { Environment, Lightformer } from "@react-three/drei";
 import { Canvas, useThree } from "@react-three/fiber";
 import { Suspense, useEffect } from "react";
 import { useWorld } from "../../lib/store";
@@ -11,6 +11,7 @@ import Bowl, { stadium } from "./Bowl";
 import CameraRig from "./camera/CameraRig";
 import Intro from "./camera/Intro";
 import Fireworks from "./eggs/Fireworks";
+import FrameGovernor from "./FrameGovernor";
 import Hotspots from "./Hotspots";
 import RoomSaini from "./players/RoomSaini";
 import Rooms from "./rooms/Rooms";
@@ -88,10 +89,12 @@ const DPR: Record<string, [number, number]> = { low: [1, 1.25], medium: [1, 1.5]
 
 export default function World3D() {
   const quality = useWorld((s) => s.quality);
-  const setQuality = useWorld((s) => s.setQuality);
 
   return (
     <Canvas
+      // Nothing is drawn unless asked for: FrameGovernor asks, as often
+      // as what is on screen needs
+      frameloop="demand"
       shadows={quality !== "low"}
       dpr={DPR[quality]}
       gl={{ antialias: true, powerPreference: "high-performance" }}
@@ -100,18 +103,7 @@ export default function World3D() {
       aria-label="A 3D football stadium. Each part of the ground is a section of this site; the same sections are in the menu."
     >
       <color attach="background" args={["#05070d"]} />
-      {/* If the frame rate stays under 24 a second, step down a quality
-          level. (Some laptops cap browsers at 30 to save battery, so
-          30 must not count as slow.) */}
-      <PerformanceMonitor
-        bounds={() => [24, 200]}
-        flipflops={2}
-        onDecline={() => {
-          const q = useWorld.getState().quality;
-          if (q === "high") setQuality("medium");
-          else if (q === "medium") setQuality("low");
-        }}
-      />
+      <FrameGovernor />
       <Surroundings />
       <AtmosphereDriver />
       <CameraRig />

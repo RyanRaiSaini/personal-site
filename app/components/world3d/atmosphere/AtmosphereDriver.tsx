@@ -8,6 +8,7 @@ import { useWorld } from "../../../lib/store";
 import { daylight, sunPosition, twilight } from "../../../lib/sun";
 import { currentInstant } from "../../../lib/time";
 import { overcastAmount, precipitationAmount } from "../../../lib/weather";
+import { stir } from "../activity";
 import { sceneOf } from "../spots";
 import { bake } from "../stadium/bakedLight";
 import { SUN_DIRECTION, tune } from "./daylight";
@@ -78,6 +79,8 @@ export default function AtmosphereDriver() {
     else if (atmo.roof !== roofTarget) {
       const step = dt / ROOF_SECONDS;
       atmo.roof = roofTarget > atmo.roof ? Math.min(roofTarget, atmo.roof + step) : Math.max(roofTarget, atmo.roof - step);
+      // the roof is moving: draw every frame until it stops
+      stir();
     }
     const roofEased = atmo.roof * atmo.roof * (3 - 2 * atmo.roof);
 
