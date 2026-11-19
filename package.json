@@ -14,7 +14,8 @@
     "stadium:pack": "node scripts/pack-stadium.mjs",
     "stadium:build": "blender --background --factory-startup --python blender/build.py -- --blend ../stadium-work/bernabeu-stadium.blend --site public/stadium",
     "stadium:assets": "node scripts/fetch-polyhaven.mjs",
-    "peek": "node scripts/peek.mjs"
+    "peek": "node scripts/peek.mjs",
+    "measure": "node scripts/measure.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
