@@ -197,6 +197,8 @@ export default function CameraRig() {
 
     camera.position.copy(c.position);
     camera.lookAt(c.target);
+    // so anything placed on screen this frame (the name tags) uses the new view
+    camera.updateMatrixWorld();
     rig.position.copy(c.position);
     rig.target.copy(c.target);
 
