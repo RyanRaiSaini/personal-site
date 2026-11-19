@@ -48,6 +48,7 @@ const SHOTS = [
   { name: "pitch-level", path: "/", query: DAY, look: [-30, 1.7, 0, 40, 9, -6, 55], scene: true },
   { name: "night-overview", path: "/", query: NIGHT, look: [0, 23.5, 64, 0, 9.5, 0, 52], scene: true },
   { name: "night-pitch-level", path: "/", query: NIGHT, look: [-30, 1.7, 0, 40, 9, -6, 55], scene: true },
+  { name: "day-roof-closed", path: "/", query: DAY.replace("roof=open", "roof=closed"), look: [58, 26, 46, 0, 8, 0, 50], scene: true },
   { name: "about-panel", path: "/about", query: DAY },
   { name: "phone-match", path: "/match", query: "", viewport: PHONE, flat: true },
   { name: "phone-tour", path: "/", query: `view=tour&${DAY}`, viewport: PHONE },
@@ -96,7 +97,11 @@ async function main() {
         await page.waitForFunction(() => window.__world && window.__world.getState().worldReady && window.__world.getState().introDone, { timeout: Number(process.env.SHOTS_TIMEOUT ?? 90_000), polling: 250 });
         // A slow first second can make the site lower its own quality; put it back
         await page.evaluate(() => window.__world.getState().setQuality("high"));
-        if (shot.look) await page.evaluate((pose) => window.__look(...pose), shot.look);
+        // SHOTS_LOOK: try a different camera position, as x,y,z,targetX,targetY,targetZ,fieldOfView
+        const look = process.env.SHOTS_LOOK ? process.env.SHOTS_LOOK.split(",").map(Number) : shot.look;
+        if (look) await page.evaluate((pose) => window.__look(...pose), look);
+        // SHOTS_EVAL: a line of code to run in the page first, for trying a setting out
+        if (process.env.SHOTS_EVAL) await page.evaluate(process.env.SHOTS_EVAL);
         if (shot.scene) await page.addStyleTag({ content: HIDE_PAGE });
         await sleep(shot.settle ?? 3500);
         await page.evaluate(() => window.__world.getState().setQuality("high"));
