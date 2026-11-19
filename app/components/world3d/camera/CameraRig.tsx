@@ -24,6 +24,8 @@ export const rig = {
   // When set, something else is steering: the camera eases to this pose
   override: null as Pose | null,
   overrideStiffness: 5,
+  // Set to true to jump straight to the override instead of easing to it
+  snapOverride: false,
   azimuth: ORBIT.startAzimuth,
   dragging: false,
   lastInput: -100,
@@ -148,7 +150,8 @@ export default function CameraRig() {
 
     if (rig.override) {
       // A show is steering
-      const k = 1 - Math.exp(-rig.overrideStiffness * dt);
+      const k = rig.snapOverride ? 1 : 1 - Math.exp(-rig.overrideStiffness * dt);
+      rig.snapOverride = false;
       c.position.lerp(scratch.set(...rig.override.position), k);
       c.target.lerp(scratchTarget.set(...rig.override.target), k);
       c.fov += (rig.override.fov - c.fov) * k;
