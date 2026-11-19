@@ -2,7 +2,7 @@
 
 My portfolio, set inside a real-time 3D football stadium. I'm a Mathematics student at the University of Waterloo looking for software engineering, AI and data internships and co-op roles. Every part of the ground is a section of the site: the goal is my projects, the dugout is my experience, the dressing room is my skills.
 
-**Live site:** https://personal-site-olive-tau.vercel.app
+**Live site:** https://ryansaini.vercel.app
 
 ## What's in it
 
