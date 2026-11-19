@@ -33,6 +33,12 @@ const doc = new PDFDocument({
 });
 doc.pipe(createWriteStream(outFile));
 
+// A résumé should be one page. Count any extra pages so the script can warn.
+let pages = 1;
+doc.on("pageAdded", () => {
+  pages += 1;
+});
+
 // "a **bold** b" -> [{ text: "a ", bold: false }, { text: "bold", bold: true }, ...]
 function segments(text) {
   return text
@@ -131,6 +137,8 @@ for (const line of resume.skills) {
   doc.y += 1;
 }
 
-const pages = doc.bufferedPageRange ? doc.bufferedPageRange().count : 1;
+const spare = Math.round(PAGE.height - MARGIN.bottom - doc.y);
 doc.end();
-console.log(`Wrote ${path.relative(root, outFile)}${pages > 1 ? ` (warning: ${pages} pages)` : ""}`);
+console.log(`Wrote ${path.relative(root, outFile)}`);
+if (pages > 1) console.warn(`Warning: the résumé runs to ${pages} pages. Shorten app/data/resume.ts to bring it back to one.`);
+else console.log(`One page, with ${spare} points of space left at the bottom.`);
