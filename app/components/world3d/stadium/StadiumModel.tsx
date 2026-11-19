@@ -52,9 +52,6 @@ function partOf(mesh: Object3D, root: Object3D): string {
   return node.name;
 }
 
-const CASTS_SHADOW = new Set(["Terraces", "Structure", "Roof", "Screen"]);
-const TAKES_SHADOW = new Set(["Terraces", "Structure"]);
-
 // The model is taken apart once (the seat patterns are lifted out of
 // it), so the result is remembered: asking twice must not fail.
 const prepared = new WeakMap<Object3D, Parts>();
@@ -82,9 +79,10 @@ function prepare(scene: Object3D, materials: StadiumMaterials): Parts {
     }
     const name = (mesh.material as Material).name;
     if (materials[name]) mesh.material = materials[name];
-    const panel = part.startsWith("RoofPanel");
-    mesh.castShadow = CASTS_SHADOW.has(part) || panel;
-    mesh.receiveShadow = TAKES_SHADOW.has(part);
+    // The stadium's own shadows were worked out in Blender (bakedLight.ts),
+    // so it takes no part in the live shadows; those are kept for the players.
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
     if (part === "Screen") screen = mesh;
     if (part === "Floodlights") lamps = mesh;
   });
@@ -111,10 +109,11 @@ function lampTexture() {
   const texture = canvasTexture(64, 32, (ctx, w, h) => {
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, w, h);
-    const dot = ctx.createRadialGradient(w / 2, h / 2, 1, w / 2, h / 2, 13);
+    // a wide hot centre, so the bar still reads as a row of lamps from across the ground
+    const dot = ctx.createRadialGradient(w / 2, h / 2, 2, w / 2, h / 2, 24);
     dot.addColorStop(0, "#ffffff");
-    dot.addColorStop(0.5, "#dfe9ff");
-    dot.addColorStop(1, "rgba(0,0,0,1)");
+    dot.addColorStop(0.55, "#e6eeff");
+    dot.addColorStop(1, "rgba(40,44,52,1)");
     ctx.fillStyle = dot;
     ctx.fillRect(0, 0, w, h);
   });
@@ -231,7 +230,7 @@ export default function StadiumModel() {
 
     // Closed panels glow softly with the daylight behind them
     (materials.Membrane as MeshStandardMaterial).emissiveIntensity = 0.03 + 0.75 * atmo.daylight * (1 - 0.45 * atmo.overcast);
-    const power = 0.25 + 3.6 * atmo.floodlights;
+    const power = 0.2 + 9.0 * atmo.floodlights;
     (materials.FloodLens as MeshBasicMaterial).color.setRGB(power, power, power * 1.06);
 
     const texture = stripRef.current;
