@@ -1,8 +1,9 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
-import { DoubleSide, type Group } from "three";
+import { useEffect, useMemo, useRef } from "react";
+import { BoxGeometry, Color, CylinderGeometry, DoubleSide, Float32BufferAttribute, type BufferGeometry, type Group } from "three";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { atmo } from "../atmosphere/state";
 import { canvasTexture } from "../textures/canvas";
 import { BOWL, DUGOUT, PITCH, TUNNEL } from "./dims";
@@ -50,49 +51,98 @@ function CornerFlag({ x, z, index }: { x: number; z: number; index: number }) {
 
 const WALL_Z = -BOWL.hz;
 
+type Block = { size: [number, number, number]; at: [number, number, number]; lean?: number; color: string };
+
+// Many plain blocks made into one shape, each keeping its own colour,
+// so a whole bench costs the graphics card a single drawing step
+function blocks(list: Block[]): BufferGeometry {
+  const parts = list.map(({ size, at, lean = 0, color }) => {
+    const part = new BoxGeometry(...size);
+    if (lean) part.rotateX(lean);
+    part.translate(...at);
+    const shade = new Color(color);
+    const count = part.attributes.position.count;
+    const colors = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) colors.set([shade.r, shade.g, shade.b], i * 3);
+    part.setAttribute("color", new Float32BufferAttribute(colors, 3));
+    return part;
+  });
+  const merged = mergeGeometries(parts, false);
+  for (const part of parts) part.dispose();
+  return merged;
+}
+
+const BENCH = {
+  seats: 14,
+  spacing: 0.72,
+  floor: 0.14,
+  leather: "#1b2750",
+  headrest: "#e6e8ec",
+  steel: "#d5d9de",
+  ribs: 6,
+};
+
+// The team bench: a raised floor, a low padded wall, a row of
+// high-backed seats and a clear canopy on white steel ribs
 function Dugout({ x }: { x: number }) {
   const { width, depth, height } = DUGOUT;
   const z = WALL_Z + depth / 2 + 0.25;
-  const seats = 9;
+
+  const geometry = useMemo(() => {
+    const back = -depth / 2;
+    const solid: Block[] = [
+      { size: [width, BENCH.floor, depth], at: [0, BENCH.floor / 2, 0], color: "#2a2d33" },
+      { size: [width, 1.0, 0.1], at: [0, BENCH.floor + 0.5, back + 0.05], color: "#151921" },
+    ];
+    for (let i = 0; i < BENCH.seats; i++) {
+      const sx = (i - (BENCH.seats - 1) / 2) * BENCH.spacing;
+      const seatY = BENCH.floor + 0.42;
+      solid.push(
+        // the pedestal, the cushion, the tall back and its headrest
+        { size: [0.12, 0.36, 0.3], at: [sx, BENCH.floor + 0.18, back + 0.62], color: "#0f1218" },
+        { size: [0.6, 0.13, 0.52], at: [sx, seatY, back + 0.66], color: BENCH.leather },
+        { size: [0.6, 0.72, 0.12], at: [sx, seatY + 0.42, back + 0.38], lean: -0.2, color: BENCH.leather },
+        { size: [0.4, 0.2, 0.13], at: [sx, seatY + 0.86, back + 0.29], lean: -0.2, color: BENCH.headrest },
+      );
+    }
+    for (let i = 0; i < BENCH.ribs; i++) {
+      const rx = -width / 2 + (width * i) / (BENCH.ribs - 1);
+      solid.push(
+        { size: [0.07, height - BENCH.floor, 0.07], at: [rx, BENCH.floor + (height - BENCH.floor) / 2, back + 0.14], color: BENCH.steel },
+        { size: [0.07, 0.07, depth + 0.1], at: [rx, height - 0.2, 0.12], lean: 0.17, color: BENCH.steel },
+      );
+    }
+
+    // the clear parts: a curved roof and a pane at each end
+    const roof = new CylinderGeometry(depth * 0.72, depth * 0.72, width, 20, 1, true, Math.PI * 1.02, Math.PI * 0.46);
+    roof.rotateZ(Math.PI / 2);
+    roof.translate(0, height - 0.55, back + 0.6);
+    const ends = [-1, 1].map((s) => {
+      const pane = new BoxGeometry(0.05, height - BENCH.floor - 0.1, depth);
+      pane.translate((s * width) / 2, BENCH.floor + (height - BENCH.floor - 0.1) / 2, 0);
+      return pane;
+    });
+    const clear = mergeGeometries([roof, ...ends], false);
+    roof.dispose();
+    for (const pane of ends) pane.dispose();
+    return { solid: blocks(solid), clear };
+  }, [width, depth, height]);
+
+  useEffect(() => {
+    return () => {
+      geometry.solid.dispose();
+      geometry.clear.dispose();
+    };
+  }, [geometry]);
+
   return (
     <group position={[x, 0, z]}>
-      {/* floor */}
-      <mesh position={[0, 0.06, 0]} receiveShadow>
-        <boxGeometry args={[width, 0.12, depth]} />
-        <meshStandardMaterial color="#24272d" roughness={0.9} />
+      <mesh geometry={geometry.solid} castShadow receiveShadow>
+        <meshStandardMaterial vertexColors roughness={0.62} />
       </mesh>
-      {/* back and end walls */}
-      <mesh position={[0, height / 2, -depth / 2 + 0.05]}>
-        <boxGeometry args={[width, height, 0.1]} />
-        <meshStandardMaterial color="#14171d" roughness={0.7} />
+      <mesh geometry={geometry.clear}>
+        <meshStandardMaterial color="#a9b8ca" transparent opacity={0.2} roughness={0.06} metalness={0.1} side={DoubleSide} depthWrite={false} />
       </mesh>
-      {[-1, 1].map((s) => (
-        <mesh key={s} position={[(s * width) / 2, height / 2, 0]}>
-          <boxGeometry args={[0.08, height, depth]} />
-          <meshStandardMaterial color="#9fb0c4" transparent opacity={0.22} roughness={0.08} metalness={0.1} />
-        </mesh>
-      ))}
-      {/* clear curved roof */}
-      <mesh position={[0, height - 0.55, -depth / 2 + 0.6]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[depth * 0.72, depth * 0.72, width, 20, 1, true, Math.PI * 1.02, Math.PI * 0.46]} />
-        <meshStandardMaterial color="#a9b8ca" transparent opacity={0.2} roughness={0.06} metalness={0.1} side={DoubleSide} />
-      </mesh>
-      {/* a row of seats */}
-      {Array.from({ length: seats }, (_, i) => {
-        const sx = (i - (seats - 1) / 2) * (width / (seats + 0.6));
-        return (
-          <group key={i} position={[sx, 0.12, -depth / 2 + 0.7]}>
-            <mesh position={[0, 0.42, 0]} castShadow>
-              <boxGeometry args={[0.62, 0.14, 0.6]} />
-              <meshStandardMaterial color="#161a26" roughness={0.55} />
-            </mesh>
-            <mesh position={[0, 0.9, -0.26]} rotation={[-0.18, 0, 0]} castShadow>
-              <boxGeometry args={[0.62, 0.9, 0.14]} />
-              <meshStandardMaterial color="#1a2030" roughness={0.55} />
-            </mesh>
-          </group>
-        );
-      })}
     </group>
   );
 }
@@ -106,11 +156,11 @@ function wallTexture() {
     // grey painted wall above a dark lower band, with a joint every two
     // metres; brighter toward the ceiling, where the strip lights are
     const paint = ctx.createLinearGradient(0, 0, 0, h * 0.62);
-    paint.addColorStop(0, "#8b9099");
-    paint.addColorStop(1, "#5d626b");
+    paint.addColorStop(0, "#636872");
+    paint.addColorStop(1, "#3d4149");
     ctx.fillStyle = paint;
     ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = "#151924";
+    ctx.fillStyle = "#10131b";
     ctx.fillRect(0, h * 0.62, w, h * 0.38);
     ctx.fillStyle = "rgba(0,0,0,0.22)";
     ctx.fillRect(0, 0, 2, h);
