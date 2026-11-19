@@ -1,51 +1,34 @@
 "use client";
 
-import { Html } from "@react-three/drei";
-import { useWorld } from "../../lib/store";
+import { useFrame, useThree } from "@react-three/fiber";
+import { Vector3 } from "three";
 import { places } from "../../sections/registry";
-import PlaceIcon from "../ui/PlaceIcon";
 import { SPOTS } from "./spots";
+import { tagScreen } from "./tagScreen";
 
-// The name tags floating over each place when you look at the whole
-// stadium. Each one is a real link, so it works with a keyboard and a
-// screen reader as well as a click. Their positions are the `anchor`
-// values in spots.ts; their looks are the `.tag` rules in globals.css.
+// Works out, every frame, where each place's name tag belongs on the
+// screen, and writes it into `tagScreen`. The tags themselves are
+// ordinary page links drawn by app/components/world/Tags.tsx; this
+// only tells them where to sit. Their 3D positions are the `anchor`
+// values in spots.ts.
+
+const point = new Vector3();
 
 export default function Hotspots() {
-  const section = useWorld((s) => s.section);
-  const introDone = useWorld((s) => s.introDone);
-  const show = useWorld((s) => s.show);
-  const navigate = useWorld((s) => s.navigate);
-  const visible = section === "home" && introDone && !show;
+  const camera = useThree((s) => s.camera);
+  const size = useThree((s) => s.size);
 
-  return (
-    <>
-      {places.map((place) => (
-        <Html key={place.id} position={SPOTS[place.id as keyof typeof SPOTS].anchor} center zIndexRange={[40, 10]} wrapperClass="tag-wrap">
-          <a
-            href={place.href}
-            className="tag"
-            data-visible={visible}
-            tabIndex={visible ? 0 : -1}
-            aria-hidden={!visible}
-            onClick={(event) => {
-              if (event.metaKey || event.ctrlKey || event.shiftKey) return;
-              event.preventDefault();
-              navigate(place.href);
-            }}
-          >
-            <span className="tag-label">
-              <PlaceIcon id={place.id} className="tag-icon" />
-              <span className="tag-text">
-                <span className="tag-place">{place.place}</span>
-                <span className="tag-title">{place.title}</span>
-              </span>
-            </span>
-            <span className="tag-stem" />
-            <span className="tag-pin" />
-          </a>
-        </Html>
-      ))}
-    </>
-  );
+  useFrame(() => {
+    for (const place of places) {
+      const anchor = SPOTS[place.id as keyof typeof SPOTS].anchor;
+      point.set(anchor[0], anchor[1], anchor[2]).project(camera);
+      const slot = (tagScreen[place.id] ??= { x: 0, y: 0, visible: false });
+      // behind the camera, or well off the edge of the screen
+      slot.visible = point.z > -1 && point.z < 1 && Math.abs(point.x) < 1.15 && Math.abs(point.y) < 1.2;
+      slot.x = (point.x * 0.5 + 0.5) * size.width;
+      slot.y = (-point.y * 0.5 + 0.5) * size.height;
+    }
+  });
+
+  return null;
 }
