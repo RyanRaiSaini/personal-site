@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import type { Egg } from "../data/portfolio";
+import type { SectionId } from "../sections/registry";
 import type { Contributions } from "./github";
 import type { Weather } from "./weather";
 
@@ -24,7 +25,26 @@ export type Show =
   | { kind: "fifteen"; startedAt: number }
   | { kind: "trent"; startedAt: number };
 
+// How the site is being viewed: the 3D tour or the flat match view
+export type ViewMode = "tour" | "match";
+
 type State = {
+  // The section the 3D world is showing. It trails the address bar by
+  // a moment when the view has to cut to a room.
+  section: SectionId;
+  // Goes up by one each time the camera should jump instead of fly
+  cuts: number;
+  // The black curtain drawn across the screen during a cut
+  curtain: boolean;
+  // Narrow (phone-sized) screen: closer camera framings, bottom sheets
+  narrow: boolean;
+  // How far the view is pushed aside to make room for the open panel, in pixels
+  viewOffset: { x: number; y: number };
+  // Moves to another page; set by the page shell so the 3D world can use it
+  navigate: (href: string) => void;
+  // The visitor prefers less motion
+  reducedMotion: boolean;
+
   // The 3D world has loaded and drawn its first frame
   worldReady: boolean;
   // The walk out of the tunnel has finished (or was skipped)
@@ -51,6 +71,12 @@ type State = {
   // Which project, shirt, trophy or photo is picked in the open section
   selection: Record<string, string | number | null>;
 
+  setSection: (section: SectionId, cut?: boolean) => void;
+  setCurtain: (curtain: boolean) => void;
+  setNarrow: (narrow: boolean) => void;
+  setViewOffset: (x: number, y: number) => void;
+  setNavigate: (navigate: (href: string) => void) => void;
+  setReducedMotion: (reduced: boolean) => void;
   setWorldReady: (ready: boolean) => void;
   setIntroDone: (done: boolean) => void;
   setQuality: (quality: Quality) => void;
@@ -68,6 +94,15 @@ type State = {
 };
 
 export const useWorld = create<State>((set, get) => ({
+  section: "home",
+  cuts: 0,
+  curtain: false,
+  narrow: false,
+  viewOffset: { x: 0, y: 0 },
+  navigate: (href) => {
+    window.location.href = href;
+  },
+  reducedMotion: false,
   worldReady: false,
   introDone: false,
   quality: "medium",
@@ -83,6 +118,17 @@ export const useWorld = create<State>((set, get) => ({
   cheerAt: 0,
   selection: {},
 
+  setSection: (section, cut = false) => set({ section, cuts: get().cuts + (cut ? 1 : 0) }),
+  setCurtain: (curtain) => set({ curtain }),
+  setNarrow: (narrow) => {
+    if (get().narrow !== narrow) set({ narrow });
+  },
+  setViewOffset: (x, y) => {
+    const current = get().viewOffset;
+    if (current.x !== x || current.y !== y) set({ viewOffset: { x, y } });
+  },
+  setNavigate: (navigate) => set({ navigate }),
+  setReducedMotion: (reducedMotion) => set({ reducedMotion }),
   setWorldReady: (worldReady) => set({ worldReady }),
   setIntroDone: (introDone) => set({ introDone }),
   setQuality: (quality) => set({ quality }),
