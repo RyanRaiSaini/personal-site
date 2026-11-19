@@ -18,8 +18,11 @@ export default function Tags() {
   const introDone = useWorld((s) => s.introDone);
   const show = useWorld((s) => s.show);
   const worldReady = useWorld((s) => s.worldReady);
+  const narrow = useWorld((s) => s.narrow);
   const holders = useRef<Record<string, HTMLDivElement | null>>({});
-  const visible = worldReady && section === "home" && introDone && !show;
+  // On a narrow screen the tags would sit on top of the home text, and
+  // the row of places below it does the same job
+  const visible = worldReady && section === "home" && introDone && !show && !narrow;
 
   // Follow the 3D world, frame by frame
   useEffect(() => {
