@@ -8,8 +8,9 @@ import { canvasTexture } from "../textures/canvas";
 import { BOWL, DUGOUT, PITCH, TUNNEL } from "./dims";
 
 // Things at the side of the pitch: the four corner flags, the two
-// dugouts and the mouth of the players' tunnel, all on the main-stand
-// (west) side except the flags.
+// dugouts and the inside of the players' tunnel, all on the main-stand
+// (west) side except the flags. The solid housing over the tunnel is
+// part of the stadium model.
 
 // ------------------------------------------------------------------
 // Corner flags
@@ -58,23 +59,23 @@ function Dugout({ x }: { x: number }) {
       {/* floor */}
       <mesh position={[0, 0.06, 0]} receiveShadow>
         <boxGeometry args={[width, 0.12, depth]} />
-        <meshStandardMaterial color="#1b1e26" roughness={0.9} />
+        <meshStandardMaterial color="#24272d" roughness={0.9} />
       </mesh>
       {/* back and end walls */}
       <mesh position={[0, height / 2, -depth / 2 + 0.05]}>
         <boxGeometry args={[width, height, 0.1]} />
-        <meshStandardMaterial color="#10224a" roughness={0.6} />
+        <meshStandardMaterial color="#14171d" roughness={0.7} />
       </mesh>
       {[-1, 1].map((s) => (
         <mesh key={s} position={[(s * width) / 2, height / 2, 0]}>
           <boxGeometry args={[0.08, height, depth]} />
-          <meshStandardMaterial color="#b9d4ff" transparent opacity={0.28} roughness={0.08} metalness={0.2} />
+          <meshStandardMaterial color="#9fb0c4" transparent opacity={0.22} roughness={0.08} metalness={0.1} />
         </mesh>
       ))}
       {/* clear curved roof */}
       <mesh position={[0, height - 0.55, -depth / 2 + 0.6]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[depth * 0.72, depth * 0.72, width, 20, 1, true, Math.PI * 1.02, Math.PI * 0.46]} />
-        <meshStandardMaterial color="#cfe2ff" transparent opacity={0.3} roughness={0.06} metalness={0.3} side={DoubleSide} />
+        <meshStandardMaterial color="#a9b8ca" transparent opacity={0.2} roughness={0.06} metalness={0.1} side={DoubleSide} />
       </mesh>
       {/* a row of seats */}
       {Array.from({ length: seats }, (_, i) => {
@@ -83,11 +84,11 @@ function Dugout({ x }: { x: number }) {
           <group key={i} position={[sx, 0.12, -depth / 2 + 0.7]}>
             <mesh position={[0, 0.42, 0]} castShadow>
               <boxGeometry args={[0.62, 0.14, 0.6]} />
-              <meshStandardMaterial color="#17337a" roughness={0.6} />
+              <meshStandardMaterial color="#161a26" roughness={0.55} />
             </mesh>
             <mesh position={[0, 0.9, -0.26]} rotation={[-0.18, 0, 0]} castShadow>
               <boxGeometry args={[0.62, 0.9, 0.14]} />
-              <meshStandardMaterial color="#1b3d92" roughness={0.6} />
+              <meshStandardMaterial color="#1a2030" roughness={0.55} />
             </mesh>
           </group>
         );
@@ -100,43 +101,42 @@ function Dugout({ x }: { x: number }) {
 // The tunnel
 // ------------------------------------------------------------------
 
-function stripeTexture() {
+function wallTexture() {
   return canvasTexture(64, 128, (ctx, w, h) => {
-    // white upper wall, royal blue lower wall, a gold line between
-    ctx.fillStyle = "#e9ecf2";
+    // grey painted wall above a dark lower band, with a joint every two
+    // metres; brighter toward the ceiling, where the strip lights are
+    const paint = ctx.createLinearGradient(0, 0, 0, h * 0.62);
+    paint.addColorStop(0, "#8b9099");
+    paint.addColorStop(1, "#5d626b");
+    ctx.fillStyle = paint;
     ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = "#12327e";
-    ctx.fillRect(0, h * 0.52, w, h * 0.48);
-    ctx.fillStyle = "#d9b85a";
-    ctx.fillRect(0, h * 0.5, w, 4);
-    ctx.fillStyle = "rgba(0,0,0,0.12)";
+    ctx.fillStyle = "#151924";
+    ctx.fillRect(0, h * 0.62, w, h * 0.38);
+    ctx.fillStyle = "rgba(0,0,0,0.22)";
     ctx.fillRect(0, 0, 2, h);
   });
 }
 
 function Tunnel() {
   const { halfWidth, height, length } = TUNNEL;
-  const mouthZ = WALL_Z + 2.2; // the canopy reaches out past the wall
+  const mouthZ = WALL_Z; // level with the front of the housing that the stadium model provides
   const endZ = WALL_Z - length;
   const midZ = (mouthZ + endZ) / 2;
   const run = mouthZ - endZ;
   const walls = useMemo(() => {
-    const t = stripeTexture();
+    const t = wallTexture();
     t.repeat.set(run / 2, 1);
     return t;
   }, [run]);
 
   return (
     <group>
-      {/* inside: floor, walls, ceiling. Painted bright because no
-          floodlight reaches in here. */}
+      {/* inside: floor, walls, ceiling. They carry their own light,
+          because no lamp reaches in here; kept dim, so the tunnel reads
+          as indoors against the daylight on the pitch. */}
       <mesh position={[0, 0.01, midZ]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[halfWidth * 2, run]} />
-        <meshBasicMaterial color="#23262e" />
-      </mesh>
-      <mesh position={[0, 0.02, midZ]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[0.5, run]} />
-        <meshBasicMaterial color="#c8a94a" />
+        <meshBasicMaterial color="#2a2d33" />
       </mesh>
       {[-1, 1].map((s) => (
         <mesh key={s} position={[s * halfWidth, height / 2, midZ]} rotation={[0, (-s * Math.PI) / 2, 0]}>
@@ -152,35 +152,19 @@ function Tunnel() {
       {[-1, 1].map((s) => (
         <mesh key={s} position={[s * (halfWidth - 0.5), height - 0.02, midZ]} rotation={[Math.PI / 2, 0, 0]}>
           <planeGeometry args={[0.16, run - 1]} />
-          <meshBasicMaterial color={[2.4, 2.5, 2.8]} toneMapped={false} />
+          <meshBasicMaterial color={[1.9, 1.95, 2.05]} toneMapped={false} />
         </mesh>
       ))}
       {/* the far end: a lit doorway back toward the dressing rooms */}
       <mesh position={[0, height / 2, endZ]}>
         <planeGeometry args={[halfWidth * 2, height]} />
-        <meshBasicMaterial color="#0c1838" />
+        <meshBasicMaterial color="#12151c" />
       </mesh>
       <mesh position={[0, 1.15, endZ + 0.02]}>
         <planeGeometry args={[1.5, 2.3]} />
-        <meshBasicMaterial color={[1.5, 1.25, 0.8]} toneMapped={false} />
+        <meshBasicMaterial color={[1.25, 1.2, 1.1]} toneMapped={false} />
       </mesh>
 
-      {/* outside: the canopy over the mouth */}
-      <mesh position={[0, height + 0.2, (mouthZ + WALL_Z) / 2 - 2.6]} castShadow>
-        <boxGeometry args={[halfWidth * 2 + 0.8, 0.4, 7.6]} />
-        <meshStandardMaterial color="#0f1b3d" roughness={0.6} />
-      </mesh>
-      {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * (halfWidth + 0.2), (height + 0.4) / 2, (mouthZ + WALL_Z) / 2 - 2.6]} castShadow>
-          <boxGeometry args={[0.4, height + 0.4, 7.6]} />
-          <meshStandardMaterial color="#0f1b3d" roughness={0.6} />
-        </mesh>
-      ))}
-      {/* a gold line round the mouth */}
-      <mesh position={[0, height + 0.2, mouthZ + 0.01]}>
-        <boxGeometry args={[halfWidth * 2 + 0.8, 0.1, 0.04]} />
-        <meshBasicMaterial color={[1.6, 1.3, 0.6]} toneMapped={false} />
-      </mesh>
     </group>
   );
 }
