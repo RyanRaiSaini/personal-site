@@ -1,31 +1,19 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef } from "react";
-import type { Mesh } from "three";
-
-// Smoke test: a turning box, to prove the 3D engine runs here. The
-// stadium replaces it.
-function Box() {
-  const ref = useRef<Mesh>(null);
-  useFrame((_, dt) => {
-    if (ref.current) ref.current.rotation.y += dt * 0.6;
-  });
-  return (
-    <mesh ref={ref}>
-      <boxGeometry args={[1.4, 1.4, 1.4]} />
-      <meshStandardMaterial color="#e6c56c" />
-    </mesh>
-  );
-}
+import { OrbitControls } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import Pitch from "./stadium/Pitch";
+import Stands from "./stadium/Stands";
 
 export default function World3D() {
   return (
-    <Canvas camera={{ position: [0, 1.5, 5], fov: 45 }} dpr={[1, 1.75]}>
+    <Canvas shadows camera={{ position: [70, 30, 60], fov: 50, near: 0.5, far: 1200 }} dpr={[1, 1.75]}>
       <color attach="background" args={["#05070d"]} />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[3, 5, 2]} intensity={2} />
-      <Box />
+      <hemisphereLight args={["#b9c8ff", "#1a2416", 0.9]} />
+      <directionalLight position={[60, 120, 40]} intensity={2.2} />
+      <Stands />
+      <Pitch />
+      <OrbitControls target={[0, 4, 0]} />
     </Canvas>
   );
 }
