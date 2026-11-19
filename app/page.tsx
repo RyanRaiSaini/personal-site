@@ -15,7 +15,9 @@ export default function Home() {
   return (
     <main className="pointer-events-none fixed inset-0 flex flex-col justify-end">
       <div className="after-intro bg-gradient-to-t from-black/70 via-black/25 to-transparent px-5 pb-6 pt-24 sm:px-10 sm:pb-9">
-        <section aria-labelledby="home-name" className="pointer-events-auto max-w-2xl text-white">
+        {/* Only the links and buttons take clicks; everywhere else a
+            click or drag goes through to the stadium behind */}
+        <section aria-labelledby="home-name" className="max-w-2xl text-white [&_a]:pointer-events-auto">
           <p className="kicker !text-[#f2cf6b]">
             Number {profile.shirtNumber} · {profile.location}
           </p>
@@ -56,8 +58,8 @@ export default function Home() {
 
         {/* Every place as a plain row of links, for keyboards and for
             anyone who would rather not hunt for name tags */}
-        <nav aria-label="Places in the stadium" className="pointer-events-auto mt-6">
-          <ul role="list" className="scroll-area -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+        <nav aria-label="Places in the stadium" className="mt-6">
+          <ul role="list" className="scroll-area pointer-events-auto -mx-1 flex w-fit max-w-full gap-2 overflow-x-auto px-1 pb-1">
             {places.map((place) => (
               <li key={place.id} className="flex-none">
                 <Link href={place.href} className="flex items-center gap-2 rounded-full border border-white/20 bg-black/45 px-3.5 py-2 text-white backdrop-blur-md transition-colors hover:border-[#f2cf6b]">
@@ -68,7 +70,7 @@ export default function Home() {
             ))}
           </ul>
         </nav>
-        <Colophon className="pointer-events-auto mt-3 text-white/45" />
+        <Colophon className="mt-3 text-white/45" />
       </div>
     </main>
   );
