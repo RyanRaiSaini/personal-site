@@ -46,6 +46,8 @@ export default function ShowOverlay() {
   const show = useWorld((s) => s.show);
   const lastEgg = useWorld((s) => s.lastEgg);
   const found = useWorld((s) => s.eggsFound.length);
+  // With a section's panel open, the banner keeps to the free side of the screen
+  const panelOpen = useWorld((s) => s.section !== "home" && s.mode === "tour");
   const [banner, setBanner] = useState<ReturnType<typeof bannerFor>>(null);
   const [toast, setToast] = useState<EggId | null>(null);
   const [confetti, setConfetti] = useState(false);
@@ -119,12 +121,12 @@ export default function ShowOverlay() {
   return (
     <>
       {banner && show && (
-        <div aria-live="polite" className={`pointer-events-none fixed inset-x-0 z-[45] flex justify-center px-4 ${banner.small ? "top-20 lg:justify-start lg:pl-10" : "top-[18vh]"}`}>
-          <div className="show-banner text-center text-white">
-            <p className={`font-display font-extrabold uppercase leading-none tracking-tight [text-shadow:0_4px_40px_rgba(0,0,0,0.75)] ${banner.small ? "text-5xl" : "text-7xl sm:text-9xl"}`} style={{ color: "#f2cf6b" }}>
+        <div aria-live="polite" className={`pointer-events-none fixed inset-x-0 z-[45] flex justify-center px-4 ${panelOpen ? "top-24 lg:pr-[min(36rem,46vw)]" : "top-[18vh]"}`}>
+          <div className="show-banner max-w-full text-center text-white">
+            <p className={`font-display font-extrabold uppercase leading-none tracking-tight [text-shadow:0_4px_40px_rgba(0,0,0,0.75)] ${banner.small || panelOpen ? "text-6xl" : "text-7xl sm:text-9xl"}`} style={{ color: "#f2cf6b" }}>
               {banner.title}
             </p>
-            <p className={`mt-1 font-display font-bold uppercase tracking-[0.18em] [text-shadow:0_2px_18px_rgba(0,0,0,0.85)] ${banner.small ? "text-xl" : "text-2xl sm:text-4xl"}`}>{banner.line}</p>
+            <p className={`mt-1 font-display font-bold uppercase tracking-[0.14em] [text-shadow:0_2px_18px_rgba(0,0,0,0.85)] ${banner.small || panelOpen ? "text-xl" : "text-2xl sm:text-4xl"}`}>{banner.line}</p>
           </div>
         </div>
       )}
