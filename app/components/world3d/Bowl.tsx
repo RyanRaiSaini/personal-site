@@ -2,6 +2,7 @@
 
 import { useWorld } from "../../lib/store";
 import Lights from "./atmosphere/Lights";
+import Precipitation from "./atmosphere/Precipitation";
 import Cast from "./players/Cast";
 import Sky from "./atmosphere/Sky";
 import { sceneOf } from "./spots";
@@ -32,6 +33,7 @@ export default function Bowl({ children }: { children?: React.ReactNode }) {
       <AdBoards />
       <Roof />
       <Halo />
+      <Precipitation />
       <Cast />
       {children}
     </group>
