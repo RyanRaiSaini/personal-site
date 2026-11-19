@@ -9,14 +9,20 @@ import { daylight, sunPosition, twilight } from "../../../lib/sun";
 import { currentInstant } from "../../../lib/time";
 import { overcastAmount, precipitationAmount } from "../../../lib/weather";
 import { sceneOf } from "../spots";
+import { SUN_DIRECTION, tune } from "./daylight";
 import { atmo, smooth } from "./state";
 
 // Works out the stadium's look once per frame and writes it into the
-// shared `atmo` object (state.ts): the real sun over Brampton, the
-// weather, how far the roof has closed and how loud the crowd is.
+// shared `atmo` object (state.ts): whether it is day or night in
+// Brampton, the weather, how far the roof has closed and how loud the
+// crowd is.
+//
+// The clock decides only whether it is day or night. The daylight
+// itself is always the same clear afternoon (daylight.ts), so the
+// stadium is seen in one considered light rather than whatever angle
+// the real sun happens to be at.
 
 const HOME = nowData.homeCity;
-const RAD = Math.PI / 180;
 
 // Sky colours for each condition
 const NIGHT_TOP = new Color("#050916");
@@ -55,7 +61,7 @@ export default function AtmosphereDriver() {
       const position = sunPosition(currentInstant(state.timeOverride, HOME.timeZone), HOME.latitude, HOME.longitude);
       sun.current = { ...position, checkedAt: atmo.time };
     }
-    const { elevation, azimuth } = sun.current;
+    const { elevation } = sun.current;
 
     // On the very first frame jump straight to the right look
     const rate = first.current ? 1000 : 1.2;
@@ -83,15 +89,10 @@ export default function AtmosphereDriver() {
     const cheerTarget = state.cheerAt > 0 && sinceCheer < 6 ? Math.max(0, 1 - sinceCheer / 6) : 0;
     atmo.cheer = smooth(atmo.cheer, cheerTarget, cheerTarget > atmo.cheer ? 8 : 1.5, dt);
 
-    // Where the light comes from. By day it comes from the real sun's
-    // compass direction, but never from lower than 36 degrees, so that
-    // sunshine reaches part of the pitch even in a Canadian winter.
-    // At night a high moon takes over.
+    // Where the light comes from: the photographed sky's sun by day,
+    // a high moon at night
     if (atmo.daylight > 0.02) {
-      const el = Math.max(elevation, 36) * RAD;
-      const az = azimuth * RAD;
-      // North is +X, east is +Z
-      atmo.sunDirection.set(Math.cos(el) * Math.cos(az), Math.sin(el), Math.cos(el) * Math.sin(az));
+      atmo.sunDirection.copy(SUN_DIRECTION);
       atmo.sunColor.copy(SUN_WHITE).lerp(SUN_WARM, atmo.twilight * 0.85);
     } else {
       atmo.sunDirection.set(-0.35, 0.8, 0.45).normalize();
@@ -117,10 +118,13 @@ export default function AtmosphereDriver() {
     fog.color.copy(atmo.fogColor);
     // The rooms are small and indoors: no haze in there
     fog.density = inBowl ? atmo.fogDensity : 0;
-    // Reflections on metal and glass: faint outdoors at night, clear indoors
-    scene.environmentIntensity = inBowl ? 0.12 + 0.3 * atmo.outdoor : 0.85;
+    // Light from the sky: full by day with the roof open, a fraction of
+    // it through the closed roof's white fabric, almost none at night.
+    // The rooms have their own soft indoor light.
+    const throughRoof = atmo.daylight * (1 - 0.45 * atmo.overcast) * (1 - 0.7 * roofEased);
+    scene.environmentIntensity = inBowl ? tune.sky * (0.05 + 1.0 * throughRoof) : 0.85;
 
-    gl.toneMappingExposure = 1.02 - 0.1 * Math.min(1, atmo.outdoor);
+    gl.toneMappingExposure = tune.exposure * (1.0 - 0.08 * Math.min(1, atmo.outdoor));
     first.current = false;
   }, -10);
 

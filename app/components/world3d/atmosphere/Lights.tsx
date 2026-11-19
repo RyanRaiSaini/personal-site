@@ -4,12 +4,17 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { Color, type DirectionalLight, type HemisphereLight, type SpotLight } from "three";
 import { useWorld } from "../../../lib/store";
+import { tune } from "./daylight";
 import { atmo } from "./state";
 
-// The stadium's lighting: daylight from the sky, the sun (or the moon),
-// and two banks of floodlights on the roof. Their strengths follow the
-// shared `atmo` state, so the look changes smoothly with the time of
-// day, the weather and the roof.
+// The stadium's lamps: the sun (or the moon), a little fill light, and
+// two banks of floodlights on the roof. The broad light of the sky is
+// not a lamp; it comes from the photographed sky (World3D.tsx). The
+// strengths follow the shared `atmo` state, so the look changes
+// smoothly between day and night and as the roof moves.
+//
+// To make the picture brighter or darker, change the numbers marked
+// "strength" below.
 
 const SKY_NIGHT = new Color("#3d4f8f");
 const SKY_DAY = new Color("#cfe2ff");
@@ -47,18 +52,21 @@ export default function Lights() {
     if (hemi.current) {
       hemi.current.color.copy(SKY_NIGHT).lerp(SKY_DAY, atmo.outdoor);
       hemi.current.groundColor.copy(GROUND_NIGHT).lerp(GROUND_DAY, atmo.outdoor);
-      hemi.current.intensity = 0.34 + 1.05 * atmo.outdoor + 0.14 * atmo.floodlights;
+      // strength of the fill light: low by day (the sky does the work), more under floodlights
+      hemi.current.intensity = tune.fill * (0.1 + 0.22 * atmo.outdoor + 0.32 * atmo.floodlights * (1 - atmo.outdoor));
     }
     if (sun.current) {
       sun.current.position.copy(atmo.sunDirection).multiplyScalar(SUN_DISTANCE);
       sun.current.color.copy(atmo.sunColor);
-      const day = 3.4 * atmo.daylight * (1 - 0.85 * atmo.overcast);
+      // strength of the sun
+      const day = tune.sun * 4.6 * atmo.daylight * (1 - 0.85 * atmo.overcast);
       const moon = 0.28 * (1 - atmo.daylight) * (1 - 0.7 * atmo.overcast);
       // Without shadows the roof can't block the sun, so dim it by hand
       const roofBlock = shadows ? 1 : 1 - 0.9 * atmo.roof;
       sun.current.intensity = (day + moon) * roofBlock;
     }
-    const flood = 150 * atmo.floodlights;
+    // strength of the floodlights
+    const flood = tune.floods * 150 * atmo.floodlights;
     if (floodWest.current) floodWest.current.intensity = flood;
     if (floodEast.current) floodEast.current.intensity = flood;
   });
@@ -77,8 +85,8 @@ export default function Lights() {
         shadow-camera-bottom={-150}
         shadow-camera-near={60}
         shadow-camera-far={520}
-        shadow-bias={-0.0006}
-        shadow-normalBias={0.6}
+        shadow-bias={-0.0005}
+        shadow-normalBias={0.12}
       />
       <spotLight ref={floodWest} position={[0, 47, -41]} color={FLOOD} angle={1.02} penumbra={0.75} decay={1} distance={0} />
       <spotLight ref={floodEast} position={[0, 47, 41]} color={FLOOD} angle={1.02} penumbra={0.75} decay={1} distance={0} />
