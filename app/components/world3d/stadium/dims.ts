@@ -1,8 +1,9 @@
 // ------------------------------------------------------------------
 // The stadium's measurements, in metres. One unit in the 3D world is
 // one metre. The pitch is centred on the origin with its length along
-// X and its width along Z. The main stand (tunnel, dugouts, crowd card
-// display) is on the -Z side.
+// X and its width along Z. North is +X and east is +Z, so the main
+// stand (tunnel, dugouts, crowd card display) on the -Z side is the
+// west stand, as at the real ground.
 // ------------------------------------------------------------------
 
 export const PITCH = {
