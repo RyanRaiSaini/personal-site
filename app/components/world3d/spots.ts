@@ -67,8 +67,8 @@ export const SPOTS: Record<Exclude<SectionId, "home">, Spot> = {
   },
   github: {
     scene: "bowl",
-    pose: { position: [0, 21, 24], target: [0, 15.5, -66], fov: 50 },
-    narrow: { position: [0, 22, 30], target: [0, 22, -66], fov: 62 },
+    pose: { position: [0, 22, 40], target: [0, 15, -66], fov: 56 },
+    narrow: { position: [0, 22, 34], target: [0, 21, -66], fov: 66 },
     anchor: [0, 23.5, -71],
   },
   live: {
@@ -85,13 +85,13 @@ export const SPOTS: Record<Exclude<SectionId, "home">, Spot> = {
   },
   awards: {
     scene: "trophy",
-    pose: { position: inRoom("trophy", [0, 1.7, 6]), target: inRoom("trophy", [0, 1.45, -2]), fov: 48 },
+    pose: { position: inRoom("trophy", [0.8, 1.75, 6.9]), target: inRoom("trophy", [-0.6, 1.4, -2]), fov: 60 },
     narrow: { position: inRoom("trophy", [0, 1.8, 6.6]), target: inRoom("trophy", [0, 2.0, -2]), fov: 64 },
     anchor: [26, 12.2, -59.6],
   },
   news: {
     scene: "press",
-    pose: { position: inRoom("press", [0.6, 1.7, 6.2]), target: inRoom("press", [0, 1.4, -2]), fov: 50 },
+    pose: { position: inRoom("press", [1.6, 1.75, 6.4]), target: inRoom("press", [-1.5, 1.4, -2]), fov: 54 },
     narrow: { position: inRoom("press", [0, 1.8, 6.8]), target: inRoom("press", [0, 2.0, -2]), fov: 66 },
     anchor: [-26, 12.2, -59.6],
   },
