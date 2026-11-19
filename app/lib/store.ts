@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import type { Egg } from "../data/portfolio";
+import type { Contributions } from "./github";
 import type { Weather } from "./weather";
 
 // ------------------------------------------------------------------
@@ -36,6 +37,7 @@ type State = {
 
   sound: boolean;
   weather: Weather | null;
+  contributions: Contributions | null;
 
   // Test overrides from the address bar (?time=22:30&weather=snow)
   timeOverride: string | null;
@@ -56,6 +58,7 @@ type State = {
   setRoofClosed: (closed: boolean) => void;
   setSound: (on: boolean) => void;
   setWeather: (weather: Weather | null) => void;
+  setContributions: (contributions: Contributions | null) => void;
   setOverrides: (time: string | null, weather: string | null) => void;
   findEgg: (id: EggId) => void;
   loadEggs: (ids: EggId[]) => void;
@@ -72,6 +75,7 @@ export const useWorld = create<State>((set, get) => ({
   roofClosed: true,
   sound: false,
   weather: null,
+  contributions: null,
   timeOverride: null,
   weatherOverride: null,
   eggsFound: [],
@@ -88,6 +92,7 @@ export const useWorld = create<State>((set, get) => ({
   },
   setSound: (sound) => set({ sound }),
   setWeather: (weather) => set({ weather }),
+  setContributions: (contributions) => set({ contributions }),
   setOverrides: (timeOverride, weatherOverride) => set({ timeOverride, weatherOverride }),
   findEgg: (id) => {
     const found = get().eggsFound;
