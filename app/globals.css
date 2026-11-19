@@ -392,3 +392,53 @@ html[data-intro="play"] .after-intro {
   scrollbar-color: var(--line-strong) transparent;
   overscroll-behavior: contain;
 }
+
+/* ------------------------------------------------------------------
+   Shows: the goal banner, and confetti on the flat pages
+   (app/components/world/ShowOverlay.tsx)
+------------------------------------------------------------------- */
+@keyframes banner-in {
+  0% {
+    opacity: 0;
+    transform: scale(1.6);
+    filter: blur(8px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.97);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.show-banner {
+  animation: banner-in 0.7s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+/* The home screen steps aside while a show is on */
+html[data-show]:not([data-show=""]) .after-intro {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes confetti-fall {
+  0% {
+    top: -4%;
+    opacity: 1;
+  }
+  100% {
+    top: 104%;
+    opacity: 0.9;
+  }
+}
+.confetti {
+  position: absolute;
+  top: -4%;
+  width: 9px;
+  height: 15px;
+  border-radius: 2px;
+  animation: confetti-fall 3s linear both;
+}
+
