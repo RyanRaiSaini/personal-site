@@ -191,6 +191,35 @@ function TrentLocker() {
   );
 }
 
+// The Easter egg's pay-off: a ball pinged out of locker 66 and clean
+// across the room, the way he hits them
+function TrentPass() {
+  const ball = useRef<Group>(null);
+  useFrame(() => {
+    if (!ball.current) return;
+    const show = useWorld.getState().show;
+    if (show?.kind !== "trent") {
+      ball.current.visible = false;
+      return;
+    }
+    const t = (performance.now() - show.startedAt) / 1000;
+    const u = (t - 0.4) / 1.05;
+    ball.current.visible = u > 0 && u < 1.25;
+    if (u <= 0) return;
+    // from the locker on the right wall to the far corner on the left
+    ball.current.position.set(5.9 - 12.2 * u, 0.85 + 1.4 * u - 1.9 * u * u + Math.sin(Math.PI * Math.min(1, u)) * 0.9, 1.4 - 3.4 * u);
+    ball.current.rotation.set(t * 9, t * 4, 0);
+  });
+  return (
+    <group ref={ball} visible={false}>
+      <mesh>
+        <sphereGeometry args={[0.11, 20, 14]} />
+        <meshStandardMaterial color="#f4f4f1" roughness={0.45} />
+      </mesh>
+    </group>
+  );
+}
+
 function floorTexture(family: string | null) {
   return canvasTexture(
     1024,
@@ -272,6 +301,7 @@ export default function DressingRoom() {
 
       {/* right wall: number 66 */}
       <TrentLocker />
+      <TrentPass />
 
       {/* a bench and a tactics table in the middle */}
       <Box size={[2.6, 0.08, 0.5]} position={[0, 0.46, 3.2]} color={WOOD} roughness={0.5} />
