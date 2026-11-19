@@ -48,6 +48,8 @@ export const tune = {
   fill: 1,
   floods: 1,
   exposure: 1,
+  bounce: 1, // light bounced off the pitch onto the stands
+  floor: 1, // the least light anything gets
 };
 
 if (typeof window !== "undefined") (window as unknown as { __tune: typeof tune }).__tune = tune;

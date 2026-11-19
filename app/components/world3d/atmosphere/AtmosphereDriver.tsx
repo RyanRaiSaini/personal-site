@@ -9,6 +9,7 @@ import { daylight, sunPosition, twilight } from "../../../lib/sun";
 import { currentInstant } from "../../../lib/time";
 import { overcastAmount, precipitationAmount } from "../../../lib/weather";
 import { sceneOf } from "../spots";
+import { bake } from "../stadium/bakedLight";
 import { SUN_DIRECTION, tune } from "./daylight";
 import { atmo, smooth } from "./state";
 
@@ -123,6 +124,17 @@ export default function AtmosphereDriver() {
     // The rooms have their own soft indoor light.
     const throughRoof = atmo.daylight * (1 - 0.45 * atmo.overcast) * (1 - 0.7 * roofEased);
     scene.environmentIntensity = inBowl ? tune.sky * (0.05 + 1.0 * throughRoof) : 0.85;
+
+    // The worked-out light (stadium/bakedLight.ts). By day the roof's
+    // shadow is used and the sky does most of the work. At night the
+    // sky is dark: the floodlit pitch and the lamps under the roof
+    // light the stands instead.
+    const night = 1 - Math.min(1, atmo.outdoor * 1.25);
+    bake.sunShade.value = Math.min(1, atmo.daylight * 1.5);
+    bake.sunThrough.value = 1 - roofEased;
+    bake.sky.value = 1.0 - 0.7 * night;
+    bake.bounce.value = tune.bounce * (2.0 + 6.8 * night);
+    bake.floor.value = tune.floor * (0.32 + 1.8 * night);
 
     gl.toneMappingExposure = tune.exposure * (1.0 - 0.08 * Math.min(1, atmo.outdoor));
     first.current = false;
