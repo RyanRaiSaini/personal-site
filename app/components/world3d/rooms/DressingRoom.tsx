@@ -15,7 +15,7 @@ import { Box, clickable, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign } from "./c
 // numbers come from `squad` and `bench` in app/data/portfolio.ts.
 // The last locker on the right is number 66, and it is not quite shut.
 
-const BAY = 1.12; // width of one locker bay
+const BAY = 1.04; // width of one locker bay
 const WOOD = "#7a5a3c";
 const WOOD_DARK = "#4d3724";
 
@@ -142,7 +142,7 @@ function Bay({ x, name, number, index }: { x: number; name: string; number: numb
 }
 
 // Number 66: a closed locker, door ajar, boots inside, warm light in the gap
-function TrentLocker() {
+function TrentLocker({ x }: { x: number }) {
   const door = useRef<Group>(null);
   const show = useWorld((s) => s.show);
   const open = show?.kind === "trent";
@@ -161,9 +161,8 @@ function TrentLocker() {
   };
 
   return (
-    <group position={[6.38, 0, 1.4]} rotation={[0, -Math.PI / 2, 0]}>
+    <group position={[x, 0, 0]}>
       <Box size={[0.06, 2.35, 0.62]} position={[-BAY / 2, 1.175, 0.31]} color={WOOD} roughness={0.55} />
-      <Box size={[0.06, 2.35, 0.62]} position={[BAY / 2, 1.175, 0.31]} color={WOOD} roughness={0.55} />
       <Box size={[BAY, 0.06, 0.62]} position={[0, 2.32, 0.31]} color={WOOD} roughness={0.55} />
       <Box size={[BAY, 0.07, 0.56]} position={[0, 0.46, 0.3]} color={WOOD} roughness={0.5} />
       <Box size={[BAY, 0.42, 0.5]} position={[0, 0.21, 0.27]} color={WOOD_DARK} roughness={0.6} />
@@ -206,8 +205,8 @@ function TrentPass() {
     const u = (t - 0.4) / 1.05;
     ball.current.visible = u > 0 && u < 1.25;
     if (u <= 0) return;
-    // from the locker on the right wall to the far corner on the left
-    ball.current.position.set(5.9 - 12.2 * u, 0.85 + 1.4 * u - 1.9 * u * u + Math.sin(Math.PI * Math.min(1, u)) * 0.9, 1.4 - 3.4 * u);
+    // out of the locker at the left of the back wall, over the room, to the far right
+    ball.current.position.set(-5.7 + 11.4 * u, 0.85 + 1.4 * u - 1.9 * u * u + Math.sin(Math.PI * Math.min(1, u)) * 0.9, -3.9 + 7.6 * u);
     ball.current.rotation.set(t * 9, t * 4, 0);
   });
   return (
@@ -257,7 +256,9 @@ export default function DressingRoom() {
 
   // Bench players wear the numbers after the starting eleven
   const benchNumbers = [12, 14, 15, 17, 18, 19, 20];
-  const startX = -((squad.length - 1) * BAY) / 2;
+  // twelve bays along the back wall: number 66 first, then the eleven
+  const firstX = -(squad.length * BAY) / 2;
+  const startX = firstX + BAY;
 
   return (
     <group>
@@ -280,10 +281,11 @@ export default function DressingRoom() {
 
       {/* a gold line and my name above the lockers */}
       <Glow size={[13.4, 0.03, 0.02]} position={[0, 2.82, -4.47]} color={[1.6, 1.3, 0.6]} />
-      <Sign lines={[{ text: "THE STARTING ELEVEN", size: 1, color: CREAM, spacing: 0.3 }]} width={6} height={0.36} position={[0, 3.14, -4.46]} background={null} />
+      <Sign lines={[{ text: "THE STARTING ELEVEN", size: 1, color: CREAM, spacing: 0.3 }]} width={6} height={0.36} position={[BAY / 2, 3.14, -4.46]} background={null} />
 
-      {/* back wall: the starting eleven */}
+      {/* back wall: number 66, then the starting eleven */}
       <group position={[0, 0, -4.48]}>
+        <TrentLocker x={firstX} />
         {squad.map((player, i) => (
           <Bay key={player.number} x={startX + i * BAY} name={player.name} number={player.number} index={i} />
         ))}
@@ -293,14 +295,12 @@ export default function DressingRoom() {
       {/* left wall: the bench */}
       <group position={[-6.68, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
         {bench.map((name, i) => (
-          <Bay key={name} x={-3.2 + i * BAY} name={name} number={benchNumbers[i] ?? 20 + i} index={i + 11} />
+          <Bay key={name} x={-3.4 + i * BAY} name={name} number={benchNumbers[i] ?? 20 + i} index={i + 11} />
         ))}
-        <Box size={[0.06, 2.35, 0.62]} position={[-3.2 + (bench.length - 0.5) * BAY, 1.175, 0.31]} color={WOOD} roughness={0.55} />
+        <Box size={[0.06, 2.35, 0.62]} position={[-3.4 + (bench.length - 0.5) * BAY, 1.175, 0.31]} color={WOOD} roughness={0.55} />
       </group>
       <Sign lines={[{ text: "THE BENCH", size: 1, color: CREAM, spacing: 0.3 }]} width={3.4} height={0.34} position={[-6.66, 3.14, -0.4]} rotation={[0, Math.PI / 2, 0]} background={null} />
 
-      {/* right wall: number 66 */}
-      <TrentLocker />
       <TrentPass />
 
       {/* a bench and a tactics table in the middle */}
