@@ -2,7 +2,7 @@
 
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { BoxGeometry, BufferAttribute, Color, DoubleSide, DynamicDrawUsage, IcosahedronGeometry, InstancedBufferAttribute, InstancedMesh, Matrix4, MeshBasicMaterial, MeshLambertMaterial, Object3D, PlaneGeometry } from "three";
+import { BufferAttribute, Color, DoubleSide, DynamicDrawUsage, InstancedBufferAttribute, InstancedMesh, Matrix4, MeshBasicMaterial, MeshLambertMaterial, Object3D, PlaneGeometry, SphereGeometry } from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { LEVEL_HEX } from "../../../lib/github";
 import { useWorld } from "../../../lib/store";
@@ -16,12 +16,14 @@ import { layoutCrowd } from "./crowdLayout";
 // roars. The fans in the main stand's second tier hold up cards that
 // spell out my GitHub contribution graph.
 
-// One seated fan: a body and a head
+// One seated fan: a rounded body and a head. Kept to about ninety
+// triangles, because there are tens of thousands of them.
 function fanGeometry() {
-  const body = new BoxGeometry(0.5, 0.58, 0.28).toNonIndexed();
-  body.translate(0, 0.55, 0);
-  const head = new IcosahedronGeometry(0.13, 1);
-  head.translate(0, 0.99, 0.01);
+  const body = new SphereGeometry(1, 7, 5).toNonIndexed();
+  body.scale(0.25, 0.37, 0.16);
+  body.translate(0, 0.5, 0);
+  const head = new SphereGeometry(0.122, 6, 5).toNonIndexed();
+  head.translate(0, 0.97, 0.012);
   const merged = mergeGeometries([body, head], false);
   // Marks which vertices are the head, so it can take a skin colour
   const part = new Float32Array(merged.getAttribute("position").count);
@@ -72,7 +74,7 @@ function fanMaterial(uniforms: Uniforms) {
 // GitHub's five shades, from "no contributions" to "a lot"
 const LEVEL_COLORS = LEVEL_HEX.map((hex) => new Color(hex));
 
-const DENSITY = { low: 0.34, medium: 0.62, high: 1 } as const;
+const DENSITY = { low: 0.3, medium: 0.56, high: 1 } as const;
 
 export default function Crowd() {
   const quality = useWorld((s) => s.quality);
