@@ -60,8 +60,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <a href="#content" className="btn btn-primary fixed left-4 top-4 z-50 -translate-y-24 focus:translate-y-0">
           Skip to content
         </a>
-        <WorldShell />
+        {/* The top bar comes first so that Tab reaches it before the
+            name tags floating over the stadium */}
         <SiteHeader />
+        <WorldShell />
         <div id="content" className="relative z-10">
           {children}
         </div>
