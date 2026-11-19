@@ -73,6 +73,8 @@ type State = {
   weatherOverride: string | null;
 
   eggsFound: EggId[];
+  // The egg found most recently in this visit (for the on-screen note)
+  lastEgg: { id: EggId; at: number } | null;
   show: Show | null;
   // Rises to 1 when the crowd should roar, then falls away by itself
   cheerAt: number;
@@ -125,6 +127,7 @@ export const useWorld = create<State>((set, get) => ({
   timeOverride: null,
   weatherOverride: null,
   eggsFound: [],
+  lastEgg: null,
   show: null,
   cheerAt: 0,
   selection: {},
@@ -158,7 +161,7 @@ export const useWorld = create<State>((set, get) => ({
     const found = get().eggsFound;
     if (found.includes(id)) return;
     const next = [...found, id];
-    set({ eggsFound: next });
+    set({ eggsFound: next, lastEgg: { id, at: performance.now() } });
     try {
       localStorage.setItem("eggs", JSON.stringify(next));
     } catch {
