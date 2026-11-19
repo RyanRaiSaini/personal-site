@@ -32,6 +32,15 @@ def sweep(b, a, c, material, face, cuts_for=None, splits=1, skip=None, material_
                 continue
             _x, _z, nx, nz = piece.at(tm, 0.0)
             facing = (nx * face[0], face[1], nz * face[0])
+            # on a corner the surface turns as it goes, so each end gets its own direction
+            smooth = None
+            if piece.kind == "corner":
+                flen = (face[0] ** 2 + face[1] ** 2) ** 0.5 or 1.0
+                ends = []
+                for t in (ta, tb):
+                    _x2, _z2, ex, ez = piece.at(t, 0.0)
+                    ends.append((ex * face[0] / flen, face[1] / flen, ez * face[0] / flen))
+                smooth = [ends[0], ends[1], ends[1], ends[0]]
             for k in range(splits):
                 f0, f1 = k / splits, (k + 1) / splits
                 d0, y0 = a[0] + (c[0] - a[0]) * f0, a[1] + (c[1] - a[1]) * f0
@@ -52,7 +61,7 @@ def sweep(b, a, c, material, face, cuts_for=None, splits=1, skip=None, material_
                     v0, v1 = f0 * length, f1 * length
                 b.quad(
                     L.point(piece, ta, d0, y0), L.point(piece, tb, d0, y0), L.point(piece, tb, d1, y1), L.point(piece, ta, d1, y1),
-                    mat, facing, [(u0, v0), (u1, v0), (u1, v1), (u0, v1)],
+                    mat, facing, [(u0, v0), (u1, v0), (u1, v1), (u0, v1)], smooth,
                 )
 
 

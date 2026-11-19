@@ -26,35 +26,53 @@ class Builder:
         self.uvs = []
         self.face_material = []
         self.materials = []
+        self.normals = []
+        self.custom_normals = False
+        self.shades = []
 
     def _material_index(self, name):
         if name not in self.materials:
             self.materials.append(name)
         return self.materials.index(name)
 
-    def quad(self, p0, p1, p2, p3, material, facing, uv=None):
+    def quad(self, p0, p1, p2, p3, material, facing, uv=None, normals=None, shade=1.0):
         """Add a four-sided face.
 
         `facing` is a direction the face should be seen from; the corners
         are reordered if needed so the face points that way.
         `uv` is four (u, v) pairs in metres, matching the corners.
+        `normals` is four directions, one per corner, for a face that is
+        part of a curve: with them the light rolls smoothly round a
+        corner of the bowl instead of showing each flat strip.
         """
         pts = [p0, p1, p2, p3]
         uv = uv or [(0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0)]
         ax, ay, az = (p1[i] - p0[i] for i in range(3))
         bx, by, bz = (p3[i] - p0[i] for i in range(3))
         nx, ny, nz = ay * bz - az * by, az * bx - ax * bz, ax * by - ay * bx
-        if nx * facing[0] + ny * facing[1] + nz * facing[2] < 0:
+        flipped = nx * facing[0] + ny * facing[1] + nz * facing[2] < 0
+        if flipped:
             pts = [p0, p3, p2, p1]
             uv = [uv[0], uv[3], uv[2], uv[1]]
+            nx, ny, nz = -nx, -ny, -nz
+        if normals:
+            self.custom_normals = True
+            if flipped:
+                normals = [normals[0], normals[3], normals[2], normals[1]]
+        else:
+            length = (nx * nx + ny * ny + nz * nz) ** 0.5 or 1.0
+            normals = [(nx / length, ny / length, nz / length)] * 4
+        self.normals.extend(to_blender(n) for n in normals)
+        self.shades.extend([shade] * 4)
         base = len(self.verts)
         self.verts.extend(to_blender(p) for p in pts)
         self.faces.append((base, base + 1, base + 2, base + 3))
         self.uvs.extend(uv)
         self.face_material.append(self._material_index(material))
 
-    def box(self, centre, size, material, axes=None):
-        """A box, optionally turned: `axes` is three unit directions."""
+    def box(self, centre, size, material, axes=None, shades=None):
+        """A box, optionally turned: `axes` is three unit directions.
+        `shades` darkens faces: (ends, top, bottom, front, back), 1 = as is."""
         ax, ay, az = axes or ((1, 0, 0), (0, 1, 0), (0, 0, 1))
         hx, hy, hz = size[0] / 2, size[1] / 2, size[2] / 2
 
@@ -70,7 +88,10 @@ class Builder:
             o = tuple(centre[i] + axis[i] * half * sign for i in range(3))
             pts = [tuple(o[i] + u_axis[i] * hu * su + v_axis[i] * hv * sv for i in range(3)) for su, sv in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
             uv = [(-hu, -hv), (hu, -hv), (hu, hv), (-hu, hv)]
-            self.quad(*pts, material, tuple(a * sign for a in axis), uv)
+            shade = 1.0
+            if shades:
+                shade = shades[0] if axis is ax else (shades[1] if sign > 0 else shades[2]) if axis is ay else (shades[3] if sign > 0 else shades[4])
+            self.quad(*pts, material, tuple(a * sign for a in axis), uv, None, shade)
         return corner
 
     def beam(self, a, b, width, material, up=(0.0, 1.0, 0.0)):
@@ -104,7 +125,11 @@ class Builder:
         for name in self.materials:
             mesh.materials.append(materials[name])
         mesh.polygons.foreach_set("material_index", self.face_material)
+        if self.custom_normals:
+            mesh.polygons.foreach_set("use_smooth", [True] * len(self.faces))
+            mesh.normals_split_custom_set_from_vertices(self.normals)
         mesh.update()
+        mesh["shades"] = self.shades
         obj = bpy.data.objects.new(self.name, mesh)
         collection.objects.link(obj)
         return obj

@@ -45,9 +45,13 @@ def build_steps(b):
                     if "vomitory" in kind and (j + 1) in removed:
                         continue
                     y2 = L.row_y(tier, j + 1)
+                    smooth = None
+                    if piece.kind == "corner":
+                        na, nb = L.inward(piece, ta), L.inward(piece, tb)
+                        smooth = [na, nb, nb, na]
                     b.quad(
                         L.point(piece, ta, db, y), L.point(piece, tb, db, y), L.point(piece, tb, db, y2), L.point(piece, ta, db, y2),
-                        "Riser", face_in, [(u0, v0 + P.TREAD), (u1, v0 + P.TREAD), (u1, v0 + P.TREAD + tier["rise"]), (u0, v0 + P.TREAD + tier["rise"])],
+                        "Riser", face_in, [(u0, v0 + P.TREAD), (u1, v0 + P.TREAD), (u1, v0 + P.TREAD + tier["rise"]), (u0, v0 + P.TREAD + tier["rise"])], smooth,
                     )
 
 

@@ -96,7 +96,7 @@ def x_of_t(piece, t):
     return piece.x0 + (piece.x1 - piece.x0) * t
 
 
-def cuts(tier, piece, corner_steps=20, straight_step=7.0, extra=()):
+def cuts(tier, piece, corner_steps=20, straight_step=2.7, extra=()):
     """Every place along a piece where the surface changes, sorted."""
     d = mid_d(tier)
     out = {0.0, 1.0}
@@ -155,7 +155,7 @@ def inward(piece, t):
     return (-nx, 0.0, -nz)
 
 
-def plain_cuts(piece, corner_steps=20, straight_step=7.0, extra=()):
+def plain_cuts(piece, corner_steps=20, straight_step=3.6, extra=()):
     """Cuts for surfaces with no aisles in them (walls, ceilings)."""
     out = {0.0, 1.0}
     if piece.kind == "corner":
