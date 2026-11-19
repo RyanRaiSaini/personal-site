@@ -6,8 +6,9 @@ import { Color, FogExp2 } from "three";
 import { now as nowData } from "../../../data/portfolio";
 import { useWorld } from "../../../lib/store";
 import { daylight, sunPosition, twilight } from "../../../lib/sun";
-import { instantAtLocalTime, parseClock } from "../../../lib/time";
+import { currentInstant } from "../../../lib/time";
 import { overcastAmount, precipitationAmount } from "../../../lib/weather";
+import { sceneOf } from "../spots";
 import { atmo, smooth } from "./state";
 
 // Works out the stadium's look once per frame and writes it into the
@@ -38,14 +39,6 @@ export const ROOF_SECONDS = 6;
 const scratchTop = new Color();
 const scratchHorizon = new Color();
 
-export function currentInstant(timeOverride: string | null): Date {
-  if (timeOverride) {
-    const clock = parseClock(timeOverride);
-    if (clock) return instantAtLocalTime(clock.hour, clock.minute, HOME.timeZone);
-  }
-  return new Date();
-}
-
 export default function AtmosphereDriver() {
   const scene = useThree((s) => s.scene);
   const gl = useThree((s) => s.gl);
@@ -59,7 +52,7 @@ export default function AtmosphereDriver() {
 
     // The sun moves slowly, so its position is refreshed once a second
     if (atmo.time - sun.current.checkedAt > 1) {
-      const position = sunPosition(currentInstant(state.timeOverride), HOME.latitude, HOME.longitude);
+      const position = sunPosition(currentInstant(state.timeOverride, HOME.timeZone), HOME.latitude, HOME.longitude);
       sun.current = { ...position, checkedAt: atmo.time };
     }
     const { elevation, azimuth } = sun.current;
@@ -119,8 +112,10 @@ export default function AtmosphereDriver() {
 
     if (!(scene.fog instanceof FogExp2)) scene.fog = new FogExp2(atmo.fogColor.getHex(), atmo.fogDensity);
     const fog = scene.fog as FogExp2;
+    const inBowl = sceneOf(state.section) === "bowl";
     fog.color.copy(atmo.fogColor);
-    fog.density = atmo.fogDensity;
+    // The rooms are small and indoors: no haze in there
+    fog.density = inBowl ? atmo.fogDensity : 0;
 
     gl.toneMappingExposure = 1.02 - 0.1 * Math.min(1, atmo.outdoor);
     first.current = false;
