@@ -1,0 +1,140 @@
+/* The résumé sheet (app/components/resume/ResumePage.tsx).
+   Always black on white, like paper, whatever the site's theme.
+   Every size is a share of the sheet's own width (cqw), so it scales
+   like a picture of a page. */
+
+.resume-sheet {
+  container-type: inline-size;
+  width: 100%;
+}
+
+.resume-page {
+  background: #ffffff;
+  color: #111111;
+  font-family: "Times New Roman", Times, "Liberation Serif", serif;
+  font-size: 1.86cqw;
+  line-height: 1.24;
+  padding: 5.4cqw 6.2cqw 5cqw;
+  border-radius: 0.6cqw;
+  box-shadow: 0 1.5cqw 5cqw rgba(0, 0, 0, 0.35);
+  text-align: left;
+}
+
+.resume-page a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.resume-name {
+  text-align: center;
+  font-size: 4.6cqw;
+  font-weight: 700;
+  font-variant: small-caps;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+.resume-contact {
+  text-align: center;
+  font-size: 1.72cqw;
+  margin-top: 0.5cqw;
+}
+
+.resume-heading {
+  font-size: 2.3cqw;
+  font-variant: small-caps;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  border-bottom: 0.14cqw solid #111111;
+  margin-top: 1.5cqw;
+  padding-bottom: 0.1cqw;
+  margin-bottom: 0.9cqw;
+}
+
+.resume-entry {
+  padding-left: 1.3cqw;
+  margin-bottom: 1cqw;
+}
+
+.resume-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2cqw;
+}
+.resume-row > p:last-child {
+  flex: none;
+  text-align: right;
+  padding-right: 1.3cqw;
+}
+
+.resume-small {
+  font-size: 1.72cqw;
+}
+
+.resume-entry ul {
+  list-style: disc;
+  padding-left: 3.4cqw;
+  padding-right: 1.3cqw;
+  margin-top: 0.5cqw;
+  font-size: 1.72cqw;
+}
+.resume-entry li {
+  margin-bottom: 0.32cqw;
+}
+
+.resume-skills {
+  padding-left: 1.3cqw;
+  font-size: 1.72cqw;
+}
+.resume-skills p {
+  margin-bottom: 0.25cqw;
+}
+
+/* On narrow panels the sheet would be too small to read, so the text
+   stops shrinking and the sheet simply flows */
+@container (max-width: 560px) {
+  .resume-page {
+    font-size: 11.5px;
+    padding: 22px 20px;
+    border-radius: 6px;
+  }
+  .resume-name {
+    font-size: 26px;
+  }
+  .resume-contact,
+  .resume-small,
+  .resume-entry ul,
+  .resume-skills {
+    font-size: 11px;
+  }
+  .resume-contact span {
+    display: inline-block;
+  }
+  .resume-heading {
+    font-size: 14px;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    border-bottom-width: 1px;
+  }
+  .resume-row {
+    flex-wrap: wrap;
+    gap: 0 12px;
+  }
+  .resume-entry {
+    padding-left: 0;
+    margin-bottom: 8px;
+  }
+  .resume-entry ul {
+    padding-left: 18px;
+    padding-right: 0;
+    margin-top: 4px;
+  }
+  .resume-row > p:last-child {
+    padding-right: 0;
+  }
+  .resume-skills {
+    padding-left: 0;
+  }
+}
