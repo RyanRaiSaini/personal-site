@@ -7,7 +7,10 @@ import { useWorld } from "../../lib/store";
 import AtmosphereDriver from "./atmosphere/AtmosphereDriver";
 import Bowl from "./Bowl";
 import CameraRig from "./camera/CameraRig";
+import Intro from "./camera/Intro";
+import Fireworks from "./eggs/Fireworks";
 import Hotspots from "./Hotspots";
+import RoomSaini from "./players/RoomSaini";
 import Rooms from "./rooms/Rooms";
 import { ORBIT } from "./spots";
 
@@ -87,8 +90,11 @@ export default function World3D() {
       </Environment>
       <AtmosphereDriver />
       <CameraRig />
-      <Bowl />
-      <Rooms />
+      <Intro />
+      <Bowl>
+        <Fireworks />
+      </Bowl>
+      <Rooms>{(room) => <RoomSaini room={room} />}</Rooms>
       <Hotspots />
       <Ready />
       <DevTools />
