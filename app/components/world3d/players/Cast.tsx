@@ -1,6 +1,6 @@
 "use client";
 
-import { useFrame } from "@react-three/fiber";
+import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { DoubleSide, type Group, type Mesh, type MeshBasicMaterial } from "three";
 import { useWorld } from "../../../lib/store";
@@ -128,6 +128,13 @@ export default function Cast() {
     if (world.show || !world.introDone) return;
     world.findEgg(scorer);
     world.startShow({ kind: "goal", scorer, label: scorer === "jude" ? "BELLINGHAM  5" : "MBAPPÉ  10" });
+  };
+
+  // A click only counts if the pointer stayed put. Letting go at the end
+  // of a drag that turned the camera should not set off a goal.
+  const click = (event: ThreeEvent<MouseEvent>, scorer: "jude" | "mbappe") => {
+    if (event.delta > 6) return;
+    start(scorer);
   };
 
   useFrame((frame) => {
@@ -311,14 +318,15 @@ export default function Cast() {
           <meshStandardMaterial map={leather} roughness={0.42} />
         </mesh>
         {/* a generous invisible target, so it is easy to hit from far away */}
-        <mesh onClick={() => start("jude")} {...clickable}>
-          <sphereGeometry args={[1.3, 12, 8]} />
+        <mesh onClick={(e) => click(e, "jude")} {...clickable}>
+          <sphereGeometry args={[2.2, 12, 8]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>
       </group>
-      {/* the south-east corner flag: click it */}
-      <mesh position={[-PITCH.halfLength, 0.9, PITCH.halfWidth]} onClick={() => start("mbappe")} {...clickable}>
-        <cylinderGeometry args={[1.2, 1.2, 2.2, 12]} />
+      {/* the south-east corner flag: click it. The target is much bigger than
+          the flag, which is only a few pixels wide from across the stadium */}
+      <mesh position={[-PITCH.halfLength, 2.4, PITCH.halfWidth]} onClick={(e) => click(e, "mbappe")} {...clickable}>
+        <cylinderGeometry args={[3, 3, 4.8, 12]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
 
