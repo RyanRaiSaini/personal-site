@@ -62,7 +62,7 @@ The public résumé has **no phone number** on purpose. `**double asterisks**` i
 | Which photos are in the album, and their order | `album` | `app/data/photos.ts` |
 | Add a photo | 1. add a line to `PHOTOS` 2. run `npm run photos -- "C:\path\to\originals"` 3. add a `photo(...)` line and put it in `album` | `scripts/optimize-photos.mjs`, then `app/data/photos.ts` |
 | My headshot | replace `public/photos/headshot.webp` (re-run the script) | `scripts/optimize-photos.mjs` |
-| The three photos framed on the press-room wall | the `<Frame … />` lines | `app/components/world3d/rooms/PressRoom.tsx` |
+| The three photos framed on the press-room wall | the `<Frame … />` lines (they use `album[0]`, `album[1]`, `album[4]`) | `app/components/world3d/rooms/PressRoom.tsx` |
 
 The originals are not in the repo. The script shrinks them, converts them to WebP and strips location data.
 
@@ -199,8 +199,8 @@ The shirts in the dressing room come from `squad` and `bench`. The trophies come
 | **Hala!** (fireworks, "GOOOL" on the big screen) | Type `hala` anywhere, or ↑ ↑ ↓ ↓ ← → ← → B A | keys: `app/components/world/ShowOverlay.tsx`; fireworks: `world3d/eggs/Fireworks.tsx` |
 | **VAR check** (red card) | Visit any address that does not exist | `app/not-found.tsx` |
 | **La Decimoquinta** (the big cup) | Click the trophy cabinet 15 times | `Cabinet` and `BigCup` in `world3d/rooms/TrophyRoom.tsx` |
-| **Wrong sport** (opens the All-Star album) | Click the basketball on the chair in the press room | `Basketball` in `world3d/rooms/PressRoom.tsx` |
-| **Locker 66** (Trent's pass) | Click the half-open locker in the dressing room | `TrentLocker` and `TrentPass` in `world3d/rooms/DressingRoom.tsx` |
+| **Wrong sport** (opens the All-Star album) | Click the basketball on the desk in the press room | `Basketball` in `world3d/rooms/PressRoom.tsx` |
+| **Locker 66** (Trent's pass) | Click the half-open locker at the left end of the dressing room's back wall | `TrentLocker` and `TrentPass` in `world3d/rooms/DressingRoom.tsx` |
 
 Also: opening a project in the Projects panel replays a goal by number 8 (`ProjectsContent.tsx` starts it, `GOALS.saini` scripts it).
 
