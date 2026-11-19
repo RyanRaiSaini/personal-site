@@ -116,6 +116,8 @@ export default function AtmosphereDriver() {
     fog.color.copy(atmo.fogColor);
     // The rooms are small and indoors: no haze in there
     fog.density = inBowl ? atmo.fogDensity : 0;
+    // Reflections on metal and glass: faint outdoors at night, clear indoors
+    scene.environmentIntensity = inBowl ? 0.12 + 0.3 * atmo.outdoor : 0.85;
 
     gl.toneMappingExposure = 1.02 - 0.1 * Math.min(1, atmo.outdoor);
     first.current = false;

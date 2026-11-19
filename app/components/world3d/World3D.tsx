@@ -1,6 +1,6 @@
 "use client";
 
-import { PerformanceMonitor } from "@react-three/drei";
+import { Environment, Lightformer, PerformanceMonitor } from "@react-three/drei";
 import { Canvas, useThree } from "@react-three/fiber";
 import { useEffect } from "react";
 import { useWorld } from "../../lib/store";
@@ -76,6 +76,15 @@ export default function World3D() {
           else if (q === "medium") setQuality("low");
         }}
       />
+      {/* What shiny things (trophies, glass, steel) reflect: a few soft
+          lights painted in code, so no image has to be downloaded */}
+      <Environment resolution={128} frames={1}>
+        <color attach="background" args={["#0c0f15"]} />
+        <Lightformer form="rect" intensity={3} color="#ffffff" position={[0, 6, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[10, 10, 1]} />
+        <Lightformer form="rect" intensity={1.6} color="#ffe2b8" position={[-6, 2, 2]} rotation={[0, Math.PI / 2, 0]} scale={[8, 3, 1]} />
+        <Lightformer form="rect" intensity={1.6} color="#bcd0ff" position={[6, 2, 2]} rotation={[0, -Math.PI / 2, 0]} scale={[8, 3, 1]} />
+        <Lightformer form="rect" intensity={1} color="#ffffff" position={[0, 2, 8]} rotation={[0, Math.PI, 0]} scale={[10, 3, 1]} />
+      </Environment>
       <AtmosphereDriver />
       <CameraRig />
       <Bowl />
