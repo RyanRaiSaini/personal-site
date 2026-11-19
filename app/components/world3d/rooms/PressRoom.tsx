@@ -231,7 +231,7 @@ export default function PressRoom() {
 
       {/* rows of chairs for the reporters */}
       {rows.map((z) => seats.map((x) => <Chair key={`${x}${z}`} x={x} z={z} />))}
-      <Basketball position={[1.4, 0.612, 1.3]} />
+      <Basketball position={[-1.4, 0.612, 1.3]} />
 
       {/* left wall: photos from All-Star weekend */}
       <Frame src={album[0].thumb} width={1.8} height={1.2} position={[-6.26, 1.75, -1.6]} rotation={[0, Math.PI / 2, 0]} />
