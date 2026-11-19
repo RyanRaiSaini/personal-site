@@ -5,8 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { type CanvasTexture, type MeshBasicMaterial } from "three";
 import { now as nowData, profile } from "../../../data/portfolio";
 import { useWorld, type Show } from "../../../lib/store";
-import { clockText } from "../../../lib/time";
-import { currentInstant } from "../atmosphere/AtmosphereDriver";
+import { clockText, currentInstant } from "../../../lib/time";
 import { atmo } from "../atmosphere/state";
 import { ledStrip, useDisplayFont, type StripSegment } from "../textures/text";
 import { HALO } from "./dims";
@@ -98,8 +97,8 @@ export default function Halo() {
     let segments: StripSegment[];
     if (show) segments = showSegments(show);
     else {
-      const instant = currentInstant(timeOverride);
       const home = nowData.homeCity;
+      const instant = currentInstant(timeOverride, home.timeZone);
       const away = nowData.awayCity;
       const conditions = weather ? `${Math.round(weather.temperature)}°C  ${weather.label.toUpperCase()}` : "LIVE";
       segments = [
