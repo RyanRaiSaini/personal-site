@@ -4,9 +4,9 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
 import { places } from "../../sections/registry";
 import { SPOTS } from "./spots";
-import { tagScreen } from "./tagScreen";
+import { tagFrame, tagScreen } from "./tagScreen";
 
-// Works out, every frame, where each place's name tag belongs on the
+// Works out, for every frame drawn, where each place's name tag belongs on the
 // screen, and writes it into `tagScreen`. The tags themselves are
 // ordinary page links drawn by app/components/world/Tags.tsx; this
 // only tells them where to sit. Their 3D positions are the `anchor`
@@ -28,6 +28,7 @@ export default function Hotspots() {
       slot.x = (point.x * 0.5 + 0.5) * size.width;
       slot.y = (-point.y * 0.5 + 0.5) * size.height;
     }
+    tagFrame.drawn?.();
   });
 
   return null;

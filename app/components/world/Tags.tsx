@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { useWorld } from "../../lib/store";
 import { places } from "../../sections/registry";
 import PlaceIcon from "../ui/PlaceIcon";
-import { tagScreen } from "../world3d/tagScreen";
+import { tagFrame, tagScreen } from "../world3d/tagScreen";
 
 // The name tags floating over each place when you look at the whole
 // stadium. Each one is a real link, so it works with a keyboard and a
@@ -24,21 +24,37 @@ export default function Tags() {
   // the row of places below it does the same job
   const visible = worldReady && section === "home" && introDone && !show && !narrow;
 
-  // Follow the 3D world, frame by frame
+  // The tags are only moved while they can be seen (and for the moment
+  // it takes them to fade out)
+  const movingUntil = useRef(0);
   useEffect(() => {
-    let frame = 0;
-    const tick = () => {
+    movingUntil.current = visible ? Infinity : performance.now() + 700;
+  }, [visible]);
+
+  // Follow the 3D world: it calls this after each frame it draws
+  useEffect(() => {
+    const last: Record<string, string> = {};
+    tagFrame.drawn = () => {
+      if (performance.now() > movingUntil.current) return;
       for (const place of places) {
         const el = holders.current[place.id];
         const slot = tagScreen[place.id];
         if (!el || !slot) continue;
-        el.style.transform = `translate3d(${slot.x.toFixed(1)}px, ${slot.y.toFixed(1)}px, 0)`;
+        // Whole pixels: a tag drifting slowly then changes a dozen times a
+        // second, not sixty, and its words stay sharp. Each change makes
+        // the browser restyle the tag, which measured as the dearest
+        // thing on the overview.
+        const next = slot.visible ? `translate3d(${Math.round(slot.x)}px, ${Math.round(slot.y)}px, 0)` : "hidden";
+        // the page is only touched when a tag has actually moved
+        if (last[place.id] === next) continue;
+        last[place.id] = next;
+        if (slot.visible) el.style.transform = next;
         el.style.display = slot.visible ? "block" : "none";
       }
-      frame = requestAnimationFrame(tick);
     };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      tagFrame.drawn = null;
+    };
   }, []);
 
   return (
