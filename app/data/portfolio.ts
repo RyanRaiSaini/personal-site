@@ -124,7 +124,6 @@ export const about = {
     { label: "Degree", value: "Honours Bachelor of Mathematics" },
     { label: "Graduating", value: "Fall 2031 (expected)" },
     { label: "Based in", value: "Brampton, Ontario" },
-    { label: "Shirt number", value: "8" },
     { label: "Open to", value: "Internships and co-ops" },
   ],
   coursework: ["Designing Programs (CS135)", "Algebra (MATH135)", "Calculus 1 (MATH137)", "Microeconomics (EC120)"],
@@ -445,7 +444,7 @@ export const now = {
   building: {
     label: "Now building",
     value: "This stadium",
-    detail: "My personal site, modelled in code with Three.js.",
+    detail: "My personal site: a stadium modelled in Blender and drawn with Three.js.",
   },
   studying: {
     label: "Studying",
@@ -457,8 +456,6 @@ export const now = {
     value: "Internships and co-ops",
     detail: "Software engineering, AI and data roles.",
   },
-  // Scrolls around the big screen and the pitch-side boards
-  ticker: ["RYAN RAI SAINI", "MATHEMATICS · UNIVERSITY OF WATERLOO", "PYTHON · TYPESCRIPT · PYTORCH", "OPEN TO INTERNSHIPS AND CO-OPS", "BRAMPTON, ONTARIO"],
   homeCity: { name: "Brampton", timeZone: "America/Toronto", latitude: 43.7315, longitude: -79.7624 },
   awayCity: { name: "Madrid", timeZone: "Europe/Madrid" },
 };
@@ -478,6 +475,20 @@ export const eggs: Egg[] = [
 ];
 
 // ------------------------------------------------------------------
+// The home screen's buttons and its one line of help
+// ------------------------------------------------------------------
+
+export const home = {
+  projects: "View projects",
+  tour: "Start the tour",
+  resume: "Résumé",
+  contact: "Contact",
+  hint: "Drag to look around. Click a sign to go there.",
+  // opens the small print
+  credits: "Credits and small print",
+};
+
+// ------------------------------------------------------------------
 // Words on the page's own controls
 // ------------------------------------------------------------------
 
@@ -494,6 +505,8 @@ export const shell = {
 // ------------------------------------------------------------------
 
 export const colophon = {
-  built: "Designed and built by Ryan Rai Saini with Next.js, React Three Fiber and TypeScript. The stadium, the crowd and the players are generated from code.",
+  built: "Designed and built by Ryan Rai Saini with Next.js, React Three Fiber and TypeScript. The stadium was modelled in Blender.",
+  // Required by the licence of the scan the stadium's measurements came from, and a thank-you for the free textures
+  credits: "Stadium proportions measured from \u201cEstadio Santiago Bernab\u00e9u, Madrid\u201d by DALGO (CC BY 4.0). Surfaces and sky from Poly Haven (CC0).",
   disclaimer: "A fan project. Not affiliated with or endorsed by Real Madrid C.F., the NBA or any player named here.",
 };
