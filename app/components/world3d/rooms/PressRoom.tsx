@@ -14,7 +14,7 @@ import { Box, clickable, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign } from "./c
 // The press room (In the News). A press-conference desk in front of a
 // sponsor-style backdrop, rows of chairs, my All-Star photos framed on
 // the wall, and a television showing the NBA film. Somebody left a
-// basketball on one of the chairs: click it.
+// basketball on the desk: click it.
 
 // The wall behind the desk: a chequerboard of my initials and number
 function backdropTexture(family: string | null) {
@@ -170,7 +170,7 @@ export default function PressRoom() {
   const family = useDisplayFont();
   const backdrop = useMemo(() => {
     const t = backdropTexture(family);
-    t.repeat.set(3.2, 1.8);
+    t.repeat.set(2.56, 1.8);
     return t;
   }, [family]);
   useEffect(() => () => backdrop.dispose(), [backdrop]);
@@ -191,8 +191,8 @@ export default function PressRoom() {
       {[-3, 0, 3].map((x) => [-2, 1.5].map((z) => <Glow key={`${x}${z}`} size={[1.5, 0.02, 0.7]} position={[x, 3.58, z]} color={[2.6, 2.6, 2.7]} />))}
 
       {/* the backdrop */}
-      <mesh position={[0, 1.95, -4.46]}>
-        <planeGeometry args={[9, 3.1]} />
+      <mesh position={[0.6, 1.95, -4.46]}>
+        <planeGeometry args={[7.2, 3.1]} />
         <meshStandardMaterial map={backdrop} roughness={0.55} />
       </mesh>
 
@@ -231,13 +231,14 @@ export default function PressRoom() {
 
       {/* rows of chairs for the reporters */}
       {rows.map((z) => seats.map((x) => <Chair key={`${x}${z}`} x={x} z={z} />))}
-      <Basketball position={[-1.4, 0.612, 1.3]} />
+      {/* left on the end of the desk, where it can't be missed */}
+      <Basketball position={[-1.95, 1.132, -3.0]} />
 
-      {/* left wall: photos from All-Star weekend */}
-      <Frame src={album[0].thumb} width={1.8} height={1.2} position={[-6.26, 1.75, -1.6]} rotation={[0, Math.PI / 2, 0]} />
-      <Frame src={album[1].thumb} width={0.9} height={1.2} position={[-6.26, 1.75, 0.4]} rotation={[0, Math.PI / 2, 0]} />
-      <Frame src={album[4].thumb} width={1.1} height={1.1} position={[-6.26, 1.75, 2.0]} rotation={[0, Math.PI / 2, 0]} />
-      <Sign lines={[{ text: "NBA ALL-STAR 2026", size: 1, color: GOLD, spacing: 0.25 }]} width={2.6} height={0.2} position={[-6.26, 2.72, -0.3]} rotation={[0, Math.PI / 2, 0]} background={null} glow={1.4} />
+      {/* back wall, left of the backdrop: photos from All-Star weekend */}
+      <Frame src={album[0].thumb} width={1.86} height={1.24} position={[-4.75, 2.28, -4.44]} rotation={[0, 0, 0]} />
+      <Frame src={album[1].thumb} width={0.84} height={1.12} position={[-5.28, 0.92, -4.44]} rotation={[0, 0, 0]} />
+      <Frame src={album[4].thumb} width={0.98} height={0.98} position={[-4.2, 0.86, -4.44]} rotation={[0, 0, 0]} />
+      <Sign lines={[{ text: "NBA ALL-STAR 2026", size: 1, color: GOLD, spacing: 0.25 }]} width={2.3} height={0.17} position={[-4.75, 3.22, -4.44]} background={null} glow={1.4} />
 
       {/* right wall: the television */}
       <group position={[6.26, 1.85, -0.6]} rotation={[0, -Math.PI / 2, 0]}>
