@@ -4,7 +4,8 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { use, useEffect, useMemo, useRef } from "react";
 import { BufferGeometry, Color, Group, InstancedBufferAttribute, InstancedMesh, MeshStandardMaterial, Sphere, Vector3 } from "three";
 import { useWorld } from "../../../lib/store";
-import { SEAT_COLOR, withBakedLight } from "./materials";
+import { withBakedLight } from "./bakedLight";
+import { SEAT_COLOR } from "./materials";
 import { loadSeatData, type SeatData } from "./seatData";
 
 // ------------------------------------------------------------------
@@ -24,7 +25,7 @@ import { loadSeatData, type SeatData } from "./seatData";
 const DETAIL_DISTANCE = 38;
 
 // From "nothing that day" to "a lot": navy, through pale blue, to white
-const PICTURE = ["#1c3070", "#4c64a8", "#8d9fd0", "#c6cfe9", "#f3f5fa"].map((hex) => new Color(hex));
+const PICTURE = ["#22398a", "#5068ac", "#8fa1d2", "#c7d0ea", "#f3f5fa"].map((hex) => new Color(hex));
 
 type Chunk = { centre: Vector3; radius: number; detailed: InstancedMesh; plain: InstancedMesh; colors: InstancedBufferAttribute; start: number; count: number };
 
@@ -65,7 +66,8 @@ function build(data: SeatData, detailedSeat: BufferGeometry, plainSeat: BufferGe
       // no two seats fade quite alike: a small, repeatable difference in shade
       const shade = 0.93 + 0.14 * (((seat * 2654435761) >>> 0) / 4294967295);
       colors.set([base.r * shade, base.g * shade, base.b * shade], i * 3);
-      light.set([details[seat * 8 + 2] / 255, details[seat * 8 + 3] / 255, 1], i * 3);
+      // sky, pitch and sun, as worked out in Blender
+      light.set([details[seat * 8 + 2] / 255, details[seat * 8 + 3] / 255, details[seat * 8 + 6] / 255], i * 3);
     }
     const matrixAttribute = new InstancedBufferAttribute(matrices, 16);
     const colorAttribute = new InstancedBufferAttribute(colors, 3);
@@ -77,7 +79,6 @@ function build(data: SeatData, detailedSeat: BufferGeometry, plainSeat: BufferGe
       mesh.instanceMatrix = matrixAttribute;
       mesh.instanceColor = colorAttribute;
       mesh.boundingSphere = sphere;
-      mesh.receiveShadow = true;
       mesh.matrixAutoUpdate = false;
       return mesh;
     };

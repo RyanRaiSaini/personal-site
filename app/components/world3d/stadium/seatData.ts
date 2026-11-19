@@ -32,7 +32,7 @@ export type SeatData = {
   manifest: StadiumManifest;
   // four numbers per seat: x, y, z, turn (radians about the upright axis)
   positions: Float32Array;
-  // eight bytes per seat: tier, row, sky, pitch, week, day, spare, spare
+  // eight bytes per seat: tier, row, sky, pitch, week, day, sun, spare
   details: Uint8Array;
 };
 
