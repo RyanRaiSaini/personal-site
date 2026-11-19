@@ -64,10 +64,23 @@ function Ready() {
 // Tells the page how much of the stadium (the model, its textures, the
 // sky) has downloaded, for the loading bar
 function LoadWatcher() {
-  const progress = useProgress((s) => s.progress);
   useEffect(() => {
-    useWorld.getState().setLoadProgress(Math.min(1, progress / 100));
-  }, [progress]);
+    let timer = 0;
+    const report = () => {
+      timer = 0;
+      useWorld.getState().setLoadProgress(Math.min(1, useProgress.getState().progress / 100));
+    };
+    // The loaders report from the middle of React's own work, so the
+    // news is passed on a moment later, and not more than a few times a second
+    const stop = useProgress.subscribe(() => {
+      if (!timer) timer = window.setTimeout(report, 80);
+    });
+    report();
+    return () => {
+      stop();
+      window.clearTimeout(timer);
+    };
+  }, []);
   return null;
 }
 
