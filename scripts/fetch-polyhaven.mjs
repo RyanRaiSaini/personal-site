@@ -27,11 +27,12 @@ const WEB = "public/stadium/textures";
 
 // asset id, the maps wanted, and the size
 //   diff = colour, nor = surface bumps, arm = occlusion / roughness / metalness packed together
+//   web: how wide the copy for the site is, in pixels, where the full 1K is more than it needs
 const TEXTURES = [
   { id: "brushed_concrete", maps: ["diff", "nor", "arm"], size: "1k", use: "the steps and walkways" },
   { id: "painted_concrete_02", maps: ["diff", "nor", "arm"], size: "1k", use: "walls, tier fronts and undersides" },
   { id: "corrugated_iron_02", maps: ["nor", "arm"], size: "1k", use: "the roof's ceiling" },
-  { id: "sparse_grass", maps: ["nor", "arm"], size: "1k", use: "fine relief on the pitch" },
+  { id: "sparse_grass", maps: ["nor", "arm"], size: "1k", web: 512, use: "fine relief on the pitch" },
 ];
 const SKY = { id: "kloofendal_48d_partly_cloudy_puresky", size: "4k", use: "daylight and the sky seen through the roof" };
 
@@ -66,7 +67,8 @@ async function main() {
       const fresh = await download(entry.url, original);
       const web = path.join(WEB, `${texture.id}_${map}.webp`);
       // surface-bump maps hold directions, not colour: keep them a little crisper
-      await sharp(original).webp({ quality: map === "nor" ? 90 : 82, effort: 5 }).toFile(web);
+      const image = texture.web ? sharp(original).resize(texture.web) : sharp(original);
+      await image.webp({ quality: map === "nor" ? 90 : 82, effort: 5 }).toFile(web);
       console.log(`${texture.id} ${map}: ${mb(entry.size)}${fresh ? " downloaded" : " (already had it)"} -> ${web}`);
     }
   }
