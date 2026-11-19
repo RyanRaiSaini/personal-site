@@ -93,7 +93,7 @@ async function main() {
     try {
       await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60_000 });
       if (!shot.flat) {
-        await page.waitForFunction(() => window.__world && window.__world.getState().worldReady && window.__world.getState().introDone, { timeout: 90_000, polling: 250 });
+        await page.waitForFunction(() => window.__world && window.__world.getState().worldReady && window.__world.getState().introDone, { timeout: Number(process.env.SHOTS_TIMEOUT ?? 90_000), polling: 250 });
         // A slow first second can make the site lower its own quality; put it back
         await page.evaluate(() => window.__world.getState().setQuality("high"));
         if (shot.look) await page.evaluate((pose) => window.__look(...pose), shot.look);
@@ -111,7 +111,8 @@ async function main() {
       if (errors.length) problems.push({ shot: shot.name, errors: [...new Set(errors)].slice(0, 4) });
     } catch (error) {
       console.log(`${shot.name.padEnd(20)} FAILED: ${String(error.message).slice(0, 160)}`);
-      problems.push({ shot: shot.name, errors: [String(error.message).slice(0, 200)] });
+      // what the page itself complained about usually explains the failure
+      problems.push({ shot: shot.name, errors: [String(error.message).slice(0, 200), ...new Set(errors)].slice(0, 6) });
     }
     await page.close();
   }
