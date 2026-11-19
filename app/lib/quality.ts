@@ -1,9 +1,15 @@
 import type { Quality } from "./store";
 
 // Guesses how much 3D this device can handle, so a phone or an old
-// laptop gets a lighter stadium (fewer fans, no shadows, no glow)
-// instead of a slideshow. The 3D world also steps down by itself if
-// it measures a low frame rate (see World3D.tsx).
+// laptop gets a lighter stadium instead of a slideshow:
+//
+//   low     no live shadows, no glow, one screen dot per page pixel
+//   medium  live shadows under the players, no glow (laptops with
+//           built-in graphics start here)
+//   high    shadows, glow round the lamps, a sharper picture
+//
+// The 3D world also steps down by itself if it measures a low frame
+// rate (see world3d/FrameGovernor.tsx).
 
 export function isNarrowScreen(): boolean {
   return window.matchMedia("(max-width: 767px), (max-height: 520px) and (pointer: coarse)").matches;

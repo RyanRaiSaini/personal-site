@@ -85,7 +85,11 @@ function Surroundings() {
   );
 }
 
-const DPR: Record<string, [number, number]> = { low: [1, 1.25], medium: [1, 1.5], high: [1, 2] };
+// How finely the picture is drawn, as [least, most] screen dots per
+// page pixel. A sharp laptop screen has 1.25 to 2; drawing every one of
+// them is what costs a built-in graphics chip the most, so only the
+// "high" level goes near it.
+const DPR: Record<string, [number, number]> = { low: [1, 1], medium: [1, 1.25], high: [1, 1.75] };
 
 export default function World3D() {
   const quality = useWorld((s) => s.quality);
