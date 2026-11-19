@@ -9,7 +9,10 @@ import type { SectionId } from "../../sections/registry";
 // along the pitch (north is +X), Y is height, Z runs across it (the
 // main stand is at -Z).
 //
-// To reframe a section, change its numbers here.
+// To reframe a section, change its numbers here. The stadium views use
+// long lenses (a field of view near 30) from well back: that is what
+// makes the stands rise behind the subject the way they do on
+// television, where a wide lens close up would shrink them.
 // ------------------------------------------------------------------
 
 export type Vec3 = [number, number, number];
@@ -49,26 +52,27 @@ function inRoom(room: Exclude<SceneId, "bowl">, v: Vec3): Vec3 {
 export const SPOTS: Record<Exclude<SectionId, "home">, Spot> = {
   about: {
     scene: "bowl",
-    pose: { position: [8.5, 2.3, 12.5], target: [-0.5, 1.5, 0], fov: 40 },
+    pose: { position: [12, 1.75, 17.5], target: [-0.9, 1.55, 0], fov: 29 },
     narrow: { position: [7, 2.6, 13], target: [0, 2.2, 0], fov: 50 },
     anchor: [0, 3.2, 0],
   },
   projects: {
     scene: "bowl",
-    pose: { position: [33, 3.4, 10.5], target: [52.5, 1.9, -1.5], fov: 42 },
+    pose: { position: [28, 2.6, 13.5], target: [52.5, 2.2, -2], fov: 33 },
     narrow: { position: [36, 3.6, 12], target: [52.5, 3, -1], fov: 52 },
     anchor: [52.5, 4.6, 0],
   },
   experience: {
     scene: "bowl",
-    pose: { position: [-8.5, 2.5, -29], target: [-15.5, 1.5, -41], fov: 42 },
+    pose: { position: [-5.5, 2.1, -22.5], target: [-15.5, 1.7, -41], fov: 33 },
     narrow: { position: [-8, 2.8, -27], target: [-15, 2.6, -41], fov: 52 },
     anchor: [-15, 4.6, -40],
   },
   github: {
     scene: "bowl",
-    pose: { position: [0, 22, 40], target: [0, 15, -66], fov: 56 },
-    narrow: { position: [0, 22, 34], target: [0, 21, -66], fov: 66 },
+    // aimed at the newer end of the picture, which is where the commits are
+    pose: { position: [46, 28, -6], target: [10, 15, -64], fov: 34 },
+    narrow: { position: [34, 30, 2], target: [12, 19, -64], fov: 50 },
     anchor: [0, 20.5, -66],
   },
   live: {
