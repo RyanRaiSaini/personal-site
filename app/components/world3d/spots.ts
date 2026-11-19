@@ -79,7 +79,7 @@ export const SPOTS: Record<Exclude<SectionId, "home">, Spot> = {
   },
   skills: {
     scene: "dressing",
-    pose: { position: inRoom("dressing", [0, 1.75, 5.4]), target: inRoom("dressing", [0, 1.35, -2]), fov: 52 },
+    pose: { position: inRoom("dressing", [-0.6, 1.75, 6.4]), target: inRoom("dressing", [-1.7, 1.35, -2]), fov: 58 },
     narrow: { position: inRoom("dressing", [0, 1.8, 6]), target: inRoom("dressing", [0, 1.9, -2]), fov: 66 },
     anchor: [-9, 3.2, -43.5],
   },
