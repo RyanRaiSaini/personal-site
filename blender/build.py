@@ -62,10 +62,12 @@ def single_material(obj, shade_for):
     mesh = obj.data
     attr = mesh.color_attributes.new(name=occlusion.ATTRIBUTE, type="FLOAT_COLOR", domain="POINT")
     colours = [1.0] * (len(mesh.vertices) * 4)
+    face_shades = mesh.get("shades")
     for poly in mesh.polygons:
         shade = shade_for(mesh.materials[poly.material_index].name)
         for vi in poly.vertices:
-            colours[vi * 4: vi * 4 + 4] = (*shade, 1.0)
+            k = face_shades[vi] if face_shades else 1.0
+            colours[vi * 4: vi * 4 + 4] = (shade[0] * k, shade[1] * k, shade[2] * k, 1.0)
         poly.material_index = 0
     attr.data.foreach_set("color", colours)
     mesh.color_attributes.active_color = attr
@@ -155,6 +157,9 @@ def render_previews(folder, collection):
 
 def main():
     args = parse_args()
+    # Blender reads a relative path as "beside the open file", so pin them down
+    args.site = os.path.abspath(args.site)
+    args.blend = os.path.abspath(args.blend)
     started = time.time()
     if not args.keep_scene:
         bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -216,11 +221,13 @@ def main():
     for name in ("Terraces", "Structure", "Roof", "Steel", "Screen", "Ribbons", "Floodlights"):
         unique = occlusion.bake(tree, objects[name])
         log(f"light on {name}: {unique} points measured")
-    occlusion.fill(objects["Glass"], (1.0, 1.0, 1.0))
+    occlusion.fill(objects["Glass"], (1.0, 1.0, 1.0, 1.0))
     for obj in panels:
-        occlusion.fill(obj, (0.55, 0.35, 1.0))
+        occlusion.fill(obj, (0.55, 0.35, 1.0, 1.0))
     light = occlusion.seat_light(tree, all_seats)
-    log(f"light on seats: sky {sum(s[0] for s in light) / len(light):.2f} average")
+    log(f"light on seats: sky {sum(s[0] for s in light) / len(light):.2f} average, {sum(1 for s in light if s[2] > 0.5)} in the sun")
+    size = occlusion.pitch_picture(tree, os.path.join(os.path.abspath(args.site), "pitch-light.png"))
+    log(f"light on the pitch: a {size[0]} x {size[1]} picture")
 
     # ---- show the seats in the Blender file ----
     try:
@@ -240,6 +247,8 @@ def main():
         "screen": P.SCREEN,
         "floods": P.FLOODS,
         "mosaic": seats.MOSAIC,
+        "sun": P.SUN,
+        "ground": {"halfX": P.BOWL["hx"], "halfZ": P.BOWL["hz"]},
         "seat": {"pitch": P.SEAT_PITCH, "tread": P.TREAD},
     }
     with open(os.path.join(args.site, "manifest.json"), "w", encoding="utf-8") as f:

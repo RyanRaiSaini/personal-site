@@ -68,5 +68,10 @@ FLOODS = {"d": -2.4, "y": 42.4, "spacing": 1.7}
 # The players' tunnel, in the middle of the main (west) stand
 TUNNEL = {"half_width": 3.0, "height": 3.1}
 
+# The sun. By day the website lights the stadium with one fixed sun, so
+# its shadows can be worked out here once. These two numbers must match
+# app/components/world3d/atmosphere/daylight.ts.
+SUN = {"compass": 114.0, "elevation": 47.88}  # degrees from north (+x) toward east (+z); degrees above the horizon
+
 # The outer shell, measured from the scan
 SHELL = {"length": 252.6, "width": 205.3, "height": 58.8}
