@@ -26,9 +26,12 @@ def build_seat(name, detailed):
     Drawn around the middle of its step, facing +z (toward the pitch)."""
     b = Builder(name)
     w = SEAT_WIDTH
+    # Faces are shaded a little by which way they point: the gaps
+    # between seats and the undersides are darker, the tops catch more
+    # light. Without this a row of identical seats reads as one long bench.
     if not detailed:
         # one slim block for the folded pan and back together
-        b.box((0.0, 0.62, 0.035), (w, 0.44, 0.13), "SeatPlastic")
+        b.box((0.0, 0.62, 0.035), (w, 0.44, 0.13), "SeatPlastic", None, (0.42, 1.0, 0.4, 0.92, 0.55))
         return b
     # the back, leaning a touch away from the pitch, in three strips so it curves
     strips = 3
@@ -38,18 +41,18 @@ def build_seat(name, detailed):
         bow0 = 0.018 * (1 - (2 * (i / strips) - 1) ** 2)
         bow1 = 0.018 * (1 - (2 * ((i + 1) / strips) - 1) ** 2)
         lo, hi = 0.40, 0.84
-        for (za, zb, facing) in ((0.0, 0.0, (0.0, 0.0, 1.0)), (-0.035, -0.035, (0.0, 0.0, -1.0))):
-            b.quad((x0, lo, za - bow0), (x1, lo, zb - bow1), (x1, hi, zb - bow1 - 0.05), (x0, hi, za - bow0 - 0.05), "SeatPlastic", facing)
+        for (za, zb, facing, shade) in ((0.0, 0.0, (0.0, 0.0, 1.0), 0.8), (-0.035, -0.035, (0.0, 0.0, -1.0), 0.55)):
+            b.quad((x0, lo, za - bow0), (x1, lo, zb - bow1), (x1, hi, zb - bow1 - 0.05), (x0, hi, za - bow0 - 0.05), "SeatPlastic", facing, None, None, shade)
         b.quad((x0, hi, -bow0 - 0.05), (x1, hi, -bow1 - 0.05), (x1, hi, -bow1 - 0.085), (x0, hi, -bow0 - 0.085), "SeatPlastic", UP)
     for s in (-1, 1):
         x = s * w / 2
-        b.quad((x, 0.40, 0.0), (x, 0.40, -0.035), (x, 0.84, -0.085), (x, 0.84, -0.05), "SeatPlastic", (s, 0.0, 0.0))
+        b.quad((x, 0.40, 0.0), (x, 0.40, -0.035), (x, 0.84, -0.085), (x, 0.84, -0.05), "SeatPlastic", (s, 0.0, 0.0), None, None, 0.42)
     # the pan, folded up against the back
     tilt = math.radians(14)
     ax = (1.0, 0.0, 0.0)
     ay = (0.0, math.cos(tilt), math.sin(tilt))
     az = (0.0, -math.sin(tilt), math.cos(tilt))
-    b.box((0.0, 0.60, 0.085), (w - 0.03, 0.40, 0.045), "SeatPlastic", (ax, ay, az))
+    b.box((0.0, 0.60, 0.085), (w - 0.03, 0.40, 0.045), "SeatPlastic", (ax, ay, az), (0.42, 1.0, 0.4, 0.95, 0.6))
     # the bracket that holds it to the step behind
     b.box((0.0, 0.36, -0.02), (0.30, 0.10, 0.12), "SeatFrame")
     return b
@@ -133,15 +136,16 @@ def all_seats():
 
 
 def write_seats(path_positions, path_details, seats, light):
-    """Two small files: positions (x, y, z, turn) as numbers, and a few
-    details per seat (tier, row, light, week, day) as bytes."""
+    """Two small files: positions (x, y, z, turn) as numbers, and eight
+    bytes of detail per seat: tier, row, sky, pitch, week, day, sun, spare."""
     with open(path_positions, "wb") as f:
         for (x, y, z, yaw, *_rest) in seats:
             f.write(struct.pack("<4f", x, y, z, yaw))
     with open(path_details, "wb") as f:
         for (seat, lit) in zip(seats, light):
             _x, _y, _z, _yaw, tier, row, week, day = seat
-            f.write(struct.pack("<8B", tier, row, max(0, min(255, round(lit[0] * 255))), max(0, min(255, round(lit[1] * 255))), week, day, 0, 0))
+            sky, pitch, sun = (max(0, min(255, round(v * 255))) for v in lit)
+            f.write(struct.pack("<8B", tier, row, sky, pitch, week, day, sun, 0))
 
 
 _ = (EAST, NORTH, SOUTH)
