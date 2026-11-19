@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { BufferGeometry, DoubleSide, Float32BufferAttribute } from "three";
-import { AD_BOARD, PITCH, TUNNEL } from "./dims";
+import { AD_BOARD, DUGOUT, PITCH, TUNNEL } from "./dims";
 
 // The boards round the pitch. They are switched off: plain dark screens
 // with no words and no sponsors on them, catching a little of the light
@@ -21,12 +21,16 @@ function runs(): Run[] {
   const z = PITCH.halfWidth + AD_BOARD.offsetZ;
   const x = PITCH.halfLength + AD_BOARD.offsetX;
   const gap = TUNNEL.halfWidth + 1.2;
+  const benchNear = DUGOUT.x - DUGOUT.width / 2 - 1;
+  const benchFar = DUGOUT.x + DUGOUT.width / 2 + 1;
   return [
     // east touchline
     { from: [-50, z], to: [50, z] },
-    // west touchline, with a gap where the tunnel comes out
-    { from: [50, -z], to: [gap, -z] },
-    { from: [-gap, -z], to: [-50, -z] },
+    // west touchline, open where the tunnel comes out and in front of each bench
+    { from: [50, -z], to: [benchFar, -z] },
+    { from: [benchNear, -z], to: [gap, -z] },
+    { from: [-gap, -z], to: [-benchNear, -z] },
+    { from: [-benchFar, -z], to: [-50, -z] },
     // behind the goals
     { from: [x, 30], to: [x, -30] },
     { from: [-x, -30], to: [-x, 30] },
