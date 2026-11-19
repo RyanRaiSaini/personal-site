@@ -83,11 +83,12 @@ export default function AtmosphereDriver() {
     const cheerTarget = state.cheerAt > 0 && sinceCheer < 6 ? Math.max(0, 1 - sinceCheer / 6) : 0;
     atmo.cheer = smooth(atmo.cheer, cheerTarget, cheerTarget > atmo.cheer ? 8 : 1.5, dt);
 
-    // Where the light comes from. By day it is the real sun, never
-    // lower than 14 degrees so the shadows stay readable. At night a
-    // high moon takes over.
+    // Where the light comes from. By day it comes from the real sun's
+    // compass direction, but never from lower than 36 degrees, so that
+    // sunshine reaches part of the pitch even in a Canadian winter.
+    // At night a high moon takes over.
     if (atmo.daylight > 0.02) {
-      const el = Math.max(elevation, 14) * RAD;
+      const el = Math.max(elevation, 36) * RAD;
       const az = azimuth * RAD;
       // North is +X, east is +Z
       atmo.sunDirection.set(Math.cos(el) * Math.cos(az), Math.sin(el), Math.cos(el) * Math.sin(az));
