@@ -42,3 +42,9 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# the stadium model before it is squeezed for the web
+/public/stadium/stadium.raw.glb
+# Blender scratch files
+__pycache__/
+*.blend1
