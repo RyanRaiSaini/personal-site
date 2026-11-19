@@ -64,8 +64,11 @@ export default function World3D() {
       aria-label="A 3D football stadium. Each part of the ground is a section of this site; the same sections are in the menu."
     >
       <color attach="background" args={["#05070d"]} />
-      {/* If the frame rate stays low, step down a quality level */}
+      {/* If the frame rate stays under 24 a second, step down a quality
+          level. (Some laptops cap browsers at 30 to save battery, so
+          30 must not count as slow.) */}
       <PerformanceMonitor
+        bounds={() => [24, 200]}
         flipflops={2}
         onDecline={() => {
           const q = useWorld.getState().quality;
