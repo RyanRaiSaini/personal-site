@@ -241,8 +241,11 @@ body {
   height: 10px;
   border-radius: 50%;
   background: #f2cf6b;
-  box-shadow: 0 0 0 0 rgba(242, 207, 107, 0.6);
-  animation: tag-pulse 2.4s ease-out infinite;
+  /* A still halo. It used to pulse for ever, which kept the browser
+     redrawing sixty times a second even with the stadium at rest. */
+  box-shadow:
+    0 0 0 4px rgba(242, 207, 107, 0.22),
+    0 0 12px rgba(242, 207, 107, 0.55);
 }
 .tag-stem {
   position: absolute;
@@ -264,11 +267,11 @@ body {
   border-radius: 999px;
   white-space: nowrap;
   color: #f5f2ea;
-  background: rgba(7, 10, 20, 0.72);
+  /* Solid, not frosted: blurring the moving stadium behind ten labels
+     was work for the graphics card on every frame */
+  background: rgba(7, 10, 20, 0.86);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
   transition:
     transform 0.2s ease,
     border-color 0.2s ease,
@@ -308,14 +311,6 @@ body {
 .tag-title {
   font-size: 0.72rem;
   color: #b8bdcb;
-}
-@keyframes tag-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(242, 207, 107, 0.6);
-  }
-  100% {
-    box-shadow: 0 0 0 14px rgba(242, 207, 107, 0);
-  }
 }
 
 /* ------------------------------------------------------------------
