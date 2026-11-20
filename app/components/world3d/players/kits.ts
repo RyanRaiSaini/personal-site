@@ -35,7 +35,7 @@ export type Kit = {
 
 export const KITS: Record<"saini" | "six" | "ten" | "sixtySix" | "keeper", Kit> = {
   // Me: number 8
-  saini: { name: "SAINI", number: 8, skin: "#b9855a", hair: "#14100e", hairStyle: "medium", beard: "goatee" },
+  saini: { name: "SAINI", number: 8, skin: "#a36f48", hair: "#14100e", hairStyle: "medium", beard: "goatee", height: 1.85 },
   // Number 6: the penalty at the south end
   six: { name: "", number: 6, skin: "#a7774f", hair: "#17110d", hairStyle: "curls", beard: "chin", height: 1.86 },
   // Number 10: in from the wing
