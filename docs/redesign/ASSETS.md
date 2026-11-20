@@ -32,7 +32,7 @@ A second model, "santiago bernabeu" by Michael Persi (mikmikoni), CC BY 4.0, was
 | Base character | "Remy", from Adobe's [Mixamo](https://www.mixamo.com) library, used for his body and skeleton only |
 | Movement | Mixamo motion capture: its "Soccer Game Pack" (penalty kick, strike, jog, goalkeeper stance and dive, the long pass) and the single clips Breathing Idle, Running, Sitting Idle and Victory |
 | Made by | Rebuilt for this site in Blender 5.3 by [`blender/build_players.py`](../../blender/build_players.py): an athlete's build, the thighs the base comes without, the plain white kit, dark hair and eyes, a second hairstyle, three beards and four standing poses |
-| Web version | [`public/players/player.glb`](../../public/players/player.glb), 1.57 MB, with its timings in `player.json` |
+| Web version | [`public/players/player.glb`](../../public/players/player.glb), 1.6 MB, with its timings in `player.json` |
 | Licence | Adobe's [Mixamo FAQ](https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html) allows characters and animations to be used "royalty free for personal, commercial, and non-profit projects". A free Adobe account is needed to download them. |
 | What is not in this repo | The files as downloaded from Mixamo. They are kept in `C:\Users\ryanr\stadium-work\mixamo\` and can be downloaded again from Mixamo at any time. Only the rebuilt model is here; it is part of this site and is not offered for reuse on its own. |
 
