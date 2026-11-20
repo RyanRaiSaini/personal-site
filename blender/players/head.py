@@ -16,6 +16,8 @@ players: the site shows the pieces each player has (kits.ts).
     BeardChin    light growth on the chin and upper lip
 """
 
+import math
+
 import bmesh
 import numpy as np
 from mathutils import Vector, noise
@@ -202,6 +204,22 @@ def _chin(co, normal, m, wide=0.040, narrow=0.011):
     return strength * (1.0 - _ramp(back, 0.022, 0.050)) * _ramp(co.z, m["jaw_bottom"] - 0.012, m["jaw_bottom"] - 0.002)
 
 
+def _circle(co, normal, m, wide=0.035):
+    """A goatee that joins the moustache: an oval of beard round the
+    mouth and over the chin, with the lips left bare."""
+    across = abs(co.x - m["mid"])
+    top = m["lip_top"] + 0.0115  # a little under the nose
+    bottom = m["jaw_bottom"] - 0.006  # just under the chin
+    centre = (top + bottom) / 2.0
+    oval = math.hypot(across / wide, (co.z - centre) / ((top - bottom) / 2.0))
+    beard = 1.0 - _ramp(oval, 0.90, 1.03)
+    lips = (1.0 - _ramp(across, m["half"] - 0.004, m["half"] + 0.001)) * _ramp(co.z, m["lip_bottom"] - 0.001, m["lip_bottom"] + 0.002) * (1.0 - _ramp(co.z, m["lip_top"] - 0.002, m["lip_top"] + 0.001))
+    # on the face it must look forward; under the chin it may look down, fading toward the throat
+    forward = _ramp(-normal.y, 0.05, 0.35)
+    under = _ramp(-normal.z, 0.25, 0.6) * (1.0 - _ramp(co.y - m["chin"].y, 0.020, 0.046))
+    return beard * (1.0 - lips) * max(forward, under)
+
+
 def _jaw(co, normal, m):
     # the band where the cheek turns under into the throat
     turning = _ramp(-normal.z, 0.05, 0.30) * (1.0 - _ramp(-normal.z, 0.70, 0.92))
@@ -211,8 +229,8 @@ def _jaw(co, normal, m):
 
 
 STYLES = {
-    # a full chin beard and a thin, separate moustache
-    "BeardGoatee": lambda co, n, m: max(_chin(co, n, m), 0.9 * _moustache(co, n, m, reach=0.011, droop=0.005)),
+    # a full goatee: the chin beard and the moustache joined round the mouth
+    "BeardGoatee": lambda co, n, m: _circle(co, n, m),
     # a light beard along the jaw, joined to light growth on the chin and lip
     "BeardStrap": lambda co, n, m: 0.62 * max(_jaw(co, n, m), 0.9 * _chin(co, n, m, wide=0.034, narrow=0.016), 0.8 * _moustache(co, n, m, reach=0.013)),
     # light growth on the chin and upper lip only
@@ -236,10 +254,11 @@ def make_beards(body, marks):
         bm = bmesh.new()
         bm.from_mesh(beard.data)
         bm.faces.index_update()
-        bm.verts.index_update()
-        solid = {v: float(cover[v.index]) for v in bm.verts}
         bmesh.ops.delete(bm, geom=[f for f in bm.faces if f.index not in wanted], context="FACES")
+        # divide it up once, so the beard's edge is finer than the face's own mesh
+        bmesh.ops.subdivide_edges(bm, edges=bm.edges[:], cuts=1, use_grid_fill=True)
         bm.normal_update()
+        solid = {v: float(strength(v.co, v.normal, marks)) for v in bm.verts}
         colour = bm.loops.layers.float_color.new("Colour")
         for v in bm.verts:
             v.co += v.normal * 0.0008
