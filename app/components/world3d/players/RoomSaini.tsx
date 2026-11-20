@@ -5,23 +5,23 @@ import { useRef } from "react";
 import { atmo } from "../atmosphere/state";
 import type { SceneId } from "../spots";
 import { KITS } from "./kits";
+import { playing, standing, type Layer } from "./moves";
 import Player, { type PlayerHandle } from "./Player";
-import { ARMS_CROSSED, HANDS_ON_HIPS, idle, mix, SEATED, STAND, type Pose } from "./poses";
 
 // Number 8 inside each room: looking over the shirts, admiring the
 // silverware, sitting at the press desk, queueing for a programme, and
 // stopping to talk in the mixed zone.
 
-type Mark = { at: [number, number, number]; facing: number; pose: Pose };
+type Mark = { at: [number, number, number]; facing: number; doing: (time: number) => Layer[] };
 
 const MARKS: Record<Exclude<SceneId, "bowl">, Mark> = {
   // back to the camera, so the name and number are on show
-  dressing: { at: [-2.4, 0, 1.3], facing: Math.PI * 1.16, pose: HANDS_ON_HIPS },
-  trophy: { at: [2.5, 0, 1.0], facing: Math.PI * 0.86, pose: ARMS_CROSSED },
+  dressing: { at: [-2.4, 0, 1.3], facing: Math.PI * 1.16, doing: (time) => standing(time, ["hips"]) },
+  trophy: { at: [2.5, 0, 1.0], facing: Math.PI * 0.86, doing: (time) => standing(time, ["folded"]) },
   // behind the desk, on the little stage
-  press: { at: [0, 0.22, -3.55], facing: 0, pose: SEATED },
-  tickets: { at: [-1.5, 0, -1.6], facing: Math.PI * 0.94, pose: STAND },
-  mixed: { at: [0.1, 0, -1.5], facing: 0.08, pose: HANDS_ON_HIPS },
+  press: { at: [0, 0.22, -3.55], facing: 0, doing: (time) => playing("sit", time) },
+  tickets: { at: [-1.5, 0, -1.6], facing: Math.PI * 0.94, doing: (time) => standing(time) },
+  mixed: { at: [0.1, 0, -1.5], facing: 0.08, doing: (time) => standing(time, ["hips"]) },
 };
 
 export default function RoomSaini({ room }: { room: Exclude<SceneId, "bowl"> }) {
@@ -29,7 +29,7 @@ export default function RoomSaini({ room }: { room: Exclude<SceneId, "bowl"> }) 
   const mark = MARKS[room];
 
   useFrame(() => {
-    player.current?.setPose(mix(mark.pose, idle(atmo.time, 5), 0.16));
+    player.current?.play(mark.doing(atmo.time));
   });
 
   return (

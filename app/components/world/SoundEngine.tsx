@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { StadiumSound } from "../../lib/audio";
 import { useWorld } from "../../lib/store";
-import { GOALS, KICK_CONTACT, KICK_TIME } from "../world3d/players/shows";
+import { GOALS } from "../world3d/players/shows";
 import { sceneOf } from "../world3d/spots";
 
 // Connects the sound (app/lib/audio.ts) to what is happening: the
@@ -43,7 +43,7 @@ export default function SoundEngine() {
   useEffect(() => {
     if (!show || show.kind !== "goal") return;
     const script = GOALS[show.scorer];
-    const id = window.setTimeout(() => engine.current?.thump(), (script.runUp + KICK_TIME * KICK_CONTACT) * 1000);
+    const id = window.setTimeout(() => engine.current?.thump(), script.contact * 1000);
     return () => window.clearTimeout(id);
   }, [show]);
 

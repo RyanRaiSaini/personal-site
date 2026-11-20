@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DoubleSide, type Group, type Mesh, type MeshBasicMaterial } from "three";
 import { useWorld } from "../../../lib/store";
 import type { SectionId } from "../../../sections/registry";
@@ -11,10 +11,11 @@ import { clickable } from "../rooms/common";
 import { PITCH } from "../stadium/dims";
 import { netKick } from "../stadium/Goals";
 import { canvasTexture } from "../textures/canvas";
-import { KITS } from "./kits";
+import { KITS, type Kit } from "./kits";
+import { blend, ease, playing, standing, type Layer, type Stance } from "./moves";
+import { loadPlayerNotes, travelAt, type ClipNote, type PlayerNotes } from "./notes";
 import Player, { type PlayerHandle } from "./Player";
-import { ARMS_CROSSED, ease, FOOT_ON_BALL, HANDS_ON_HIPS, idle, kick, mix, run, STAND, type Pose } from "./poses";
-import { BALL_FLIGHT, GOALS, goalLength, KICK_CONTACT, KICK_TIME, showLength, type Scorer } from "./shows";
+import { AWAY_AFTER, BALL_FLIGHT, GOALS, goalLength, showLength, type GoalScript, type Scorer } from "./shows";
 
 // ------------------------------------------------------------------
 // The players out on the pitch, and the director of every goal.
@@ -25,18 +26,24 @@ import { BALL_FLIGHT, GOALS, goalLength, KICK_CONTACT, KICK_TIME, showLength, ty
 //     Kylian Mbappé. Each scores and celebrates.
 //   - Opening a project replays a goal by number 8 at the north end.
 //
-// The scripts (positions, timings, celebrations) are in shows.ts.
+// The scripts (positions, timings, celebrations) are in shows.ts. The
+// movements are motion capture that comes with the player model; this
+// file only says which one to play when, and where the player is.
 // ------------------------------------------------------------------
 
 const BALL_R = 0.11;
 
-// Where number 8 waits in each section: [x, z], the way he faces, and his pose
-const REST: Partial<Record<SectionId, { at: [number, number]; facing: number; pose: Pose }>> = {
-  home: { at: [0, 0], facing: 0.4, pose: FOOT_ON_BALL },
-  about: { at: [0, 0], facing: 0.62, pose: FOOT_ON_BALL },
-  projects: { at: [PITCH.halfLength - 13.4, 3.6], facing: Math.PI * 0.42, pose: HANDS_ON_HIPS },
-  experience: { at: [-15.2, -38.3], facing: 0.55, pose: ARMS_CROSSED },
+// Where number 8 waits in each section: [x, z], the way he faces, and how he stands
+const REST: Partial<Record<SectionId, { at: [number, number]; facing: number; stances: Stance[] }>> = {
+  home: { at: [0, 0], facing: 0.4, stances: ["foot", "hips"] },
+  about: { at: [0, 0], facing: 0.62, stances: ["foot", "hips"] },
+  projects: { at: [PITCH.halfLength - 13.4, 3.6], facing: Math.PI * 0.42, stances: ["hips"] },
+  experience: { at: [-15.2, -38.3], facing: 0.55, stances: ["folded"] },
 };
+
+// Where the ball under his foot is, measured from him: to his right and in front
+// (the same place the "foot" pose was built for: blender/players/stances.py)
+const UNDER_FOOT = { x: -0.11, z: 0.31 };
 
 function ballTexture() {
   return canvasTexture(
@@ -85,6 +92,60 @@ function mixAngle(a: number, b: number, t: number): number {
   return a + d * t;
 }
 
+// From a player's own directions (to his left, in front of him) to the pitch's, for a player facing `facing`
+function turned(facing: number, left: number, front: number): [number, number] {
+  const c = Math.cos(facing);
+  const s = Math.sin(facing);
+  return [left * c + front * s, -left * s + front * c];
+}
+
+// A run that builds up, holds its pace and eases off: how far along he is, for u from 0 to 1
+function glide(u: number): number {
+  const k = Math.min(1, Math.max(0, u));
+  const ramp = 0.2;
+  const area = 1 - ramp;
+  if (k < ramp) return (k * k) / (2 * ramp) / area;
+  if (k > 1 - ramp) return 1 - ((1 - k) * (1 - k)) / (2 * ramp) / area;
+  return (k - ramp / 2) / area;
+}
+
+function sizeOf(kit: Kit, notes: PlayerNotes) {
+  return (kit.height ?? notes.height) / notes.height;
+}
+
+// Everything about a goal that follows from its script and the kick's
+// motion capture: where the scorer must stand for his boot to meet the
+// ball, and when each part of the move begins.
+type Plan = {
+  clip: ClipNote;
+  size: number;
+  facing: number; // the way the shot goes
+  origin: [number, number]; // where he is when the kick's own movement begins
+  away: [number, number]; // where he is when he turns away to celebrate
+  tClip: number;
+  tAway: number;
+  tParty: number;
+  tHold: number;
+};
+
+function planOf(script: GoalScript, notes: PlayerNotes, kit: Kit): Plan | null {
+  const clip = notes.clips[script.kick];
+  if (!clip?.kick) return null;
+  const size = sizeOf(kit, notes);
+  const dx = script.target[0] - script.ball[0];
+  const dz = script.target[2] - script.ball[1];
+  const reach = Math.hypot(dx, dz);
+  const facing = turnToward(dx, dz);
+  // stand so that the kicking foot arrives just behind the ball
+  const [footX, footZ] = turned(facing, clip.kick.where[0] * size, clip.kick.where[2] * size);
+  const origin: [number, number] = [script.ball[0] - (dx / reach) * 0.14 - footX, script.ball[1] - (dz / reach) * 0.14 - footZ];
+  const gone = travelAt(clip, clip.kick.at + AWAY_AFTER);
+  const [goneX, goneZ] = turned(facing, gone[0] * size, gone[1] * size);
+  const tAway = script.contact + AWAY_AFTER;
+  const tParty = tAway + script.runOff;
+  return { clip, size, facing, origin, away: [origin[0] + goneX, origin[1] + goneZ], tClip: script.contact - clip.kick.at, tAway, tParty, tHold: tParty + 0.5 };
+}
+
 // A gold ring on the grass that hints something can be clicked
 function HintRing({ x, z }: { x: number; z: number }) {
   const ring = useRef<Mesh>(null);
@@ -115,13 +176,30 @@ export default function Cast() {
   const leather = useMemo(() => ballTexture(), []);
   useEffect(() => () => leather.dispose(), [leather]);
 
-  const guestWho: Scorer | null = show?.kind === "goal" && show.scorer !== "saini" ? show.scorer : null;
+  // the numbers that come with the player model
+  const [notes, setNotes] = useState<PlayerNotes | null>(null);
+  useEffect(() => {
+    let alive = true;
+    loadPlayerNotes()
+      .then((loaded) => alive && setNotes(loaded))
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const guestWho: Exclude<Scorer, "saini"> | null = show?.kind === "goal" && show.scorer !== "saini" ? show.scorer : null;
   const idleNow = !show && introDone;
 
   // A new show starts with nobody having scored yet
   useEffect(() => {
     scored.current = false;
   }, [show]);
+
+  const plans = useMemo(() => {
+    if (!notes) return null;
+    return { saini: planOf(GOALS.saini, notes, KITS.saini), jude: planOf(GOALS.jude, notes, KITS.jude), mbappe: planOf(GOALS.mbappe, notes, KITS.mbappe) };
+  }, [notes]);
 
   const start = (scorer: "jude" | "mbappe") => {
     const world = useWorld.getState();
@@ -149,23 +227,21 @@ export default function Cast() {
       if (rest) {
         me.group.position.set(rest.at[0], 0, rest.at[1]);
         me.group.rotation.y = rest.facing;
-        me.setPose(mix(rest.pose, idle(atmo.time, 2), 0.18));
+        me.play(standing(atmo.time, rest.stances));
         // The centre ball sits under his raised foot, or on the centre spot
         if (centreBall.current) {
-          if (rest.pose === FOOT_ON_BALL) {
-            const lx = -0.11;
-            const lz = 0.31;
-            const c = Math.cos(rest.facing);
-            const s = Math.sin(rest.facing);
-            centreBall.current.position.set(rest.at[0] + lx * c + lz * s, BALL_R, rest.at[1] - lx * s + lz * c);
+          if (rest.stances.includes("foot")) {
+            const [bx, bz] = turned(rest.facing, UNDER_FOOT.x, UNDER_FOOT.z);
+            centreBall.current.position.set(rest.at[0] + bx, BALL_R, rest.at[1] + bz);
           } else centreBall.current.position.set(0, BALL_R, 0);
         }
       }
     }
 
     const balls = { north: northBall.current, south: southBall.current };
+    const plan = goal && plans ? plans[goal.scorer] : null;
 
-    if (!goal) {
+    if (!goal || !plan || !notes) {
       // Everything back to its mark
       if (balls.north) balls.north.position.set(GOALS.saini.ball[0], BALL_R, GOALS.saini.ball[1]);
       if (balls.south) balls.south.position.set(GOALS.jude.ball[0], BALL_R, GOALS.jude.ball[1]);
@@ -173,7 +249,7 @@ export default function Cast() {
         directing.current = false;
         rig.override = null;
       }
-      // Other shows end on a timer
+      // Shows end on a timer
       if (current && (performance.now() - current.startedAt) / 1000 > showLength(current)) world.startShow(null);
       return;
     }
@@ -182,59 +258,72 @@ export default function Cast() {
     const player = goal.scorer === "saini" ? me : guest.current;
     const ball = balls[script.goal];
     const t = (performance.now() - goal.startedAt) / 1000;
-
-    const tKick = script.runUp;
-    const tContact = tKick + KICK_TIME * KICK_CONTACT;
-    const tKickEnd = tKick + KICK_TIME;
-    const tParty = tKickEnd + script.runOff;
-    const tHold = tParty + 0.5;
-
+    const { clip, size, tClip, tAway, tParty, tHold } = plan;
+    const tContact = script.contact;
     const goalX = script.goal === "south" ? -PITCH.halfLength : PITCH.halfLength;
+    const runSpeed = (notes.clips.run.speed ?? 4.3) * size;
+
+    const celebrating = (since: number): Layer[] => ("stance" in script.celebration ? standing(atmo.time, [script.celebration.stance]) : playing(script.celebration.clip, Math.max(0, since)));
+
     let x: number;
     let z: number;
     let facing: number;
-    let pose: Pose;
+    let layers: Layer[];
 
-    if (t < tKick) {
-      // the run-up
-      const u = ease(t / tKick);
-      x = script.start[0] + (script.strike[0] - script.start[0]) * u;
-      z = script.start[1] + (script.strike[1] - script.start[1]) * u;
-      facing = turnToward(script.strike[0] - script.start[0], script.strike[1] - script.start[1]);
-      const distance = Math.hypot(script.strike[0] - script.start[0], script.strike[1] - script.start[1]) * u;
-      pose = mix(STAND, run(distance * 2.3), Math.min(1, t * 5));
-    } else if (t < tKickEnd) {
-      // the shot
-      x = script.strike[0];
-      z = script.strike[1];
-      facing = turnToward(script.target[0] - script.ball[0], script.target[2] - script.ball[1]);
-      pose = kick((t - tKick) / KICK_TIME);
-    } else if (t < tParty) {
-      // wheeling away
-      const u = ease((t - tKickEnd) / script.runOff);
-      x = script.strike[0] + (script.party[0] - script.strike[0]) * u;
-      z = script.strike[1] + (script.party[1] - script.strike[1]) * u;
-      const travel = turnToward(script.party[0] - script.strike[0], script.party[1] - script.strike[1]);
-      const shotDir = turnToward(script.target[0] - script.ball[0], script.target[2] - script.ball[1]);
-      facing = mixAngle(shotDir, travel, Math.min(1, (t - tKickEnd) * 3));
-      const distance = Math.hypot(script.party[0] - script.strike[0], script.party[1] - script.strike[1]) * u;
-      // already starting to open up near the end of the run
-      pose = mix(run(distance * 2.1, 0.9), script.celebration, ease((u - 0.72) / 0.28) * 0.5);
+    if (t < tClip) {
+      // coming to the ball
+      const into = ease((t - (tClip - 0.14)) / 0.14);
+      if (script.approach) {
+        const from = script.approach.from;
+        const u = Math.max(0, t / tClip);
+        x = from[0] + (plan.origin[0] - from[0]) * u;
+        z = from[1] + (plan.origin[1] - from[1]) * u;
+        const far = Math.hypot(plan.origin[0] - from[0], plan.origin[1] - from[1]);
+        const pace = (notes.clips[script.approach.gait].speed ?? 3) * size;
+        facing = mixAngle(turnToward(plan.origin[0] - from[0], plan.origin[1] - from[1]), plan.facing, ease((t - (tClip - 0.35)) / 0.35));
+        layers = blend(playing(script.approach.gait, (far * u) / pace), playing(script.kick, 0), into);
+      } else {
+        // a penalty: he stands over it first
+        x = plan.origin[0];
+        z = plan.origin[1];
+        facing = plan.facing;
+        layers = blend(standing(atmo.time), playing(script.kick, 0), into);
+      }
+    } else if (t < tAway) {
+      // the kick: the motion capture carries him through the ball
+      const [left, front] = travelAt(clip, t - tClip);
+      const [mx, mz] = turned(plan.facing, left * size, front * size);
+      x = plan.origin[0] + mx;
+      z = plan.origin[1] + mz;
+      facing = plan.facing;
+      layers = playing(script.kick, t - tClip);
     } else {
-      // the celebration
-      x = script.party[0];
-      z = script.party[1];
-      const travel = turnToward(script.party[0] - script.strike[0], script.party[1] - script.strike[1]);
-      const settle = ease((t - tParty) / 0.5);
-      facing = mixAngle(travel, script.partyFacing, settle);
-      const breathing = Math.sin(atmo.time * 2.2) * 0.02;
-      pose = mix(mix(run(0, 0.4), script.celebration, 0.5 + settle * 0.5), { ...script.celebration, lean: script.celebration.lean + breathing }, settle);
+      const far = Math.hypot(script.party[0] - plan.away[0], script.party[1] - plan.away[1]);
+      const travel = turnToward(script.party[0] - plan.away[0], script.party[1] - plan.away[1]);
+      if (t < tParty) {
+        // wheeling away
+        const u = (t - tAway) / script.runOff;
+        const along = glide(u);
+        x = plan.away[0] + (script.party[0] - plan.away[0]) * along;
+        z = plan.away[1] + (script.party[1] - plan.away[1]) * along;
+        facing = mixAngle(plan.facing, travel, Math.min(1, (t - tAway) * 3));
+        const running = blend(playing(script.kick, t - tClip), playing("run", (far * along) / runSpeed), Math.min(1, (t - tAway) / 0.28));
+        // already starting to open up near the end of the run
+        layers = blend(running, celebrating(t - tParty + 0.35), ease((u - 0.8) / 0.2) * 0.5);
+      } else {
+        // the celebration
+        x = script.party[0];
+        z = script.party[1];
+        const settle = ease((t - tParty) / 0.5);
+        facing = mixAngle(travel, script.partyFacing, settle);
+        layers = blend(playing("run", far / runSpeed), celebrating(t - tParty + 0.35), 0.5 + settle * 0.5);
+      }
     }
 
     if (player) {
       player.group.position.set(x, 0, z);
       player.group.rotation.y = facing;
-      player.setPose(pose);
+      player.play(layers);
     }
 
     // The ball: waiting, flying, then lying in the net
@@ -263,18 +352,18 @@ export default function Cast() {
     if (script.directed) {
       directing.current = true;
       rig.overrideStiffness = 3.2;
-      const toGoal = Math.sign(goalX - script.strike[0]);
+      const toGoal = Math.sign(goalX - script.ball[0]);
       if (t < tContact + BALL_FLIGHT + 0.55) {
         // behind the taker, looking at the goal
         rig.override = {
-          position: [script.strike[0] - toGoal * 8.5, 2.3, script.strike[1] + 3.4],
+          position: [script.ball[0] - toGoal * 9.5, 2.3, script.ball[1] + 3.6],
           target: [goalX, 1.5, script.target[2] * 0.4],
           fov: 40,
         };
       } else if (t < tHold) {
         // running alongside
         rig.override = {
-          position: [x + toGoal * -5.5, 1.9, z + (script.party[1] > script.strike[1] ? -4.5 : 4.5) * 0.9],
+          position: [x + toGoal * -5.5, 1.9, z + (script.party[1] > script.ball[1] ? -4.5 : 4.5) * 0.9],
           target: [x, 1.25, z],
           fov: 42,
         };

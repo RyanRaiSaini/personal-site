@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { eggs } from "../../data/portfolio";
 import { useWorld, type EggId, type Show } from "../../lib/store";
-import { BALL_FLIGHT, GOALS, KICK_CONTACT, KICK_TIME } from "../world3d/players/shows";
+import { BALL_FLIGHT, GOALS } from "../world3d/players/shows";
 import { sceneOf } from "../world3d/spots";
 
 // ------------------------------------------------------------------
@@ -18,7 +18,7 @@ const KONAMI = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "Ar
 function bannerFor(show: Show): { title: string; line: string; delay: number; small?: boolean } | null {
   if (show.kind === "goal") {
     const script = GOALS[show.scorer];
-    const delay = script.runUp + KICK_TIME * KICK_CONTACT + BALL_FLIGHT;
+    const delay = script.contact + BALL_FLIGHT;
     if (show.scorer === "saini") return { title: "Goal", line: show.label, delay, small: true };
     return { title: "Gooooool!", line: show.label, delay };
   }
