@@ -146,6 +146,16 @@ function planOf(script: GoalScript, notes: PlayerNotes, kit: Kit): Plan | null {
   return { clip, size, facing, origin, away: [origin[0] + goneX, origin[1] + goneZ], tClip: script.contact - clip.kick.at, tAway, tParty, tHold: tParty + 0.5 };
 }
 
+// As recorded the goalkeeper dives to his right. Which way that is on
+// the pitch depends on which goal he is in; when the script wants the
+// other way he is shown as in a mirror, and his shirt is printed to suit.
+function keeperMirrored(script: GoalScript): boolean {
+  const look = turnToward(script.goal === "south" ? 1 : -1, 0);
+  const recorded = turned(look, -1, 0)[1];
+  const wanted = (script.keeper === "wrong" ? -1 : 1) * Math.sign(script.target[2] || 1);
+  return Math.sign(recorded) !== wanted;
+}
+
 // A gold ring on the grass that hints something can be clicked
 function HintRing({ x, z }: { x: number; z: number }) {
   const ring = useRef<Mesh>(null);
@@ -335,11 +345,7 @@ export default function Cast() {
       const out = -Math.sign(goalX); // from the goal line toward the pitch
       const lineX = goalX + out * 0.7;
       const look = turnToward(out, 0);
-      // As recorded he dives to his right. Which way that is on the pitch
-      // depends on which goal he is in; turn him over if the script wants the other.
-      const recorded = turned(look, -1, 0)[1];
-      const wanted = (script.keeper === "wrong" ? -1 : 1) * Math.sign(script.target[2] || 1);
-      const flip = Math.sign(recorded) !== wanted;
+      const flip = keeperMirrored(script);
       // "wrong": at full stretch as the ball goes in the other side. "late": the right way, a moment too slow.
       const tDive = tContact + BALL_FLIGHT - (script.keeper === "wrong" ? 0.95 : 0.6);
       const into = ease((t - (tDive - 0.15)) / 0.15);
@@ -410,7 +416,7 @@ export default function Cast() {
     <group>
       <Player ref={saini} kit={KITS.saini} />
       {guestWho && <Player key={guestWho} ref={guest} kit={KITS[guestWho]} />}
-      {guestWho && GOALS[guestWho].keeper && <Player ref={keeper} kit={KITS.keeper} />}
+      {guestWho && GOALS[guestWho].keeper && <Player ref={keeper} kit={KITS.keeper} mirrored={keeperMirrored(GOALS[guestWho])} />}
 
       {/* the ball under number 8's foot at the centre spot */}
       <group ref={centreBall} position={[-0.14, BALL_R, 0.27]}>

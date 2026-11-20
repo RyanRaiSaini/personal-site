@@ -106,8 +106,10 @@ function clipFor(library: Shared, name: string, without: Stance[] | undefined): 
 // ---- pictures ----
 
 // The shirt with its print: the model's own shirt picture, tinted if
-// the kit is not white, with the name and number drawn on the back
-function printedShirt(base: Texture, notes: PlayerNotes, kit: Kit, family: string | null) {
+// the kit is not white, with the name and number drawn on the back.
+// A player shown as in a mirror has his print drawn back to front, so
+// that it reads the right way round on the pitch.
+function printedShirt(base: Texture, notes: PlayerNotes, kit: Kit, family: string | null, mirrored: boolean) {
   const size = 1024;
   const texture = canvasTexture(
     size,
@@ -126,12 +128,19 @@ function printedShirt(base: Texture, notes: PlayerNotes, kit: Kit, family: strin
       const across = (x: number, z: number) => (u[0] + u[1] * x + u[2] * z) * size;
       const down = (x: number, z: number) => (1 - (v[0] + v[1] * x + v[2] * z)) * size;
       const perMetre = Math.abs(v[2]) * size;
+      const write = (text: string, height: number) => {
+        ctx.save();
+        ctx.translate(across(0, height), down(0, height));
+        if (mirrored) ctx.scale(-1, 1);
+        ctx.fillText(text, 0, 0);
+        ctx.restore();
+      };
       ctx.fillStyle = kit.colour ? PALE : INK;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       // the heading font's capitals are about 0.7 of its size
       ctx.font = `800 ${Math.round((PRINT.numberHeight * perMetre) / 0.7)}px ${family}`;
-      ctx.fillText(String(kit.number), across(0, PRINT.numberAt), down(0, PRINT.numberAt));
+      write(String(kit.number), PRINT.numberAt);
       if (kit.name) {
         let fontSize = (PRINT.nameHeight * perMetre) / 0.7;
         ctx.font = `700 ${fontSize}px ${family}`;
@@ -141,7 +150,7 @@ function printedShirt(base: Texture, notes: PlayerNotes, kit: Kit, family: strin
           fontSize *= widest / wide;
           ctx.font = `700 ${fontSize}px ${family}`;
         }
-        ctx.fillText(kit.name, across(0, PRINT.nameAt), down(0, PRINT.nameAt));
+        write(kit.name, PRINT.nameAt);
       }
     },
     { repeat: false, anisotropy: 8 },
@@ -190,7 +199,7 @@ function skinTint(kit: Kit, notes: PlayerNotes) {
 
 type Playing = { action: AnimationAction; loop: boolean; length: number; used: boolean };
 
-const Figure = forwardRef<PlayerHandle, { kit: Kit; shadow: boolean }>(function Figure({ kit, shadow }, ref) {
+const Figure = forwardRef<PlayerHandle, { kit: Kit; shadow: boolean; mirrored: boolean }>(function Figure({ kit, shadow, mirrored }, ref) {
   const model = useGLTF(MODEL_URL, false, true);
   const notes = use(loadPlayerNotes());
   const family = useDisplayFont();
@@ -201,7 +210,7 @@ const Figure = forwardRef<PlayerHandle, { kit: Kit; shadow: boolean }>(function 
   const mixer = useMemo(() => new AnimationMixer(figure), [figure]);
   const playing = useRef(new Map<string, Playing>());
 
-  const shirt = useMemo(() => (library.maps.shirt ? printedShirt(library.maps.shirt, notes, kit, family) : null), [library, notes, kit, family]);
+  const shirt = useMemo(() => (library.maps.shirt ? printedShirt(library.maps.shirt, notes, kit, family, mirrored) : null), [library, notes, kit, family, mirrored]);
   useEffect(() => () => shirt?.dispose(), [shirt]);
 
   const blob = useMemo(() => new MeshBasicMaterial({ map: shadowTexture(), transparent: true, depthWrite: false, opacity: 0.85 }), []);
@@ -322,11 +331,13 @@ class Quiet extends Component<{ children: ReactNode }, { failed: boolean }> {
   }
 }
 
-const Player = forwardRef<PlayerHandle, { kit: Kit; shadow?: boolean }>(function Player({ kit, shadow = true }, ref) {
+// `mirrored` is for a player whose group is turned over (scale.x = -1) to
+// make a recorded movement go the other way
+const Player = forwardRef<PlayerHandle, { kit: Kit; shadow?: boolean; mirrored?: boolean }>(function Player({ kit, shadow = true, mirrored = false }, ref) {
   return (
     <Quiet>
       <Suspense fallback={null}>
-        <Figure ref={ref} kit={kit} shadow={shadow} />
+        <Figure ref={ref} kit={kit} shadow={shadow} mirrored={mirrored} />
       </Suspense>
     </Quiet>
   );
