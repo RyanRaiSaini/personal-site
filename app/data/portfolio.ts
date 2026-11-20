@@ -14,6 +14,7 @@ export type Project = {
   kicker: string; // small line above the title: where and when
   summary: string; // one sentence: what it is
   description: string; // a short paragraph
+  award?: string; // a prize it won, shown under the title
   features: string[]; // what it does, as short bullets
   role?: string; // what I did myself
   stats: { value: string; label: string }[];
@@ -30,8 +31,8 @@ export type Experience = {
   organizationUrl?: string;
   team?: string; // department or programme
   location: string;
-  start: string;
-  end: string;
+  start?: string; // leave both out to show no dates
+  end?: string;
   kind: "work" | "leadership";
   summary: string;
   highlights: string[];
@@ -93,9 +94,9 @@ export const profile = {
   firstName: "Ryan",
   shirtName: "SAINI",
   shirtNumber: 8,
-  headline: "Mathematics at the University of Waterloo. I build AI, computer vision and web projects.",
+  headline: "Mathematics student at the University of Waterloo, working in artificial intelligence, computer vision and web development.",
   shortHeadline: "math@uwaterloo",
-  seeking: "Looking for software engineering, AI and data internships and co-op roles.",
+  seeking: "Seeking internship and co-op positions in software engineering, artificial intelligence and data.",
   location: "Brampton, Ontario",
   email: "ryansinquires@gmail.com",
   githubUser: "RyanRaiSaini",
@@ -113,38 +114,43 @@ export const profile = {
 // ------------------------------------------------------------------
 
 export const about = {
-  greeting: "Hi, I'm Ryan.",
   paragraphs: [
-    "I'm a Mathematics student at the University of Waterloo who likes building things with AI: computer vision that runs in real time, data workflows that save a team hours, and web projects like this stadium.",
-    "In summer 2026 I worked as an AI Data Engineer Intern at BHive, Brampton's innovation hub, where I built a research workflow that screened more than 6,000 local companies. That November I led a team of four at HackUMass XIV to build Empyrean, smart glasses that tell blind and low-vision people exactly what they are touching.",
-    "Away from the keyboard I sit on Make-A-Wish Canada's youth advisory board, help run community events with Bleeding Disorders Canada, and watch far too much football and basketball.",
+    "I am a Mathematics student at the University of Waterloo with a focus on applied artificial intelligence. My work includes real-time computer vision, data workflows that reduce manual research, and web development.",
+    "In the summer of 2026, I was an AI Data Engineer Intern at BHive, Brampton's innovation hub, where I developed a research workflow that screened more than 6,000 local companies. In November 2026, I led a team of four at HackUMass XIV to build Empyrean, smart glasses that identify objects by touch for blind and low-vision users.",
+    "Outside my studies, I serve on STARboard, Make-A-Wish Canada's national youth advisory board, and work in logistics and operations for Bleeding Disorders Canada.",
   ],
+  factsTitle: "Profile",
   facts: [
     { label: "School", value: "University of Waterloo" },
     { label: "Degree", value: "Honours Bachelor of Mathematics" },
     { label: "Graduating", value: "Fall 2031 (expected)" },
     { label: "Based in", value: "Brampton, Ontario" },
-    { label: "Open to", value: "Internships and co-ops" },
+    { label: "Seeking", value: "Internship and co-op positions" },
   ],
+  courseworkTitle: "Current coursework",
   coursework: ["Designing Programs (CS135)", "Algebra (MATH135)", "Calculus 1 (MATH137)", "Microeconomics (EC120)"],
+  interestsTitle: "Interests",
+  // the two buttons at the end
+  projectsButton: "View projects",
+  resumeButton: "Résumé",
 };
 
 export const interests: Interest[] = [
   {
     name: "Football",
-    description: "Real Madrid, every match. My favourite player of all time is Trent Alexander-Arnold, which explains a locker somewhere in this stadium.",
+    description: "A long-standing Real Madrid supporter. My favourite player is Trent Alexander-Arnold.",
   },
   {
     name: "Basketball",
-    description: "A lifelong NBA fan. In 2026 Make-A-Wish sent me to All-Star weekend, and I still haven't fully recovered.",
+    description: "A lifelong follower of the NBA. In 2026, I attended NBA All-Star weekend through Make-A-Wish.",
   },
   {
     name: "Sports analytics",
-    description: "Where the maths degree and the sports obsession meet.",
+    description: "The application of mathematics and data to sport.",
   },
   {
     name: "Community",
-    description: "Make-A-Wish Canada and the bleeding disorders community, both of which shaped who I am.",
+    description: "Long-standing involvement with Make-A-Wish Canada and the bleeding disorders community.",
   },
 ];
 
@@ -152,27 +158,37 @@ export const interests: Interest[] = [
 // Projects (the goal). Each project is a goal scored.
 // ------------------------------------------------------------------
 
+export const projectText = {
+  // the label beside each project's match minute
+  goal: "Goal",
+  // the two halves an open project is split into
+  overviewTab: "Overview",
+  resultsTab: "My role and results",
+  role: "My role",
+  builtWith: "Built with",
+};
+
 export const projects: Project[] = [
   {
     id: "empyrean",
     title: "Empyrean",
     kicker: "HackUMass XIV · November 2026 · Team of four",
-    summary: "AI-powered smart glasses that tell blind and low-vision people exactly what they are touching.",
+    award: "Winner of the “Build Your Hackathon A-Team with SpaceXSI” prize at HackUMass XIV",
+    summary: "Smart glasses that identify what blind and low-vision users are touching.",
     description:
-      "A camera on a pair of glasses tracks the wearer's fingertips. When a hand lands on an object, a speaker says exactly what it is, down to the brand: \"Heinz ketchup\", not \"bottle\". We built it in 36 hours at HackUMass XIV in Amherst, Massachusetts.",
+      "A camera mounted on the glasses tracks the wearer's fingertips. When the wearer touches an object, a speaker identifies it by name and brand, for example “Heinz ketchup” rather than “bottle”. The team built Empyrean in 36 hours at HackUMass XIV in Amherst, Massachusetts.",
     features: [
-      "Follows the wearer's fingertips and names whatever they touch, down to the brand.",
-      "Sounds an alarm when the wearer walks toward stairs, a drop or a vehicle.",
-      "Keeps a touch history, so you can ask \"where did I last touch the ketchup?\"",
-      "Speaks with offline voices and shows everything on a live dashboard.",
-      "Runs as a 10-module real-time pipeline with 330+ automated tests.",
+      "Tracks the wearer's fingertips and identifies each object touched, including its brand.",
+      "Issues an audible warning when the wearer approaches stairs, a drop or a vehicle.",
+      "Maintains a touch history, so the wearer can ask where an object was last handled.",
+      "Provides offline speech output and a live monitoring dashboard.",
+      "Runs as a 10-module real-time pipeline.",
     ],
-    role: "I led the team, built the voice output and the live dashboard, collected training and test images for new objects, tested the full system with a real camera and speaker, and gave the final pitch to the SpaceX and Gemini track judges.",
+    role: "I led the team of four, developed the speech output and the live dashboard, collected training and test images, tested the complete system on physical hardware, and delivered the final presentation to the SpaceX and Gemini track judges.",
     stats: [
-      { value: "0.885", label: "mAP50 on 8 custom objects" },
-      { value: "54/60", label: "brands named correctly" },
-      { value: "435 ms", label: "median naming time" },
-      { value: "330+", label: "automated tests" },
+      { value: "90%", label: "brand identification accuracy" },
+      { value: "< 0.5 s", label: "response time" },
+      { value: "36 hours", label: "from start to finish" },
     ],
     technologies: ["Python", "PyTorch", "YOLO11", "MediaPipe", "OpenCV", "Grok Vision", "FastAPI", "Tiger Data"],
     links: [{ label: "Code on GitHub", href: "https://github.com/richardlancs/Empyrean" }],
@@ -181,21 +197,22 @@ export const projects: Project[] = [
   },
   {
     id: "bhive-registry",
-    title: "BHive Prospect Registry",
-    kicker: "BHive internship · Summer 2026",
-    summary: "An AI-assisted research workflow that screened 6,000+ Brampton companies and turned the results into a shared, filterable registry.",
+    title: "BHive Summer Internship",
+    kicker: "City of Brampton, Economic Development Office · Summer 2026",
+    summary: "An AI-assisted research workflow that screened more than 6,000 Brampton companies and organized the results into a shared, searchable registry.",
     description:
-      "BHive needed to know which local companies fit its projects and sales priorities. I built a research and filtering workflow that worked through more than 6,000 Brampton companies, then organised what it found so the whole team could use it.",
+      "BHive needed to identify which local companies matched its projects and sales priorities. I developed a research and filtering workflow that assessed more than 6,000 Brampton companies and organized the findings for use by the whole team.",
     features: [
-      "Screens companies against each project's criteria with AI-assisted research.",
-      "Records industry, estimated headcount, revenue and sources for every company.",
-      "Lets teammates filter prospects and build an outreach list for a specific project.",
-      "Documented in Google Sheets and step-by-step SOPs, so the process can be repeated.",
+      "Screens companies against the criteria of each project using AI-assisted research.",
+      "Records the industry, estimated headcount, revenue and supporting sources for each company.",
+      "Allows team members to filter prospects and prepare project-specific outreach lists.",
+      "Documented in Google Sheets and standard operating procedures, so that the process can be repeated.",
     ],
-    role: "I designed and built the workflow, the registry and its documentation during my internship. It is an internal tool, so the code is not public.",
+    role: "I designed and developed the workflow, the registry and its documentation during my internship. As an internal tool, its source code is not public.",
     stats: [
       { value: "6,000+", label: "companies screened" },
-      { value: "300+", label: "outreach emails sent" },
+      { value: "50+", label: "startups onboarded" },
+      { value: "10+", label: "in-person events supported" },
     ],
     technologies: ["Python", "Java", "Excel", "Google Sheets"],
     links: [{ label: "About BHive", href: "https://thebhive.ca/" }],
@@ -204,24 +221,12 @@ export const projects: Project[] = [
   },
   {
     id: "personal-site",
-    title: "This stadium",
-    kicker: "Personal site · In progress",
-    summary: "The portfolio you are looking at: a football stadium built to scale, where every part of the ground is a section.",
-    description:
-      "The stands, the roof and all 63,322 seats are a model built to scale in Blender from Python scripts, and lit by a photographed sky. The pitch and the players are drawn in code with Three.js. The roof is the dark-mode switch, the weather is Brampton's real weather, and the seats of the main stand show my GitHub contributions.",
-    features: [
-      "A real-time 3D stadium, modelled in Blender and drawn with React Three Fiber.",
-      "A retractable roof that doubles as the dark-mode switch.",
-      "Live Brampton time and weather. If it rains there, it rains here.",
-      "My GitHub contributions shown in the seats of the main stand.",
-      "A flat \"match view\" for phones and anyone who prefers plain pages.",
-      "A few Easter eggs. Try the penalty spot.",
-    ],
-    stats: [
-      { value: "63,322", label: "seats, each one modelled" },
-      { value: "11", label: "places to visit" },
-      { value: "7", label: "Easter eggs" },
-    ],
+    title: "Personal Website",
+    kicker: "Personal project · In progress",
+    summary: "This portfolio: an interactive 3D football stadium in which each area presents a section of my work.",
+    description: "A personal project. The stadium is modelled to scale in Blender and drawn in the browser with Three.js.",
+    features: [],
+    stats: [],
     technologies: ["Next.js", "React", "TypeScript", "Three.js", "React Three Fiber", "Blender", "Python", "Tailwind CSS", "Vercel"],
     links: [{ label: "Code on GitHub", href: "https://github.com/RyanRaiSaini/personal-site" }],
     status: "in-progress",
@@ -232,6 +237,15 @@ export const projects: Project[] = [
 // ------------------------------------------------------------------
 // Experience (the dugout). Each role is a signing.
 // ------------------------------------------------------------------
+
+export const experienceText = {
+  // the word before a role's dates
+  work: "Signed",
+  leadership: "Captaincy",
+  // opens the rest of a role's points; {n} is how many there are in all
+  more: "Show all {n} points",
+  skills: "Skills used",
+};
 
 export const experience: Experience[] = [
   {
@@ -244,13 +258,14 @@ export const experience: Experience[] = [
     start: "June 2026",
     end: "August 2026",
     kind: "work",
-    summary: "Summer 2026 internship at Brampton's innovation hub, created with the City of Brampton to support founders, start-ups and established businesses.",
+    summary: "A summer 2026 internship at BHive, Brampton's innovation hub, established with the City of Brampton to support founders, startups and established businesses.",
     highlights: [
-      "Built an AI-assisted research and filtering workflow in Python, Java and Excel that screened 6,000+ Brampton companies for BHive's projects and sales priorities.",
-      "Turned the research into a shared registry with industry, estimated headcount, revenue and sources, so teammates could filter prospects and build outreach lists for each project.",
-      "Built the Google Sheets that explain BHive's internal project work and how it is categorised, and wrote SOPs with AI tools so the process can be repeated.",
-      "Evaluated technology vendors across construction, healthcare, manufacturing and trucking, and supported exploratory talks with Procore, Rockwell Automation and SOTI through research, calls, demos and follow-ups.",
-      "Ran a personalised outreach programme of 300+ emails and helped onboard 50+ startups.",
+      "Developed an AI-assisted research and filtering workflow using Python, Java and Excel to screen 6,000+ Brampton companies and identify prospects for BHive projects and sales priorities.",
+      "Organized company research into a shared registry with industry, estimated headcount, revenue and sources, so that team members could filter prospects and build project-specific outreach lists.",
+      "Prepared Google Sheets documenting BHive's internal project work and its categorization, and wrote standard operating procedures so that the process can be repeated.",
+      "Evaluated technology vendors across construction, healthcare, manufacturing and trucking, and supported exploratory discussions with Procore, Rockwell Automation and SOTI through research, demonstrations and follow-ups.",
+      "Created a personalized email outreach program and supported onboarding for 50+ startups, coordinating introductions, follow-ups and program information.",
+      "Identified and engaged startup founders and senior leaders of small and medium-sized businesses as attendees for 10+ in-person events planned for 2026 to 2029, and introduced prospective partners to BHive's partnership program, including discussions of sponsorships valued at $100,000 or more.",
     ],
     tags: ["Python", "Java", "Excel", "Google Sheets", "AI research"],
   },
@@ -263,11 +278,11 @@ export const experience: Experience[] = [
     start: "October 2024",
     end: "Present",
     kind: "work",
-    summary: "Running community events and communications for families living with bleeding disorders.",
+    summary: "Logistics, events and communications for families living with bleeding disorders.",
     highlights: [
-      "Coordinated large community events, including the \"Just the Dads\" weekend for 50+ families, managing logistics and allocating $7,500 in funding from Bayer, Pfizer and local nonprofits.",
-      "Wrote website articles and community stories read by 150+ families and sponsors.",
-      "Produced marketing materials and public calls for 125+ vendors, and coordinated sponsor communications.",
+      "Coordinated large-scale community events, including the “Just the Dads” weekend for 50+ families, managing logistics and allocating $7,500 in funding from Bayer, Pfizer and local nonprofits.",
+      "Wrote and distributed website articles and community stories for more than 150 families and sponsors.",
+      "Produced marketing materials and public calls for 125+ vendors, and coordinated sponsor communications and sponsorship arrangements.",
     ],
     tags: ["Event logistics", "Writing", "Sponsor relations"],
   },
@@ -278,13 +293,13 @@ export const experience: Experience[] = [
     organizationUrl: "https://makeawish.ca/about-us/our-people/starboard/",
     team: "STARboard",
     location: "Toronto, ON",
-    start: "August 2026",
-    end: "Present",
+    // no dates are shown for this role, at my request
     kind: "leadership",
-    summary: "Representing youth wish recipients on Make-A-Wish Canada's national advisory board.",
+    summary: "A member of STARboard, Make-A-Wish Canada's national youth advisory board of wish recipients.",
     highlights: [
-      "Selected to represent youth wish recipients across Canada, advising Make-A-Wish on decisions and acting as an ambassador.",
-      "Spoke with 100+ sponsors and contributed to fundraising events that raised $50,000+ for wishes.",
+      "Selected to represent youth wish recipients across Canada, advising Make-A-Wish Canada on the needs of young people and their families.",
+      "Spoke with more than 100 sponsors and contributed to fundraising events that raised more than $50,000 for wishes.",
+      "Supported event safety protocols and assisted wish children and their families at Make-A-Wish events.",
     ],
     tags: ["Leadership", "Public speaking", "Fundraising"],
   },
@@ -318,28 +333,34 @@ export const awards: Award[] = [
     id: "starboard",
     title: "STARboard selection",
     from: "Make-A-Wish Canada",
-    year: "2026",
     note: "Chosen for the national youth advisory board of wish recipients.",
   },
 ];
 
 export const makeAWish = {
-  heading: "Make-A-Wish and the NBA",
+  // the names of the section's two tabs
+  awardsTab: "Awards",
+  storyTab: "Make-A-Wish and the NBA",
   paragraphs: [
-    "I live with severe Von Willebrand disease, Type 3, a rare bleeding disorder. Growing up, that often meant being told to sit out of sports instead of being encouraged to try.",
-    "In February 2026 Make-A-Wish sent me to NBA All-Star weekend. I watched the Rising Stars, stood on the court at the Celebrity Game, and interviewed Kevin Durant, Shai Gilgeous-Alexander, Adam Silver and Magic Johnson. I also spoke with Kawhi Leonard at Media Day and met rising stars Stephon Castle, Dylan Harper, Ace Bailey and VJ Edgecombe.",
-    "Afterwards I wrote about the weekend for Hemophilia Ontario. The story was shared with 50+ sponsors and partners, including Bayer and Pfizer. Today I sit on STARboard, Make-A-Wish Canada's youth advisory board, where I have spoken with 100+ sponsors and helped with events that raised $50,000+ for wishes.",
+    "I live with severe Type 3 von Willebrand disease, a rare bleeding disorder. Throughout my childhood, I was often advised to sit out of sports rather than encouraged to take part.",
+    "In February 2026, I was selected for a Make-A-Wish experience at NBA All-Star weekend. I took part in NBA Cares programming, Media Day, the Rising Stars game and the Celebrity Game, and interviewed Kevin Durant, Shai Gilgeous-Alexander, Adam Silver and Magic Johnson.",
+    "Afterwards, I wrote a first-person account of the experience for Hemophilia Ontario, which distributed the article to more than 50 sponsors and partners, including Bayer and Pfizer. I now serve on STARboard, Make-A-Wish Canada's national youth advisory board, where I have spoken with more than 100 sponsors and contributed to fundraising events that raised more than $50,000 for wishes.",
   ],
   quote: {
     text: "Those challenges don't define my limits.",
-    source: "From my story for Hemophilia Ontario",
+    source: "From my article for Hemophilia Ontario",
   },
   stats: [
-    { value: "100+", label: "sponsors spoken with" },
+    { value: "100+", label: "sponsors engaged" },
     { value: "$50,000+", label: "raised for wishes" },
-    { value: "50+", label: "sponsors read my story" },
+    { value: "50+", label: "sponsors and partners sent my article" },
   ],
-  met: ["Kevin Durant", "Shai Gilgeous-Alexander", "Kawhi Leonard", "Adam Silver", "Magic Johnson", "Stephon Castle", "Dylan Harper", "Ace Bailey", "VJ Edgecombe"],
+  board: {
+    name: "STARboard, Make-A-Wish Canada",
+    note: "A national advisory board of young people whose wishes were granted.",
+    link: "View the board",
+  },
+  photosButton: "Photos and press",
   starboardUrl: "https://makeawish.ca/about-us/our-people/starboard/",
 };
 
@@ -355,7 +376,7 @@ export const news: NewsItem[] = [
     title: "Make-A-Wish at NBA All-Star 2026",
     date: "March 5, 2026",
     isoDate: "2026-03-05",
-    summary: "The NBA's behind-the-scenes film of Make-A-Wish families meeting the 2026 All-Stars. I am in a lot of it.",
+    summary: "The NBA's behind-the-scenes film of Make-A-Wish families at NBA All-Star 2026, in which I appear.",
     href: "https://www.nba.com/watch/video/make-a-wish-at-nba-all-star-2026",
     cta: "Watch on NBA.com",
   },
@@ -366,9 +387,9 @@ export const news: NewsItem[] = [
     title: "My Make-A-Wish Moment with the NBA: Ryan's Story",
     date: "April 17, 2026",
     isoDate: "2026-04-17",
-    summary: "My first-person story about growing up with a bleeding disorder, being treated differently in sports, and the weekend that changed how I see myself.",
+    summary: "My first-person account of growing up with a bleeding disorder, of inclusion in sport, and of my experience at NBA All-Star 2026.",
     href: "https://www.hemophilia.on.ca/hemophilia/the-collab-of-a-lifetime-when-the-nba-and-hemophilia-connect/",
-    cta: "Read the story",
+    cta: "Read the article",
   },
   {
     id: "starboard-profile",
@@ -376,9 +397,9 @@ export const news: NewsItem[] = [
     outlet: "Make-A-Wish Canada",
     title: "STARboard: Young Voices, Big Impact",
     date: "2026",
-    summary: "My profile on Make-A-Wish Canada's national youth advisory board, a group of wish recipients aged 13 to 18 from across the country.",
+    summary: "My profile as a member of STARboard, Make-A-Wish Canada's national youth advisory board of wish recipients aged 13 to 18.",
     href: "https://makeawish.ca/about-us/our-people/starboard/",
-    cta: "See the board",
+    cta: "View the board",
   },
   {
     id: "instagram-post",
@@ -387,21 +408,38 @@ export const news: NewsItem[] = [
     title: "Rising Stars x Make-A-Wish",
     date: "February 18, 2026",
     isoDate: "2026-02-18",
-    summary: "NBA Cares' post from the Rising Stars and Make-A-Wish meet-up at All-Star weekend.",
+    summary: "NBA Cares' post on the Rising Stars and Make-A-Wish event at NBA All-Star 2026.",
     href: "https://www.instagram.com/p/DU6guPKkYb2/",
     cta: "View the post",
   },
 ];
 
 export const pressRoom = {
-  intro: "A few times the cameras were pointed my way, and one time I was the one asking the questions.",
+  // the names of the section's two tabs
+  coverageTab: "Coverage",
+  photosTab: "Photos",
+  intro: "Media coverage of my Make-A-Wish weekend at NBA All-Star 2026.",
   albumTitle: "NBA All-Star 2026",
-  albumNote: "Photos from my Make-A-Wish weekend at NBA All-Star 2026, shared with the NBA's permission.",
+  albumNote: "Photos from my Make-A-Wish weekend at NBA All-Star 2026.",
+  // A second line from the same published article. The Awards section
+  // carries a different one, so no quote appears twice.
+  quote: {
+    text: "For the first time, I wasn't watching from the sidelines or through a screen. I was there, part of the moment.",
+    source: "From my article for Hemophilia Ontario",
+  },
 };
 
 // ------------------------------------------------------------------
 // Skills (the dressing room)
 // ------------------------------------------------------------------
+
+export const skillsText = {
+  // the names of the section's two tabs
+  elevenTab: "Starting eleven",
+  allTab: "All skills",
+  elevenNote: "The tools I use most, set out in a 4-3-3.",
+  bench: "On the bench",
+};
 
 export const skillGroups: SkillGroup[] = [
   {
@@ -441,10 +479,17 @@ export const bench: string[] = ["YOLO", "MediaPipe", "Three.js", "Tailwind CSS",
 // ------------------------------------------------------------------
 
 export const now = {
+  weatherTitle: "Weather in {city}",
+  weatherNote: "The stadium's weather follows Brampton's. Weather data from Open-Meteo.",
+  weatherLoading: "Loading the weather for Brampton…",
+  roofTitle: "The roof",
+  // {state} becomes "open" or "closed"
+  roofNote: "The roof is this site's light and dark switch. It is currently {state}.",
+  currentTitle: "Currently",
   building: {
-    label: "Now building",
-    value: "This stadium",
-    detail: "My personal site: a stadium modelled in Blender and drawn with Three.js.",
+    label: "Current project",
+    value: "This website",
+    detail: "A stadium modelled in Blender and drawn with Three.js.",
   },
   studying: {
     label: "Studying",
@@ -452,16 +497,50 @@ export const now = {
     detail: "Programming, algebra, calculus and microeconomics.",
   },
   seeking: {
-    label: "Open to",
+    label: "Seeking",
     value: "Internships and co-ops",
-    detail: "Software engineering, AI and data roles.",
+    detail: "Software engineering, artificial intelligence and data.",
   },
   homeCity: { name: "Brampton", timeZone: "America/Toronto", latitude: 43.7315, longitude: -79.7624 },
   awayCity: { name: "Madrid", timeZone: "Europe/Madrid" },
 };
 
 // ------------------------------------------------------------------
+// GitHub (the stands), Résumé (the ticket office), Contact (the mixed zone)
+// ------------------------------------------------------------------
+
+export const githubText = {
+  lead: "Each square represents one day.",
+  body: "Darker squares indicate more contributions. The seats of the main stand show the same data.",
+  saved: "GitHub is temporarily unavailable. A saved copy is shown.",
+};
+
+export const resumeText = {
+  note: "A complete copy, including my telephone number, is available on request.",
+};
+
+export const contactText = {
+  lead: "Email is the most reliable way to reach me.",
+  email: "Email",
+  linkedin: "LinkedIn",
+  copy: "Copy email address",
+  copied: "Copied",
+  basedIn: "Based in {location}.",
+};
+
+// ------------------------------------------------------------------
+// The flat match view's own lines
+// ------------------------------------------------------------------
+
+export const matchText = {
+  fullTime: "Full time",
+  thanks: "Thank you for visiting.",
+  tourNote: "On a larger screen, this site is a 3D stadium that can be explored.",
+};
+
+// ------------------------------------------------------------------
 // Easter eggs. The 3D world reports each one here when it is found.
+// These keep their playful wording: they are hidden extras.
 // ------------------------------------------------------------------
 
 export const eggs: Egg[] = [
@@ -505,8 +584,8 @@ export const shell = {
 // ------------------------------------------------------------------
 
 export const colophon = {
-  built: "Designed and built by Ryan Rai Saini with Next.js, React Three Fiber and TypeScript. The stadium was modelled in Blender.",
+  built: "Designed and developed by Ryan Rai Saini using Next.js, React Three Fiber, TypeScript and Blender.",
   // Required by the licence of the scan the stadium's measurements came from, and a thank-you for the free textures
-  credits: "Stadium proportions measured from \u201cEstadio Santiago Bernab\u00e9u, Madrid\u201d by DALGO (CC BY 4.0). Surfaces and sky from Poly Haven (CC0).",
-  disclaimer: "A fan project. Not affiliated with or endorsed by Real Madrid C.F., the NBA or any player named here.",
+  credits: "Stadium proportions measured from “Estadio Santiago Bernabéu, Madrid” by DALGO (CC BY 4.0). Surfaces and sky from Poly Haven (CC0).",
+  disclaimer: "An independent personal project. Not affiliated with or endorsed by Real Madrid C.F., the NBA or any individual named.",
 };
