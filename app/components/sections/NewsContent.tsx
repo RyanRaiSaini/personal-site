@@ -3,15 +3,19 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { makeAWish, news, pressRoom } from "../../data/portfolio";
+import { news, pressRoom } from "../../data/portfolio";
 import { album } from "../../data/photos";
 import { useWorld } from "../../lib/store";
-import { Arrow, ExternalLink, SubHeading } from "./parts";
+import Tabs from "../ui/Tabs";
+import { Arrow, ExternalLink, Quote } from "./parts";
 
 // In the News: the press room. The links come from `news` and the
 // photos from `album` (app/data/portfolio.ts and app/data/photos.ts).
 // Clicking a photo opens it large; the basketball in the 3D press
 // room opens the album too.
+//
+// Two tabs: the coverage, and the photos. Together they ran to five
+// screens of scrolling.
 
 const KIND_LABEL = { video: "Video", article: "Article", profile: "Profile", social: "Post" } as const;
 
@@ -84,71 +88,77 @@ export default function NewsContent() {
 
   const photo = viewing === null ? null : album[viewing];
 
+  const coverage = (
+    <div className="grid gap-4">
+      <p className="text-ink-soft">{pressRoom.intro}</p>
+      <ul role="list" className="grid gap-2.5">
+        {news.map((item) => (
+          <li key={item.id}>
+            <ExternalLink href={item.href} className="card group flex gap-3.5 transition-colors hover:border-gold">
+              <span className="mt-0.5 flex-none text-gold">
+                <KindIcon kind={item.kind} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="label block">
+                  {item.outlet}, {KIND_LABEL[item.kind].toLowerCase()}, {item.date}
+                </span>
+                <span className="mt-1 block font-display text-[1.375rem] font-bold uppercase leading-tight tracking-wide">{item.title}</span>
+                <span className="mt-1 block text-[0.9375rem] leading-[1.55] text-ink-soft">{item.summary}</span>
+                <span className="mt-2 inline-flex items-center gap-1.5 text-[0.9375rem] font-medium text-royal group-hover:text-gold">
+                  {item.cta} <Arrow />
+                </span>
+              </span>
+            </ExternalLink>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+
+  const photos = (
+    <div className="grid gap-4">
+      <p className="text-ink-soft">{pressRoom.albumNote}</p>
+      <ul role="list" className="grid grid-cols-3 gap-1.5 sm:gap-2">
+        {album.map((item, i) => (
+          <li key={item.slug} className={i === 0 ? "col-span-3" : ""}>
+            <button
+              type="button"
+              onClick={(e) => {
+                opener.current = e.currentTarget;
+                setViewing(i);
+              }}
+              className="group relative block w-full overflow-hidden rounded-lg border border-line"
+              aria-label={`Open photo: ${item.alt}`}
+            >
+              <Image
+                src={i === 0 ? item.src : item.thumb}
+                alt=""
+                width={item.width}
+                height={item.height}
+                sizes={i === 0 ? "(min-width: 1024px) 32rem, 100vw" : "(min-width: 1024px) 11rem, 33vw"}
+                placeholder="blur"
+                blurDataURL={item.blur}
+                className={`w-full object-cover transition-transform duration-500 group-hover:scale-[1.04] ${i === 0 ? "aspect-[2/1]" : "aspect-square"}`}
+              />
+              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-2.5 pb-1.5 pt-6 text-left font-display text-sm font-semibold uppercase tracking-wide text-white">{item.caption}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {/* a different line from the one in Awards, from the same published article */}
+      <Quote text={pressRoom.quote.text} source={pressRoom.quote.source} />
+    </div>
+  );
+
   return (
-    <div className="space-y-8">
-      <p className="leading-relaxed text-ink-soft">{pressRoom.intro}</p>
-
-      <section aria-labelledby="news-links" className="space-y-3">
-        <SubHeading id="news-links">Clippings</SubHeading>
-        <ul role="list" className="space-y-2.5">
-          {news.map((item) => (
-            <li key={item.id}>
-              <ExternalLink href={item.href} className="group flex gap-3.5 rounded-2xl border border-line bg-bg-raised/40 px-4 py-3.5 transition-colors hover:border-gold">
-                <span className="mt-0.5 flex-none text-gold">
-                  <KindIcon kind={item.kind} />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-xs uppercase tracking-[0.14em] text-ink-faint">
-                    {item.outlet} · {KIND_LABEL[item.kind]} · {item.date}
-                  </span>
-                  <span className="mt-0.5 block font-display text-2xl font-bold uppercase leading-tight tracking-wide">{item.title}</span>
-                  <span className="mt-1 block text-sm leading-relaxed text-ink-soft">{item.summary}</span>
-                  <span className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-royal group-hover:text-gold">
-                    {item.cta} <Arrow />
-                  </span>
-                </span>
-              </ExternalLink>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section aria-labelledby="news-album" className="space-y-3">
-        <SubHeading id="news-album">{pressRoom.albumTitle}</SubHeading>
-        <p className="text-sm text-ink-soft">{pressRoom.albumNote}</p>
-        <ul role="list" className="grid grid-cols-3 gap-1.5 sm:gap-2">
-          {album.map((item, i) => (
-            <li key={item.slug} className={i === 0 ? "col-span-3" : ""}>
-              <button
-                type="button"
-                onClick={(e) => {
-                  opener.current = e.currentTarget;
-                  setViewing(i);
-                }}
-                className="group relative block w-full overflow-hidden rounded-xl border border-line"
-                aria-label={`Open photo: ${item.alt}`}
-              >
-                <Image
-                  src={i === 0 ? item.src : item.thumb}
-                  alt=""
-                  width={item.width}
-                  height={item.height}
-                  sizes={i === 0 ? "(min-width: 1024px) 32rem, 100vw" : "(min-width: 1024px) 11rem, 33vw"}
-                  placeholder="blur"
-                  blurDataURL={item.blur}
-                  className={`w-full object-cover transition-transform duration-500 group-hover:scale-[1.04] ${i === 0 ? "aspect-[3/2]" : "aspect-square"}`}
-                />
-                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-2.5 pb-1.5 pt-6 text-left font-display text-sm font-semibold uppercase tracking-wide text-white">{item.caption}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <figure className="rounded-2xl border border-gold/50 bg-bg-raised/40 px-5 py-4">
-        <blockquote className="font-display text-2xl font-bold uppercase leading-tight tracking-wide">“{makeAWish.quote.text}”</blockquote>
-        <figcaption className="mt-2 text-sm text-ink-faint">{makeAWish.quote.source}</figcaption>
-      </figure>
+    <div className="sec">
+      <Tabs
+        label="In the News"
+        tabs={[
+          { id: "coverage", title: pressRoom.coverageTab, content: coverage },
+          { id: "photos", title: pressRoom.photosTab, content: photos },
+        ]}
+      />
 
       {/* The large photo is attached to the page itself, not to the
           panel, so it can fill the whole screen */}
