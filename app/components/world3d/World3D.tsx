@@ -125,7 +125,9 @@ export default function World3D() {
       // Nothing is drawn unless asked for: FrameGovernor asks, as often
       // as what is on screen needs
       frameloop="demand"
-      shadows={quality !== "low"}
+      // plain PCF shadows: three.js has dropped the soft kind that
+      // `shadows` alone asks for, and fell back to these with a warning
+      shadows={quality !== "low" && "percentage"}
       dpr={lean ? LEAN_DPR : DPR[quality]}
       gl={{ antialias: true, powerPreference: "high-performance" }}
       camera={{ position: [0, ORBIT.height, ORBIT.radiusZ], fov: ORBIT.fov, near: 0.3, far: 2000 }}
