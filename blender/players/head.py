@@ -93,6 +93,24 @@ def paint_skin(image, folder):
         gain = np.clip(plain / skin.mean(axis=0), 0.75, 1.7)
         full[r, c, :3] = np.clip(limb * gain, 0.0, 1.0)
 
+    # The base model's skin is blotched with red (cheeks, nose, knuckles).
+    # Under a tint that turns to rust, so each dot's colour is drawn part
+    # of the way to plain skin while its light and shade are kept.
+    for box in [FACE, *LIMBS]:
+        r, c = _box(full, box)
+        part = full[r, c, :3]
+        light = pictures.brightness(part)[..., None]
+        skin = (part.max(axis=2, keepdims=True) > 0.45) & (part[..., 0:1] > part[..., 2:3])
+        if box is FACE:
+            skin = skin & (hair_map[r, c][..., None] < 0.1)
+        even = plain * (light / pictures.brightness(plain[None, None, :])[..., None])
+        evened = np.clip(part + (even - part) * P.SKIN_EVEN, 0.0, 1.0)
+        # and a little smoother: pores and freckles show up far more under a dark tint
+        if box is FACE:
+            skin = skin & (lip_map[r, c][..., None] < 0.1)
+        evened = evened + (pictures.blur(evened, 5) - evened) * P.SKIN_SMOOTH
+        full[r, c, :3] = np.where(skin, evened, part)
+
     small = pictures.shrink(full, P.SIZE["skin"])
     # the colour of plain skin, which the site needs to know to tint it
     # to each player's own tone
