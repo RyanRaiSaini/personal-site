@@ -93,8 +93,9 @@ def tidy(body):
 
 def shape_up(arm, objects):
     """Give the slight base model an athlete's build: broader across the
-    shoulders, fuller in the arms, a stronger neck. The skeleton's arms
-    move out with the shoulders, so every movement still fits."""
+    shoulders, deeper in the chest, narrower at the waist, fuller in the
+    arms and calves, a stronger neck. The skeleton's arms move out with
+    the shoulders, so every movement still fits."""
     s = P.SHAPE
 
     def wider(z):
@@ -106,14 +107,17 @@ def shape_up(arm, objects):
     neck_low = bones[f"{P.BONE}Neck"].head_local.copy()
     neck_high = bones[f"{P.BONE}Head"].head_local.copy()
     spine = bones[f"{P.BONE}Spine"].head_local.copy()
+    shin = {side: (bones[f"{P.BONE}{side}Leg"].head_local.copy(), bones[f"{P.BONE}{side}Foot"].head_local.copy()) for side in ("Left", "Right")}
 
     for obj in objects:
         names = {g.index: g.name[len(P.BONE):] for g in obj.vertex_groups}
         for v in obj.data.vertices:
             total = sum(g.weight for g in v.groups) or 1.0
-            head = arms = neck = 0.0
+            head = arms = neck = lower = 0.0
             for g in v.groups:
                 name = names[g.group]
+                if name in ("LeftLeg", "RightLeg"):
+                    lower += g.weight / total
                 if name in ("Head", "Neck", "LeftEye", "RightEye", "HeadTop_End"):
                     head += g.weight / total
                 if name == "Neck":
@@ -132,7 +136,20 @@ def shape_up(arm, objects):
                 k = 1.0 + (s["neck"] - 1.0) * neck
                 co.x = centre.x + (co.x - centre.x) * k
                 co.y = centre.y + (co.y - centre.y) * k
+            if lower > 0.0:
+                knee, ankle = shin["Left" if co.x > 0 else "Right"]
+                down = min(1.0, max(0.0, (knee.z - co.z) / (knee.z - ankle.z)))
+                centre = knee.lerp(ankle, down)
+                # the calf swells below the knee and tapers to the ankle
+                swell = 1.0 - 0.75 * max(0.0, (down - 0.45) / 0.55)
+                k = 1.0 + (s["calves"] - 1.0) * lower * swell
+                co.x = centre.x + (co.x - centre.x) * k
+                co.y = centre.y + (co.y - centre.y) * k
             co.x *= 1.0 + (wider(co.z) - 1.0) * (1.0 - head)
+            # a deeper chest: the front of the torso comes forward
+            chest = max(0.0, 1.0 - abs(co.z - s["chest_at"]) / s["chest_reach"])
+            if chest > 0.0 and arms == 0.0 and head == 0.0 and co.y < spine.y:
+                co.y = spine.y + (co.y - spine.y) * (1.0 + (s["chest"] - 1.0) * chest * chest * (3.0 - 2.0 * chest))
             # a narrower waist: everything at that height draws in together,
             # shirt, shorts and skin, so nothing pokes through anything else
             near = max(0.0, 1.0 - abs(co.z - s["waist_at"]) / s["waist_reach"])

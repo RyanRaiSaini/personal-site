@@ -26,10 +26,10 @@ BONE = "mixamorig:"
 # built here, upward from the top of each shin. Each pair is a height
 # and the thigh's radius at that height.
 THIGH = [
-    (0.535, 0.0570),
-    (0.575, 0.0560),
-    (0.630, 0.0630),
-    (0.668, 0.0665),  # the hem of the shorts
+    (0.535, 0.0635),
+    (0.575, 0.0625),
+    (0.630, 0.0705),
+    (0.668, 0.0740),  # the hem of the shorts
     # Above the hem the thigh is out of sight, so it is drawn well in:
     # when a leg is lifted the cloth at the front stays with the hips,
     # and a full thigh would come through it.
@@ -55,19 +55,27 @@ WHITE = (0.965, 0.965, 0.955)
 GOLD = (0.851, 0.722, 0.353)
 BOOT = (0.085, 0.090, 0.105)
 HAIR = (0.070, 0.058, 0.050)
+# How far the skin's red blotches are drawn toward plain skin, 0 to 1
+SKIN_EVEN = 0.55
+# How far the skin's fine detail (pores, freckles) is smoothed away, 0 to 1
+SKIN_SMOOTH = 0.35
 
 # ---- build ----
 # The base model is slight. These make him an athlete: broader across
 # the shoulders, fuller in the arms, a stronger neck.
 SHAPE = {
-    "shoulders": 1.10,  # how much wider across the shoulders (the arms go out with them)
+    "shoulders": 1.15,  # how much wider across the shoulders (the arms go out with them)
     "from": 1.06,  # no wider below this height...
     "full": 1.32,  # ...and fully wider above this one
-    "arms": 1.12,  # how much thicker the arms
-    "neck": 1.07,  # how much thicker the neck
-    "waist": 0.92,  # how much narrower at the waist...
+    "arms": 1.24,  # how much thicker the arms
+    "neck": 1.12,  # how much thicker the neck
+    "chest": 1.09,  # how much deeper the chest, at the front...
+    "chest_at": 1.33,  # ...which is at this height...
+    "chest_reach": 0.16,  # ...and fades out this far above and below it
+    "waist": 0.88,  # how much narrower at the waist...
     "waist_at": 1.03,  # ...which is at this height...
     "waist_reach": 0.20,  # ...and fades out this far above and below it
+    "calves": 1.16,  # how much thicker the lower leg, most of it at the calf
 }
 
 # ---- hair ----
