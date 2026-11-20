@@ -51,9 +51,10 @@ After any change: save, check it at `http://localhost:3000` (run `npm run dev` f
 | Anything on the résumé | `resume` | `app/data/resume.ts` |
 | Rebuild the PDF after a change | run `npm run resume` | writes `public/resume/Ryan-Saini-Resume.pdf` |
 | How the résumé looks on the page | | `app/components/resume/resume.css` |
-| How the PDF is laid out | | `scripts/build-resume-pdf.mjs` |
+| How the PDF is laid out | `GAP`, `SIZE` and the margins at the top | `scripts/build-resume-pdf.mjs` |
+| The words on the Download and Open buttons, and the note under the page | `resumeText` | `app/data/portfolio.ts` |
 
-The public résumé has **no phone number** on purpose. `**double asterisks**` in the résumé data make text bold.
+The PDF is set to match my LaTeX résumé: the same typeface (Computer Modern, in `scripts/fonts/`), margins, sizes and spacing, so its lines turn where the original's do. The public résumé has **no phone number** on purpose; the email address is in its place. `**double asterisks**` in the résumé data make text bold.
 
 ### Photos
 
@@ -85,7 +86,8 @@ Each section has one file that lays out its content. They are used by both the 3
 | Now (clocks, weather, roof buttons) | `app/components/sections/LiveContent.tsx` |
 | Résumé | `app/components/sections/ResumeContent.tsx` |
 | Contact | `app/components/sections/ContactContent.tsx` |
-| Small shared pieces (stat boxes, chips, links) | `app/components/sections/parts.tsx` |
+| Small shared pieces (a titled part, stat boxes, chips, quotes, links, and bullet lists that fold away behind "Show all") | `app/components/sections/parts.tsx` |
+| The tabs that split a long section in two (Projects, Skills, Awards, In the News) | `app/components/ui/Tabs.tsx` |
 
 | I want to change… | File |
 |---|---|
@@ -115,6 +117,9 @@ Each section has one file that lays out its content. They are used by both the 3
 | Menus and notes that sit over the stadium | `.glass` | `app/globals.css` |
 | The dark plates of the top bar and the home screen | `.plate`, `.wordmark`, `.top-links`, `.home-…` | `app/globals.css` |
 | A section's panel, and the sign above its title | `.panel`, `.sign` | `app/globals.css` |
+| The gaps inside every section: between its parts, and between a heading and what follows | `--gap-block`, `--gap-item` in `.sec` | `app/globals.css` |
+| Headings, cards, labels, facts, quotes and tabs inside a section | `.part-title`, `.card`, `.label`, `.facts`, `.quote`, `.tabs…` | `app/globals.css` |
+| The start screen | `.start…` | `app/globals.css` |
 | The name tags floating in the stadium | `.tag…` | `app/globals.css` |
 | The loading bar | `.loading…` | `app/globals.css` |
 | The "GOOOOOL!" banner animation | `.show-banner` | `app/globals.css` |
@@ -138,7 +143,12 @@ Everything 3D is in `app/components/world3d/`. Sizes are in metres. The pitch is
 | Where a name tag floats | `SPOTS.<section>.anchor` | `app/components/world3d/spots.ts` |
 | The overview track (height, distance, zoom) | `ORBIT` | `app/components/world3d/spots.ts` |
 | Drift speed, drag speed, flight time, pointer lean | | `app/components/world3d/camera/CameraRig.tsx` |
+| The words on the start screen | `home.tour`, `home.startNote`, `home.skipStart` (the name and line under it are `profile.name` and `profile.headline`) | `app/data/portfolio.ts` |
+| How the start screen is laid out | the `.start` styles | `app/globals.css`, `app/components/world/StartScreen.tsx` |
+| Where the camera stands on the start screen | `WAITING` | `app/components/world3d/camera/Intro.tsx` |
 | The walk out of the tunnel (speed, path) | `WALK`, `EMERGE` | `app/components/world3d/camera/Intro.tsx` |
+| Which section opens after the walk-out | `setSection("about")` and `navigate("/about")` at the end of the walk; `openTour` for the skip button | `app/components/world3d/camera/Intro.tsx`, `app/components/world/WorldShell.tsx` |
+| How dark the tunnel is, and the haze of light in its mouth | `DEEP`, `spill`, and the `glow` in `Tunnel` | `app/components/world3d/stadium/PitchSide.tsx` |
 
 ### The stadium
 
@@ -198,14 +208,25 @@ The shirts in the dressing room come from `squad` and `bench`. The trophies come
 
 | I want to change… | Look for | File |
 |---|---|---|
-| A player's name, number, skin tone, hair | `KITS` | `app/components/world3d/players/kits.ts` |
+Every player is a copy of one model (`public/players/player.glb`), moved by motion capture. Each has his own skin tone, hair, beard, height and shirt print.
+
+| I want to change… | Look for | File |
+|---|---|---|
+| A player's name, number, skin tone, hair colour, hairstyle, beard, height | `KITS` (the choices for hair and beard are listed at the top of the file) | `app/components/world3d/players/kits.ts` |
 | My own figure (number 8) | `KITS.saini` | `app/components/world3d/players/kits.ts` |
-| The body shape and kit colours | `KIT`, `TRIM`, the shapes in `parts` | `app/components/world3d/players/Player.tsx` |
-| A celebration pose | `ARMS_WIDE` (Jude), `ARMS_CROSSED` (Mbappé), `FIST_UP` (me) | `app/components/world3d/players/poses.ts` |
-| Where a goal is scored from, where the scorer runs, how long he celebrates | `GOALS` | `app/components/world3d/players/shows.ts` |
-| Where number 8 stands in each outdoor section | `REST` | `app/components/world3d/players/Cast.tsx` |
-| Where number 8 stands in each room | `MARKS` | `app/components/world3d/players/RoomSaini.tsx` |
+| The print on the back of the shirt (size, place, colour) | `PRINT`, `INK` | `app/components/world3d/players/Player.tsx` |
+| The kit's colour for someone not in white (the goalkeeper) | `colour` in `KITS` | `app/components/world3d/players/kits.ts` |
+| A celebration | `celebration` in `GOALS`: a standing pose (`"wide"`, `"folded"`, `"hips"`) or the motion-captured `"victory"` | `app/components/world3d/players/shows.ts` |
+| Where a goal is scored from, how the scorer arrives, where he runs, how long he celebrates | `GOALS` (keep the running speeds human: the note at the top says how) | `app/components/world3d/players/shows.ts` |
+| The goalkeeper: who he is, and which way he dives | `KITS.keeper`; `keeper` in `GOALS` (`"wrong"` or `"late"`) | `players/kits.ts`, `players/shows.ts` |
+| Where number 8 stands in each outdoor section, and how he stands | `REST` | `app/components/world3d/players/Cast.tsx` |
+| Where number 8 is in each room, and what he is doing | `MARKS` | `app/components/world3d/players/RoomSaini.tsx` |
 | The camera during a goal | "The camera, for the two guest stars" | `app/components/world3d/players/Cast.tsx` |
+| The body's build, the cut of the kit, the hairstyles and beards | `blender/players/params.py`, and the file beside it for each part, then rebuild (section 11) | `blender/players/` |
+| A standing pose (where the hands or the foot go) | `hands_on_hips`, `arms_folded`, `arms_wide`, `foot_on_ball`, then rebuild | `blender/players/stances.py` |
+| Which motion-capture clips the model carries | `CLIPS`, then rebuild | `blender/build_players.py` |
+
+How a player moves is a short list of clips to mix, written in `players/moves.ts` (`standing`, `playing`, `blend`). The timings that come with the model (how long each clip is, when and where its kick lands) are read from `public/players/player.json` by `players/notes.ts`.
 
 ---
 
@@ -213,13 +234,15 @@ The shirts in the dressing room come from `squad` and `bench`. The trophies come
 
 | Egg | How it is triggered | Where the code is |
 |---|---|---|
-| **Hey Jude** (number 5, arms wide) | Click the ball on the south penalty spot | trigger and direction: `players/Cast.tsx`; script: `GOALS.jude` in `players/shows.ts` |
-| **Corner specialist** (Mbappé, number 10, arms crossed) | Click the south-east corner flag | trigger: `players/Cast.tsx`; script: `GOALS.mbappe` in `players/shows.ts` |
+| **Hey Jude** (number 5, a penalty, arms wide) | Click the ball on the south penalty spot | trigger and direction: `players/Cast.tsx`; script: `GOALS.jude` in `players/shows.ts` |
+| **Corner specialist** (Mbappé, number 10, arms folded) | Click the south-east corner flag | trigger: `players/Cast.tsx`; script: `GOALS.mbappe` in `players/shows.ts` |
 | **Hala!** (fireworks, "GOOOL" on the big screen) | Type `hala` anywhere, or ↑ ↑ ↓ ↓ ← → ← → B A | keys: `app/components/world/ShowOverlay.tsx`; fireworks: `world3d/eggs/Fireworks.tsx` |
 | **VAR check** (red card) | Visit any address that does not exist | `app/not-found.tsx` |
 | **La Decimoquinta** (the big cup) | Click the trophy cabinet 15 times | `Cabinet` and `BigCup` in `world3d/rooms/TrophyRoom.tsx` |
 | **Wrong sport** (opens the All-Star album) | Click the basketball on the desk in the press room | `Basketball` in `world3d/rooms/PressRoom.tsx` |
-| **Locker 66** (Trent's pass) | Click the half-open locker at the left end of the dressing room's back wall | `TrentLocker` and `TrentPass` in `world3d/rooms/DressingRoom.tsx` |
+| **Number 66** (Trent's long pass) | Click the shirt left on a seat in the south dugout | `world3d/eggs/TrentShirt.tsx` (where the shirt is, where the pass is hit from and lands); its timing is `LONG_PASS` in `players/shows.ts` |
+
+The two goals are scored past a goalkeeper, who is nobody in particular and is on the pitch only for those two Easter eggs.
 
 Also: opening a project in the Projects panel replays a goal by number 8 (`ProjectsContent.tsx` starts it, `GOALS.saini` scripts it).
 
@@ -234,6 +257,8 @@ The number of clicks for the cabinet is the `15` in `Cabinet` (`TrophyRoom.tsx`)
 | I want to change… | Look for | File |
 |---|---|---|
 | Overall volume | `MASTER` | `app/lib/audio.ts` |
+| How loud each sound is against the others | `LEVEL` | `app/lib/audio.ts` |
+| How often something happens in the crowd (a swell, clapping, a drum) | `EVENT_GAP`, in seconds | `app/lib/audio.ts` |
 | The crowd, the roar, the whistle, the thump | the methods of `StadiumSound` | `app/lib/audio.ts` |
 | When each sound plays | | `app/components/world/SoundEngine.tsx` |
 
@@ -250,7 +275,7 @@ There are no audio files. Everything is generated in the browser, and it is sile
 | How often is the stadium redrawn? | Every frame while something moves or the visitor is doing something, 30 a second for a while after, then not at all until the next input. Never while the tab is hidden. | `REST_AFTER` in `app/components/world3d/FrameGovernor.tsx` |
 | What if the stadium fails to load? | A loading bar shows progress; after 12 seconds it offers the flat view; if the 3D breaks, the flat view opens by itself | `app/components/world/WorldShell.tsx` |
 | Light or dark on first load? | The roof follows Brampton: dark at night. Decided before the page paints. | the `bootScript` in `app/layout.tsx` |
-| When does the walk-out play? | Home page, once per visit, on the 3D tour only | `bootScript` in `app/layout.tsx`, `world3d/camera/Intro.tsx` |
+| When is the start screen shown? | Home page, once per visit, on the 3D tour only, and not for visitors who have asked their device for less motion. "Start the tour" plays the walk-out and opens About; "Skip to the stadium" goes to the overview. The top bar is there throughout. | `bootScript` in `app/layout.tsx`, `app/lib/intro.ts`, `app/components/world/WorldShell.tsx`, `world3d/camera/Intro.tsx` |
 | Where does the GitHub data come from? | GitHub's public contribution calendar, refreshed hourly, with a saved copy as a fallback | `app/api/contributions/route.ts`, `app/lib/githubParse.ts` |
 
 ---
@@ -266,7 +291,7 @@ Add these to the address to see a particular look without waiting for it:
 | `/?weather=snow&roof=open` | Snow falling through the open roof (`clear`, `cloudy`, `overcast`, `fog`, `rain`, `snow`, `storm`) |
 | `/?roof=closed` | Roof closed (dark theme) |
 | `/?quality=low` | The lightest 3D (also `medium`, `high`) |
-| `/?nointro=1` | Skip the walk-out |
+| `/?nointro=1` | Skip the start screen and the walk-out |
 | `/?view=tour` or `/?view=match` | Force the 3D tour or the flat match view |
 
 In the browser console:
@@ -295,6 +320,9 @@ npm run peek -- "<address>" "<code>"                # run a line of code in the 
 npm run stadium:build    # rebuild the stadium model in Blender (section 10)
 npm run stadium:pack     # squeeze the model for the web
 npm run stadium:assets   # fetch the Poly Haven textures and sky again
+
+npm run players:build    # rebuild the player model in Blender (section 11)
+npm run players:pack     # squeeze the player model for the web
 ```
 
 Every push to `main` is checked by GitHub Actions (`.github/workflows/ci.yml`) and deployed by Vercel.
@@ -335,3 +363,46 @@ What the build writes into `public/stadium/`:
 To open the stadium in Blender itself, open `C:\Users\ryanr\stadium-work\bernabeu-stadium.blend`. Every part is a named object (Terraces, Structure, Roof, Steel, Screen, Floodlights, RoofPanel.000 to .009, SeatHi, SeatLo). Edits made by hand there are lost on the next rebuild; lasting changes belong in the scripts.
 
 Sources and licences for everything used are in [docs/redesign/ASSETS.md](docs/redesign/ASSETS.md).
+
+---
+
+## 11. Rebuilding the player model
+
+Needed only after changing the player's **body, kit, hair, beards, poses or clips**. Names, numbers, skin tones and heights are in `kits.ts` and need no rebuild.
+
+The player is built from a stock character in Adobe's Mixamo library ("Remy") and Mixamo's motion-capture clips. Only his body and skeleton are kept; the build makes him a footballer. The Mixamo downloads are **not in this repository** (see [docs/redesign/ASSETS.md](docs/redesign/ASSETS.md)); they are in `C:\Users\ryanr\stadium-work\mixamo\source\`.
+
+1. Change a number in `blender/players/params.py`, or the file for the part you want (each says at the top what it does):
+
+   | File | What it does |
+   |---|---|
+   | `body.py` | Loads the base, gives him an athlete's build, builds the thighs the base comes without |
+   | `kit.py` | Shorts, socks, boots, and the shirt's picture |
+   | `head.py` | Skin, eyes, the short curls, the three beards |
+   | `clips.py` | Brings each motion-capture clip onto the player and measures its kick |
+   | `stances.py` | The standing poses |
+   | `look.py` | Materials, and the preview pictures |
+
+2. Run Blender with no window (about a minute; add `--preview <folder>` for pictures of each player):
+
+   ```bash
+   "C:/Program Files/Blender Foundation/Blender 5.3/blender.exe" --background --factory-startup --python blender/build_players.py -- --source "C:/Users/ryanr/stadium-work/mixamo/source" --blend "C:/Users/ryanr/stadium-work/mixamo/footballer.blend" --site public/players
+   ```
+
+3. Squeeze the model for the web:
+
+   ```bash
+   npm run players:pack
+   ```
+
+4. Look at it (`npm run dev`), then take the pictures again (`npm run shots -- http://localhost:3000 docs/redesign/after`).
+
+What the build writes into `public/players/`:
+
+| File | What it is |
+|---|---|
+| `player.glb` | The model the site loads (1.6 MB): one body, the kit, two hairstyles, three beards, ten clips and four poses |
+| `player.raw.glb` | The same before squeezing (6 MB; not committed) |
+| `player.json` | The timings the site needs: each clip's length, the moment and place of each kick, how far the player travels |
+
+To add a clip: download it from Mixamo for the same character (FBX, "Without Skin", 30 frames a second), put it in the source folder, and add a line to `CLIPS` in `blender/build_players.py`. Then name it in `ClipName` in `players/moves.ts`.
