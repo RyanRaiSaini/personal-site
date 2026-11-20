@@ -120,23 +120,26 @@ export default function ShowOverlay() {
 
   return (
     <>
+      {/* The banner sits in the lower part of the picture, like a
+          broadcast caption, so it never covers the scorer's face in his
+          close-up. With a panel open it keeps to the free side, up top. */}
       {banner && show && (
-        <div aria-live="polite" className={`pointer-events-none fixed inset-x-0 z-[45] flex justify-center px-4 ${panelOpen ? "top-24 lg:pr-[min(36rem,46vw)]" : "top-[18vh]"}`}>
+        <div aria-live="polite" className={`pointer-events-none fixed inset-x-0 z-[45] flex justify-center px-4 ${panelOpen ? "top-24 lg:pr-[min(36rem,46vw)]" : "bottom-[8vh]"}`}>
           <div className="show-banner max-w-full text-center text-white">
-            <p className={`font-display font-extrabold uppercase leading-none tracking-tight [text-shadow:0_4px_40px_rgba(0,0,0,0.75)] ${banner.small || panelOpen ? "text-6xl" : "text-7xl sm:text-9xl"}`} style={{ color: "#f2cf6b" }}>
+            <p className={`font-display font-extrabold uppercase leading-none tracking-tight [text-shadow:0_4px_40px_rgba(0,0,0,0.75)] ${banner.small || panelOpen ? "text-6xl" : "text-7xl sm:text-8xl"}`} style={{ color: "#f2cf6b" }}>
               {banner.title}
             </p>
-            <p className={`mt-1 font-display font-bold uppercase tracking-[0.14em] [text-shadow:0_2px_18px_rgba(0,0,0,0.85)] ${banner.small || panelOpen ? "text-xl" : "text-2xl sm:text-4xl"}`}>{banner.line}</p>
+            <p className={`mt-1 font-display font-bold uppercase tracking-[0.14em] [text-shadow:0_2px_18px_rgba(0,0,0,0.85)] ${banner.small || panelOpen ? "text-xl" : "text-2xl sm:text-3xl"}`}>{banner.line}</p>
           </div>
         </div>
       )}
 
       {egg && (
-        <div role="status" className="pointer-events-none fixed inset-x-0 bottom-6 z-[65] flex justify-center px-4">
-          <p className="glass panel-in flex items-center gap-3 rounded-full px-5 py-2.5 text-sm">
-            <span className="kicker">Easter egg found</span>
+        <div role="status" className="pointer-events-none fixed inset-x-0 top-[4.75rem] z-[65] flex justify-center px-4">
+          <p className="plate panel-in flex items-center gap-3 px-4 py-2 text-sm">
+            <span className="kicker !text-[#e6c56c]">Easter egg found</span>
             <span className="font-display text-lg font-bold uppercase tracking-wide">{egg.name}</span>
-            <span className="font-mono text-xs text-ink-faint">
+            <span className="font-display text-sm text-white/60">
               {found} of {eggs.length}
             </span>
           </p>
