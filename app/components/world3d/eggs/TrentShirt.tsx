@@ -92,7 +92,7 @@ export default function TrentShirt() {
     // the end of a drag is not a click
     if (event.delta > 6) return;
     const world = useWorld.getState();
-    if (world.show) return;
+    if (world.show || !world.introDone) return;
     world.findEgg("trent");
     world.startShow({ kind: "trent" });
   };
