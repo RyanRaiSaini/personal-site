@@ -242,7 +242,7 @@ function floorTexture(family: string | null) {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.font = `800 250px ${family}`;
-        ctx.fillText("RS8", w / 2, h / 2 + 12);
+        ctx.fillText("RS", w / 2, h / 2 + 12);
       }
     },
     { repeat: false },

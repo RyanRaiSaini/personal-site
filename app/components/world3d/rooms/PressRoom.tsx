@@ -31,7 +31,7 @@ function backdropTexture(family: string | null) {
         ctx.textBaseline = "middle";
         if ((row * 2 + col) % 2 === 0) {
           ctx.font = `800 62px ${family}`;
-          ctx.fillText("RS8", col * cell + cell / 2, row * cell + cell / 2 + 3);
+          ctx.fillText("RS", col * cell + cell / 2, row * cell + cell / 2 + 3);
         } else {
           ctx.font = `700 25px ${family}`;
           ctx.fillText("RYAN SAINI", col * cell + cell / 2, row * cell + cell / 2 - 10);

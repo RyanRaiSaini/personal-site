@@ -23,7 +23,7 @@ function boardTexture(family: string | null) {
         const even = (row + col) % 2 === 0;
         ctx.fillStyle = even ? GOLD : CREAM;
         ctx.font = even ? `800 54px ${family}` : `700 22px ${family}`;
-        ctx.fillText(even ? "RS8" : "SAY HELLO", col * cell + cell / 2, row * cell + cell / 2 + 2);
+        ctx.fillText(even ? "RS" : "CONTACT", col * cell + cell / 2, row * cell + cell / 2 + 2);
       }
     }
     ctx.strokeStyle = "rgba(255,255,255,0.08)";
