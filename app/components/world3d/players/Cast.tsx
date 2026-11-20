@@ -201,8 +201,10 @@ export default function Cast() {
   }, []);
 
   const guestWho: Exclude<Scorer, "saini"> | null = show?.kind === "goal" && show.scorer !== "saini" ? show.scorer : null;
-  // the goalkeeper is in goal for any goal whose script has one, number 8's included
-  const keeperIn: Scorer | null = show?.kind === "goal" && GOALS[show.scorer].keeper ? show.scorer : null;
+  const section = useWorld((s) => s.section);
+  // The goalkeeper is in goal for any goal whose script has one. While
+  // Projects is open he waits in the north goal, ready for number 8's.
+  const keeperIn: Scorer | null = show?.kind === "goal" ? (GOALS[show.scorer].keeper ? show.scorer : null) : section === "projects" ? "saini" : null;
   const idleNow = !show && introDone;
 
   // A new show starts with nobody having scored yet
@@ -262,6 +264,15 @@ export default function Cast() {
       if (directing.current) {
         directing.current = false;
         rig.override = null;
+      }
+      // With Projects open the goalkeeper stands on his line in the north goal
+      const waiting = keeper.current;
+      if (waiting && !goal && world.section === "projects") {
+        const look = turnToward(-1, 0);
+        waiting.group.position.set(PITCH.halfLength - 0.7, 0, 0);
+        waiting.group.rotation.y = look;
+        waiting.group.scale.x = keeperMirrored(GOALS.saini) ? -1 : 1;
+        waiting.play(playing("keeper-ready", atmo.time));
       }
       // Shows end on a timer
       if (current && (performance.now() - current.startedAt) / 1000 > showLength(current)) world.startShow(null);
