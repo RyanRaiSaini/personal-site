@@ -45,6 +45,8 @@ next-env.d.ts
 
 # the stadium model before it is squeezed for the web
 /public/stadium/stadium.raw.glb
+# and the player model, likewise
+/public/players/player.raw.glb
 # Blender scratch files
 __pycache__/
 *.blend1
