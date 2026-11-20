@@ -62,9 +62,9 @@ app/
 │   ├── world3d/          # the 3D world
 │   │   ├── stadium/      # the stadium model, its materials and light, seats, pitch, goals
 │   │   ├── rooms/        # dressing room, trophy room, press room, ticket office, mixed zone
-│   │   ├── players/      # the player figure, poses and goal scripts
+│   │   ├── players/      # the players, their moves and the goal scripts
 │   │   ├── atmosphere/   # sky, lights, weather
-│   │   ├── camera/       # the camera rig and the walk-out
+│   │   ├── camera/       # the camera rig, the start screen's view and the walk-out
 │   │   └── spots.ts      # camera positions for every section
 │   ├── match/            # pieces of the flat match view
 │   └── resume/           # the résumé page

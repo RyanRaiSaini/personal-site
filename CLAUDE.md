@@ -19,15 +19,18 @@ This is Ryan Rai Saini's personal site: a portfolio set inside a 3D football sta
 - No official Real Madrid assets: no crest, no official kit design, no sponsor logos, no anthem audio, no photos of players. The kit is plain white with a name and number. The boards round the pitch and the ring of screens stay blank (Ryan asked for no sponsors on 2026-11-19).
 - "Number 8" appears on Ryan's shirt and nowhere else: not in headings, badges, the tab icon or the rooms.
 - The credit for the scan the stadium was measured from (`colophon.credits`) is required by its licence. Do not remove it. Sources and licences are in `docs/redesign/ASSETS.md`.
-- Players other than number 8 (Ryan) appear only in Easter eggs. Skin tones in `players/kits.ts` are chosen to match each player; keep them accurate.
+- Players other than number 8 (Ryan) appear only in Easter eggs. Skin tones in `players/kits.ts` are chosen to match each player; keep them accurate. The goalkeeper in the two guest goals is nobody in particular.
+- No player's face comes from a photograph. Players are told apart by number, skin tone, hair, beard, height and celebration.
 - Photo captions stay general ("All-Star Media Day"). Do not name people in individual photos.
 - Ryan does not know SQL. Do not list it as a skill.
 
 ## Technical notes
 
 - Next.js 16 with Cache Components. Read the bundled docs in `node_modules/next/dist/docs/` before using a Next API.
-- The 3D world (`app/components/world3d/`) is loaded only in the browser, after the page's text. Nothing outside that folder may import from `three`, or the main bundle grows by half a megabyte. The pure data files there (`spots.ts`, `players/shows.ts`, `players/poses.ts`, `stadium/dims.ts`, `tagScreen.ts`, `activity.ts`) are safe to import anywhere.
+- The 3D world (`app/components/world3d/`) is loaded only in the browser, after the page's text. Nothing outside that folder may import from `three`, or the main bundle grows by half a megabyte. The pure data files there (`spots.ts`, `players/shows.ts`, `players/moves.ts`, `players/notes.ts`, `players/kits.ts`, `stadium/dims.ts`, `tagScreen.ts`, `activity.ts`) are safe to import anywhere.
 - The stands, roof and seats are a model built by the Python scripts in `blender/` and loaded from `public/stadium/`. To change the stadium's shape, change `blender/stadium/params.py` and rebuild (WHERE-TO-EDIT.md, section 10); do not edit `stadium.glb` by hand. The sun's direction is set in two places that must match: `daylight.ts` and `SUN` in `params.py`.
+- The players are one model (`public/players/player.glb`) built by `blender/build_players.py` from a Mixamo base and Mixamo motion capture. To change the body, kit, hair, poses or clips, change the scripts in `blender/players/` and rebuild (WHERE-TO-EDIT.md, section 11); do not edit `player.glb` by hand. The Mixamo downloads are not in the repo and must not be added to it.
+- A player is moved by passing `play()` a list of clips to mix each frame (`players/moves.ts`); every clip's time is set by hand, so nothing runs on by itself. The player moves over the ground in code: the clips have had their own travel taken out, and `player.json` says how far each would have gone.
 - The stadium's shadows and shade are worked out in Blender and travel with the model (`stadium/bakedLight.ts` reads them). The stadium casts and receives no live shadows; the one shadow map is for the players, the ball and the goals.
 - The picture is drawn on demand (`frameloop="demand"`, driven by `FrameGovernor.tsx`): full rate while something moves or the visitor is active, 30 a second for a while, then nothing. Anything new that animates on its own must call `stir()` from `activity.ts` each frame while it moves, or it will freeze when the governor rests. Changes that go through the store wake it by themselves.
 - A see-through material that is also double-sided needs `forceSinglePass`, or three.js rebuilds its shader lookup twice a frame.
@@ -36,6 +39,7 @@ This is Ryan Rai Saini's personal site: a portfolio set inside a 3D football sta
 - `useFrame` priorities: the atmosphere runs at -10, the camera at -5, everything else at 0. Never use a positive priority; it turns off automatic rendering.
 - Positions are in metres. North is +X; the main stand is at -Z. Rooms are built far from the bowl, at the origins in `spots.ts`.
 - The dev server sometimes misses an edit to `app/globals.css` made by a script. If a new style does not show up, add a blank line to the file and save again.
+- A first visit opens on a start screen in the tunnel (`data-intro` on `<html>`: "start", then "play", then "done"; `app/lib/intro.ts`). While it shows, the camera holds still (`rig.holdStill`) and the picture rests like anywhere else.
 - Test switches (`?time=`, `?weather=`, `?roof=`, `?quality=`, `?nointro=1`, `?view=`) and the console helpers `__world`, `__look`, `__tune`, `__bake` and `__activity` are listed in WHERE-TO-EDIT.md, section 8.
 - To judge a visual change, take the fixed set of pictures (`npm run shots -- http://localhost:3000 <folder>`) and look at them; to judge a speed change, use `npm run measure`. Both drive the Chrome already installed, with no window, and use the laptop's own graphics chip.
 
