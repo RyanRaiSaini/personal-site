@@ -177,6 +177,7 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - The build changed for it: broader shoulders, a deeper chest, a narrower waist, fuller arms, calves and thighs (`SHAPE` and `THIGH` in `blender/players/params.py`). The base model's red blotches are evened out and its pores smoothed, so a brown tint comes out clean, not rusty (`SKIN_EVEN`, `SKIN_SMOOTH`). The goatee is one oval round the mouth with the lips left bare (`_circle` in `blender/players/head.py`).
 - The goalkeeper's number is printed in white: navy was lost on his green shirt. His dive was recorded one way only, so in one of the two goals he is shown as in a mirror, and his number came out back to front; a mirrored player's shirt is now printed the other way round (`Player.tsx`, `keeperMirrored` in `Cast.tsx`).
 - Looked at and left alone: the fingers in the hands-on-hips pose. The breathing clip already curls them about as much as a hand resting on a hip would.
+- The arms-wide celebration is the exception. At the end of an outstretched arm the same half-curled fingers read as limp, so that pose now holds the hands open (`arms_wide` in `blender/players/stances.py`). The model file did not change: only the list of bones the pose fixes, in `player.json`.
 
 ### The shorts on a raised leg (2026-11-20)
 
