@@ -36,11 +36,15 @@ const NIGHT = "nointro=1&roof=closed&time=22:00&weather=clear&quality=high";
 
 // look: [x, y, z, targetX, targetY, targetZ, fieldOfView], in metres.
 // scene: true hides the page's text and buttons, leaving the 3D view.
+// start: true takes the picture on the start screen, before the walk-out.
 const SHOTS = [
+  { name: "start-screen", path: "/", query: DAY.replace("nointro=1&", ""), start: true },
   { name: "first-view", path: "/", query: DAY, look: [0, 23.5, 64, 0, 9.5, 0, 52] },
   { name: "overview", path: "/", query: DAY, look: [0, 23.5, 64, 0, 9.5, 0, 52], scene: true },
   { name: "overview-corner", path: "/", query: DAY, look: [58, 26, 46, 0, 8, 0, 50], scene: true },
   { name: "centre-circle", path: "/", query: DAY, look: [8.5, 2.3, 12.5, -0.5, 1.5, 0, 40], scene: true },
+  { name: "number-eight", path: "/", query: DAY, look: [2.5, 1.45, 3.7, 0, 0.95, 0, 30], scene: true },
+  { name: "number-eight-back", path: "/", query: DAY, look: [-2.4, 1.5, -3.6, 0, 1.0, 0, 30], scene: true },
   { name: "goal", path: "/", query: DAY, look: [33, 3.4, 10.5, 52.5, 1.9, -1.5, 42], scene: true },
   { name: "dugout", path: "/", query: DAY, look: [-8.5, 2.5, -29, -15.5, 1.5, -41, 42], scene: true },
   { name: "main-stand", path: "/", query: DAY, look: [0, 22, 40, 0, 15, -66, 56], scene: true },
@@ -55,6 +59,8 @@ const SHOTS = [
   { name: "skills-panel", path: "/skills", query: DAY },
   { name: "awards-panel", path: "/awards", query: DAY },
   { name: "news-panel", path: "/news", query: DAY },
+  { name: "resume-panel", path: "/resume", query: DAY },
+  { name: "contact-panel", path: "/contact", query: DAY },
   { name: "github-panel", path: "/github", query: DAY },
   { name: "live-panel", path: "/live", query: DAY },
   { name: "phone-match", path: "/match", query: "", viewport: PHONE, flat: true },
@@ -108,7 +114,7 @@ async function main() {
     try {
       await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60_000 });
       if (!shot.flat) {
-        await page.waitForFunction(() => window.__world && window.__world.getState().worldReady && window.__world.getState().introDone, { timeout: Number(process.env.SHOTS_TIMEOUT ?? 90_000), polling: 250 });
+        await page.waitForFunction((start) => window.__world && window.__world.getState().worldReady && (start || window.__world.getState().introDone), { timeout: Number(process.env.SHOTS_TIMEOUT ?? 90_000), polling: 250 }, Boolean(shot.start));
         // A slow first second can make the site lower its own quality; put it back
         await page.evaluate(() => window.__world.getState().setQuality("high"));
         // SHOTS_LOOK: try a different camera position, as x,y,z,targetX,targetY,targetZ,fieldOfView
