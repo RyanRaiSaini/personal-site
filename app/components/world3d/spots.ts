@@ -89,7 +89,8 @@ export const SPOTS: Record<Exclude<SectionId, "home">, Spot> = {
   },
   awards: {
     scene: "trophy",
-    pose: { position: inRoom("trophy", [0.8, 1.75, 6.9]), target: inRoom("trophy", [-0.6, 1.4, -2]), fov: 60 },
+    // close enough to read the plaques
+    pose: { position: inRoom("trophy", [0.55, 1.62, 4.9]), target: inRoom("trophy", [-0.7, 1.32, -2]), fov: 50 },
     narrow: { position: inRoom("trophy", [0, 1.8, 6.6]), target: inRoom("trophy", [0, 2.0, -2]), fov: 64 },
     anchor: [26, 14.4, -58.2],
   },
