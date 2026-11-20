@@ -244,7 +244,7 @@ How a player moves is a short list of clips to mix, written in `players/moves.ts
 | **Wrong sport** (opens the All-Star album) | Click the basketball on the desk in the press room | `Basketball` in `world3d/rooms/PressRoom.tsx` |
 | **Number 66** (the long pass) | Click the shirt left on a seat in the south dugout | `world3d/eggs/BenchShirt.tsx` (where the shirt is, where the pass is hit from and lands); its timing is `LONG_PASS` in `players/shows.ts` |
 
-The two goals are scored past a goalkeeper (number 1), who is nobody in particular and is on the pitch only for those two Easter eggs.
+Both goals are scored past a goalkeeper (number 1), who is nobody in particular. He is also in goal for number 8's goal when a project is opened. He is on the pitch only during a goal.
 
 **Only number 8 has a name on his shirt.** Every other player is a number and nothing more, on the shirt, in the goal banner and on the ring of screens. No other player is named anywhere on the site, in the code or in these notes.
 

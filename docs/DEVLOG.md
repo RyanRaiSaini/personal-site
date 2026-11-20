@@ -187,6 +187,10 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - `blender/check_players.py` proves it: it plays the ten clips and four poses and measures 360 places on the thighs against the cloth. Nothing shows through, and the cloth comes no nearer than 12 mm. Run on the model from before, the same check fails.
 - The inside of the shirt's hem was gold (its turned-in edge shares the collar's part of the picture) and showed as a fleck at the hip. It is white now.
 
+### The goalkeeper in number 8's goal (2026-11-20)
+
+- Number 1 had been built for the two hidden goals only, so the goal visitors see most, number 8's replay when a project is opened, went into an empty net. Ryan pointed this out. He is now in goal for it too, and dives the right way a moment too late (`keeper: "late"` in `GOALS.saini`, `players/shows.ts`).
+
 ### The start of a visit
 
 - A first visit opens in the players' tunnel: my name, "Start the tour", and the pitch lit at the far end. Pressing it plays the walk-out and opens About. The top bar is there throughout, and visitors who prefer less motion never see it.
