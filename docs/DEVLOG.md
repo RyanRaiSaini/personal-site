@@ -178,6 +178,14 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - The goalkeeper's number is printed in white: navy was lost on his green shirt. His dive was recorded one way only, so in one of the two goals he is shown as in a mirror, and his number came out back to front; a mirrored player's shirt is now printed the other way round (`Player.tsx`, `keeperMirrored` in `Cast.tsx`).
 - Looked at and left alone: the fingers in the hands-on-hips pose. The breathing clip already curls them about as much as a hand resting on a hip would.
 
+### The shorts on a raised leg (2026-11-20)
+
+- With his foot on the ball, number 8's raised leg looked like a thin stick inside a white bell. The cause was in the base model. It has no legs, so each leg of its shorts is closed off inside by a level sheet a little above the hem. The thigh built for it stood through that sheet, and from in front the sheet showed as a white ceiling round the leg.
+- The same sheet had been taken for the crotch, so the cloth was only ever fitted to the thigh in its last two centimetres. To stop the thigh showing through higher up, its hidden part had been drawn in thin: the stick.
+- `fit_shorts` (`blender/players/kit.py`) now takes the sheet out, finds the real crotch (0.795 m up, not 0.689) and hangs the cloth 14 mm clear of the thigh's own outline all the way up. The thigh stays full under the cloth and sits forward of the shin's line, where a thigh's bulk is (`THIGH` in `params.py`). The hem hangs straight and level.
+- `blender/check_players.py` proves it: it plays the ten clips and four poses and measures 360 places on the thighs against the cloth. Nothing shows through, and the cloth comes no nearer than 12 mm. Run on the model from before, the same check fails.
+- The inside of the shirt's hem was gold (its turned-in edge shares the collar's part of the picture) and showed as a fleck at the hip. It is white now.
+
 ### The start of a visit
 
 - A first visit opens in the players' tunnel: my name, "Start the tour", and the pitch lit at the far end. Pressing it plays the walk-out and opens About. The top bar is there throughout, and visitors who prefer less motion never see it.
