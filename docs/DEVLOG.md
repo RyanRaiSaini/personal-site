@@ -165,10 +165,18 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 
 - The code-drawn figures are gone. Every player is a copy of one model, rebuilt in Blender from Mixamo's "Remy" (body and skeleton only) and moved by Mixamo motion capture: `blender/build_players.py`, section 11 of WHERE-TO-EDIT.md.
 - What the build does to the base: an athlete's build; the thighs the base model comes without; shorts shortened and cleared of pockets; long socks cut level under the knee; the shirt's picture made white with a gold collar and cuffs; hair and eyebrows near black, eyes brown, one skin colour all over so a single tint suits it; short curls and three beards as separate pieces; four standing poses worked out from where the hands and feet should be.
-- Each player is told apart by `kits.ts`: skin tone, hair, beard, height, name and number. No face is taken from a photograph.
+- Each player is told apart by `kits.ts`: skin tone, hair, beard, height and number. No face is taken from a photograph.
 - The clips had their travel over the ground taken out and written down, with the moment and place of each kick, so the site can stand a player where his boot will meet the ball.
 - The goals are re-timed to speeds a person can run. The two guest goals are scored past a goalkeeper. Number 66's Easter egg moved from a locker to a shirt on the bench, and he now comes on to hit the pass himself.
 - Mixamo's own files are not in the repo.
+
+### Numbers, not names (2026-11-20)
+
+- Ryan's decision: only number 8 has a name on his shirt (SAINI). Every other player is a number and nothing more (6, 10, 66 and the goalkeeper's 1): on the shirt, in the goal banner, on the ring of screens, in the code and in these notes. The Interests line on the About page was reworded to match.
+- Number 8 is drawn to Ryan's own description: 1.85 m, brown skin, a full goatee joined to the moustache, an athletic build (`KITS.saini` in `players/kits.ts`).
+- The build changed for it: broader shoulders, a deeper chest, a narrower waist, fuller arms, calves and thighs (`SHAPE` and `THIGH` in `blender/players/params.py`). The base model's red blotches are evened out and its pores smoothed, so a brown tint comes out clean, not rusty (`SKIN_EVEN`, `SKIN_SMOOTH`). The goatee is one oval round the mouth with the lips left bare (`_circle` in `blender/players/head.py`).
+- The goalkeeper's number is printed in white: navy was lost on his green shirt. His dive was recorded one way only, so in one of the two goals he is shown as in a mirror, and his number came out back to front; a mirrored player's shirt is now printed the other way round (`Player.tsx`, `keeperMirrored` in `Cast.tsx`).
+- Looked at and left alone: the fingers in the hands-on-hips pose. The breathing clip already curls them about as much as a hand resting on a hip would.
 
 ### The start of a visit
 
