@@ -99,11 +99,14 @@ export function goalLength(script: GoalScript): number {
   return script.contact + AWAY_AFTER + script.runOff + 0.5 + script.hold;
 }
 
+// Number 66's long pass from the touchline (eggs/TrentShirt.tsx)
+export const LONG_PASS = { contact: 1.9, flight: 2.5, length: 5.6 };
+
 // How long each kind of show lasts before the world goes back to normal
 export function showLength(show: Show): number {
   if (show.kind === "goal") return goalLength(GOALS[show.scorer]);
   if (show.kind === "fireworks") return 9;
   if (show.kind === "fifteen") return 8;
   // number 66's pass: long enough for the ball to land
-  return 4.4;
+  return LONG_PASS.length;
 }
