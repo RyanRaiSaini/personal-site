@@ -1,20 +1,31 @@
-// Small pieces shared by the section contents
+// Small pieces shared by the section contents. Every section is built
+// from these, so the gaps, text sizes and cards match from one section
+// to the next. Their looks are the "Inside a section" rules in
+// app/globals.css.
 
-export function SubHeading({ children, id }: { children: React.ReactNode; id?: string }) {
+// A titled part of a section. A rule separates it from the part above.
+export function Block({ title, id, children }: { title?: string; id?: string; children: React.ReactNode }) {
   return (
-    <h2 id={id} className="font-display text-2xl font-bold uppercase tracking-wide">
+    <section aria-labelledby={title && id ? id : undefined} className="part">
+      {title && (
+        <h2 id={id} className="part-title">
+          {title}
+        </h2>
+      )}
       {children}
-    </h2>
+    </section>
   );
 }
 
+// The highlighted numbers: "6,000+ companies screened"
 export function Stats({ items }: { items: { value: string; label: string }[] }) {
+  if (items.length === 0) return null;
   return (
-    <dl className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fit,minmax(7.5rem,1fr))]">
+    <dl className="stats">
       {items.map((item) => (
-        <div key={item.label} className="rounded-xl border border-line bg-bg-raised/40 px-3 py-2.5">
-          <dd className="font-display text-3xl font-bold leading-none text-gold">{item.value}</dd>
-          <dt className="mt-1 text-xs leading-snug text-ink-soft">{item.label}</dt>
+        <div key={item.label} className="stat">
+          <dd className="stat-value">{item.value}</dd>
+          <dt className="stat-label">{item.label}</dt>
         </div>
       ))}
     </dl>
@@ -30,6 +41,43 @@ export function Chips({ items, label }: { items: string[]; label: string }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+// A list of points. With `show`, only that many are on screen at first
+// and the rest open with one click. `more` is the wording of that
+// link, with {n} standing for the full count.
+export function Bullets({ items, show, more }: { items: string[]; show?: number; more?: string }) {
+  const first = show && items.length > show ? items.slice(0, show) : items;
+  const rest = show && items.length > show ? items.slice(show) : [];
+  const list = (lines: string[]) => (
+    <ul className="bullets">
+      {lines.map((line) => (
+        <li key={line.slice(0, 40)}>
+          <span>{line}</span>
+        </li>
+      ))}
+    </ul>
+  );
+  if (rest.length === 0) return list(first);
+  return (
+    <div className="grid gap-2">
+      {list(first)}
+      <details className="more">
+        <summary>{(more ?? "Show all {n}").replace("{n}", String(items.length))}</summary>
+        {list(rest)}
+      </details>
+    </div>
+  );
+}
+
+// A line of my own, set large, with where it was published
+export function Quote({ text, source }: { text: string; source: string }) {
+  return (
+    <figure className="quote">
+      <blockquote>“{text}”</blockquote>
+      <figcaption>{source}</figcaption>
+    </figure>
   );
 }
 
