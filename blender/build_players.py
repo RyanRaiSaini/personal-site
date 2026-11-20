@@ -120,7 +120,7 @@ def main():
     mats = {
         "Skin": look.material("Skin", picture=skin_picture, rough=0.62),
         "Eyes": look.material("Eyes", picture=skin_picture, rough=0.25),
-        "Shirt": look.material("Shirt", picture=kit.paint_shirt(base["shirt"], work), folds=kit.shirt_folds(base["shirt_folds"], work), rough=0.78),
+        "Shirt": look.material("Shirt", picture=kit.paint_shirt(base["shirt"], work, shirt), folds=kit.shirt_folds(base["shirt_folds"], work), rough=0.78),
         "Shorts": look.material("Shorts", colour=P.WHITE, rough=0.8, both_sides=True),
         "Socks": look.material("Socks", painted=True, rough=0.85, both_sides=True),
         "Boots": look.material("Boots", picture=kit.paint_boots(base["boots"], work), rough=0.42),

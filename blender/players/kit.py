@@ -283,7 +283,40 @@ def lower_boots(boots):
 # Pictures
 # ------------------------------------------------------------------
 
-def paint_shirt(image, folder):
+def _footprint(obj, shape, wanted):
+    """The part of an object's picture used by some of its faces: those
+    whose corners all pass `wanted`. Rows are counted from the bottom."""
+    height, width = shape
+    mask = np.zeros(shape, dtype=bool)
+    mesh = obj.data
+    uv = mesh.uv_layers.active.data
+    margin = 1.5  # in dots, so neighbouring faces leave no seam between them
+    for poly in mesh.polygons:
+        if not all(wanted(mesh.vertices[i].co) for i in poly.vertices):
+            continue
+        pts = [(uv[li].uv.x * (width - 1), uv[li].uv.y * (height - 1)) for li in poly.loop_indices]
+        for k in range(1, len(pts) - 1):
+            a, b, c = pts[0], pts[k], pts[k + 1]
+            area = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+            if abs(area) < 1e-9:
+                continue
+            x0 = max(0, int(min(a[0], b[0], c[0]) - margin))
+            x1 = min(width - 1, int(max(a[0], b[0], c[0]) + margin) + 1)
+            y0 = max(0, int(min(a[1], b[1], c[1]) - margin))
+            y1 = min(height - 1, int(max(a[1], b[1], c[1]) + margin) + 1)
+            if x1 < x0 or y1 < y0:
+                continue
+            gx, gy = np.meshgrid(np.arange(x0, x1 + 1), np.arange(y0, y1 + 1))
+            inside = np.ones(gx.shape, dtype=bool)
+            turn = 1.0 if area > 0 else -1.0
+            for p, q in ((a, b), (b, c), (c, a)):
+                length = math.hypot(q[0] - p[0], q[1] - p[1]) or 1.0
+                inside &= turn * ((q[0] - p[0]) * (gy - p[1]) - (q[1] - p[1]) * (gx - p[0])) / length > -margin
+            mask[y0 : y1 + 1, x0 : x1 + 1] |= inside
+    return mask
+
+
+def paint_shirt(image, folder, shirt):
     """The shirt's picture: white cloth with the base model's weave kept
     faintly, and gold where the base had its dark collar and cuffs."""
     grid = pictures.shrink(pictures.read(image), P.SIZE["shirt"])
@@ -300,6 +333,10 @@ def paint_shirt(image, folder):
     # the collar is at the top of the picture, the cuffs at the bottom;
     # the dark hem in between becomes plain cloth
     trim = band & ((up > 0.70) | (up < 0.21))
+    # ...and so does the hem's turned-in edge, which shares the collar's
+    # part of the picture and would show gold from below
+    hem = min(v.co.z for v in shirt.data.vertices)
+    trim &= ~_footprint(shirt, trim.shape, lambda co: co.z < hem + 0.12)
     out = np.ones_like(grid)
     for c in range(3):
         out[..., c] = np.where(trim, P.GOLD[c], P.WHITE[c] * weave)
