@@ -189,7 +189,7 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 
 ### The goalkeeper in number 8's goal (2026-11-20)
 
-- Number 1 had been built for the two hidden goals only, so the goal visitors see most, number 8's replay when a project is opened, went into an empty net. Ryan pointed this out. He is now in goal for it too, and dives the right way a moment too late (`keeper: "late"` in `GOALS.saini`, `players/shows.ts`).
+- Number 1 had been built for the two hidden goals only, so the goal visitors see most, number 8's replay when a project is opened, went into an empty net. Ryan pointed this out. He is now in goal for it too, and dives the right way a moment too late (`keeper: "late"` in `GOALS.saini`, `players/shows.ts`). At first he came on only while the replay played, so the Projects view still showed an empty net; he now waits on his line the whole time Projects is open (`Cast.tsx`).
 
 ### The start of a visit
 
