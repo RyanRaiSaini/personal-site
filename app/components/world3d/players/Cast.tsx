@@ -24,7 +24,8 @@ import { AWAY_AFTER, BALL_FLIGHT, GOALS, goalLength, showLength, type GoalScript
 //   - Clicking the ball on the south penalty spot brings on number 6;
 //     clicking the south-east corner flag brings on number 10. Each
 //     scores past a goalkeeper and celebrates. Neither is named.
-//   - Opening a project replays a goal by number 8 at the north end.
+//   - Opening a project replays a goal by number 8 at the north end,
+//     past the same goalkeeper.
 //
 // The scripts (positions, timings, celebrations) are in shows.ts. The
 // movements are motion capture that comes with the player model; this
@@ -200,6 +201,8 @@ export default function Cast() {
   }, []);
 
   const guestWho: Exclude<Scorer, "saini"> | null = show?.kind === "goal" && show.scorer !== "saini" ? show.scorer : null;
+  // the goalkeeper is in goal for any goal whose script has one, number 8's included
+  const keeperIn: Scorer | null = show?.kind === "goal" && GOALS[show.scorer].keeper ? show.scorer : null;
   const idleNow = !show && introDone;
 
   // A new show starts with nobody having scored yet
@@ -416,7 +419,7 @@ export default function Cast() {
     <group>
       <Player ref={saini} kit={KITS.saini} />
       {guestWho && <Player key={guestWho} ref={guest} kit={KITS[guestWho]} />}
-      {guestWho && GOALS[guestWho].keeper && <Player ref={keeper} kit={KITS.keeper} mirrored={keeperMirrored(GOALS[guestWho])} />}
+      {keeperIn && <Player key={keeperIn} ref={keeper} kit={KITS.keeper} mirrored={keeperMirrored(GOALS[keeperIn])} />}
 
       {/* the ball under number 8's foot at the centre spot */}
       <group ref={centreBall} position={[-0.14, BALL_R, 0.27]}>

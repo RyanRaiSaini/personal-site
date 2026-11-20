@@ -89,6 +89,7 @@ export const GOALS: Record<Scorer, GoalScript> = {
     hold: 3.2,
     celebration: { clip: "victory" },
     directed: false,
+    keeper: "late",
   },
 };
 
