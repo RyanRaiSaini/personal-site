@@ -2,8 +2,11 @@
 thighs it comes without (the base wears long shorts and has nothing
 underneath them)."""
 
+import math
+
 import bmesh
 import bpy
+import numpy as np
 from mathutils import Vector
 
 from . import params as P
@@ -197,7 +200,11 @@ def build_thighs(body, arm):
 
     The skin picture already has the whole leg painted on it, so the new
     surface carries on along the picture in the direction the shin was
-    going."""
+    going.
+
+    Returns each thigh's outline for the shorts to be hung round: for
+    "Left" and "Right", a list of rings, each a height with the angles
+    and distances of its points measured from the leg's own line."""
     bm = bmesh.new()
     bm.from_mesh(body.data)
     bm.verts.ensure_lookup_table()
@@ -205,6 +212,7 @@ def build_thighs(body, arm):
     weights = bm.verts.layers.deform.verify()
     group = {g.name: g.index for g in body.vertex_groups}
     added = 0
+    outlines = {}
 
     for side in ("Left", "Right"):
         up_name, low_name = f"{P.BONE}{side}UpLeg", f"{P.BONE}{side}Leg"
@@ -260,15 +268,21 @@ def build_thighs(body, arm):
         previous = ring
         before = 0.0  # how far up the leg the last ring was from the rim
         last_z = base_z
-        for z, radius in P.THIGH:
-            c = axis(z)
+        rings = []
+        for z, radius, forward in P.THIGH:
+            line = axis(z)
+            # the front is -Y
+            c = Vector((line.x, line.y - forward, z))
             after = before + (z - last_z)
             last_z = z
             current = []
+            angles, reaches = [], []
             for i, v in enumerate(ring):
                 # keep the shape of the shin's rim, grown to the thigh's size
                 shape = Vector((v.co.x - centre.x, v.co.y - centre.y)).length / base_radius
                 p = Vector((c.x + spokes[i].x * radius * shape, c.y + spokes[i].y * radius * shape, z))
+                angles.append(math.atan2(p.y - line.y, p.x - line.x))
+                reaches.append(math.hypot(p.x - line.x, p.y - line.y))
                 nv = bm.verts.new(p)
                 # the shin's pull fades out over the knee
                 fade = max(0.0, min(1.0, (P.KNEE_BLEND_TOP - z) / (P.KNEE_BLEND_TOP - base_z)))
@@ -294,9 +308,12 @@ def build_thighs(body, arm):
                 added += 1
             previous = current
             before = after
+            rings.append((z, np.array(angles), np.array(reaches)))
+        outlines[side] = rings
 
     bm.normal_update()
     bm.to_mesh(body.data)
     bm.free()
     body.data.update()
     log(f"thighs built: {added} faces")
+    return outlines

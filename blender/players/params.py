@@ -23,18 +23,18 @@ BONE = "mixamorig:"
 
 # ---- legs ----
 # The base model has no legs under its long shorts, so the thighs are
-# built here, upward from the top of each shin. Each pair is a height
-# and the thigh's radius at that height.
+# built here, upward from the top of each shin. Each row is a height,
+# the thigh's radius at that height, and how far forward of the shin's
+# own line it sits there (a thigh carries its bulk at the front).
 THIGH = [
-    (0.535, 0.0635),
-    (0.575, 0.0625),
-    (0.630, 0.0705),
-    (0.668, 0.0740),  # the hem of the shorts
-    # Above the hem the thigh is out of sight, so it is drawn well in:
-    # when a leg is lifted the cloth at the front stays with the hips,
-    # and a full thigh would come through it.
-    (0.700, 0.0540),
-    (0.745, 0.0380),
+    (0.535, 0.0635, 0.000),
+    (0.575, 0.0640, 0.003),
+    (0.630, 0.0735, 0.008),
+    (0.668, 0.0790, 0.013),  # the hem of the shorts
+    # Above the hem the thigh is under the cloth, but it is still a
+    # thigh: anyone looking up the leg of the shorts sees it.
+    (0.705, 0.0780, 0.016),
+    (0.745, 0.0740, 0.020),
 ]
 # Above this height the leg follows the thigh bone alone; below it the
 # shin has a say, so the knee bends smoothly.
@@ -46,8 +46,8 @@ SOCK_THICKNESS = 0.004
 SOCK_BAND = 0.034  # the gold band at the top of the sock
 SHORTS_HEM = 0.665  # the bottom of the shorts: mid-thigh
 SHORTS_KEEP_ABOVE = 0.90  # the shorts keep their shape above this height; below it they are shortened
-SHORTS_SLIM = 0.90  # how much narrower the leg of the shorts is than the base model's
-SHORTS_CLEAR = 0.019  # the least gap between the thigh and the cloth round it (less, and a lifted knee shows through)
+SHORTS_SLIM = 0.95  # how much narrower the leg of the shorts is at the hem than the base model's
+SHORTS_CLEAR = 0.014  # the least gap between the thigh and the cloth round it
 BOOT_SQUASH = 0.84  # the base model wears thick-soled trainers: boots sit lower
 
 # Colours, as the site's own (0 to 1, the way a screen stores them)

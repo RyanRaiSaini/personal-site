@@ -104,10 +104,10 @@ def main():
     bpy.data.objects.remove(meshes[P.BASE["lashes"]])
     body.tidy(skin_obj)
     body.shape_up(arm, [skin_obj, shirt, shorts, boots, hair, eyes])
-    body.build_thighs(skin_obj, arm)
+    thighs = body.build_thighs(skin_obj, arm)
 
     # ---- the kit ----
-    kit.fit_shorts(shorts, arm)
+    kit.fit_shorts(shorts, arm, thighs)
     kit.lower_boots(boots)
     socks = kit.make_socks(skin_obj)
     printed = kit.back_of_shirt(shirt)
