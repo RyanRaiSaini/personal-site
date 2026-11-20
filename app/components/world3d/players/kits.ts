@@ -31,11 +31,13 @@ export type Kit = {
   colour?: string;
 };
 
-export const KITS: Record<"saini" | "jude" | "mbappe", Kit> = {
+export const KITS: Record<"saini" | "jude" | "mbappe" | "keeper", Kit> = {
   // Me: number 8
   saini: { name: "SAINI", number: 8, skin: "#b9855a", hair: "#14100e", hairStyle: "medium", beard: "goatee" },
   // Jude Bellingham: number 5
   jude: { name: "BELLINGHAM", number: 5, skin: "#a7774f", hair: "#17110d", hairStyle: "curls", beard: "chin", height: 1.86 },
   // Kylian Mbappé: number 10
   mbappe: { name: "MBAPPÉ", number: 10, skin: "#7c4c30", hair: "#120d0a", hairStyle: "crop", height: 1.78 },
+  // The goalkeeper the two guests score past: nobody in particular
+  keeper: { name: "", number: null, skin: "#c08e68", hair: "#1a1410", hairStyle: "crop", colour: "#2c6a55", height: 1.9 },
 };

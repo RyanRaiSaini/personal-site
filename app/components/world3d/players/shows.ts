@@ -34,6 +34,9 @@ export type GoalScript = {
   hold: number; // seconds the celebration is held
   celebration: { stance: Stance } | { clip: "victory" };
   directed: boolean; // true = the camera follows the scorer
+  // The goalkeeper he beats: "wrong" dives the wrong way, "late" dives
+  // the right way and is beaten anyway. Left out for no goalkeeper.
+  keeper?: "wrong" | "late";
 };
 
 const SOUTH = -PITCH.halfLength;
@@ -53,6 +56,7 @@ export const GOALS: Record<Scorer, GoalScript> = {
     hold: 4.6,
     celebration: { stance: "wide" },
     directed: true,
+    keeper: "wrong",
   },
   // In from the left wing, a shot across the keeper, then toward the
   // corner flag with his arms folded
@@ -69,6 +73,7 @@ export const GOALS: Record<Scorer, GoalScript> = {
     hold: 4.6,
     celebration: { stance: "folded" },
     directed: true,
+    keeper: "late",
   },
   // Number 8, at the north end: the replay for each project
   saini: {

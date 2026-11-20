@@ -23,7 +23,7 @@ import { AWAY_AFTER, BALL_FLIGHT, GOALS, goalLength, showLength, type GoalScript
 //   - Number 8 (me) stands wherever the open section is.
 //   - Clicking the ball on the south penalty spot brings on Jude
 //     Bellingham; clicking the south-east corner flag brings on
-//     Kylian Mbappé. Each scores and celebrates.
+//     Kylian Mbappé. Each scores past a goalkeeper and celebrates.
 //   - Opening a project replays a goal by number 8 at the north end.
 //
 // The scripts (positions, timings, celebrations) are in shows.ts. The
@@ -168,6 +168,7 @@ export default function Cast() {
   const introDone = useWorld((s) => s.introDone);
   const saini = useRef<PlayerHandle>(null);
   const guest = useRef<PlayerHandle>(null);
+  const keeper = useRef<PlayerHandle>(null);
   const centreBall = useRef<Group>(null);
   const northBall = useRef<Group>(null);
   const southBall = useRef<Group>(null);
@@ -326,6 +327,30 @@ export default function Cast() {
       player.play(layers);
     }
 
+    // The goalkeeper: set, then a full-stretch dive
+    const stopper = keeper.current;
+    const dive = notes.clips["keeper-dive"];
+    if (stopper && script.keeper && dive) {
+      const tall = sizeOf(KITS.keeper, notes);
+      const out = -Math.sign(goalX); // from the goal line toward the pitch
+      const lineX = goalX + out * 0.7;
+      const look = turnToward(out, 0);
+      // As recorded he dives to his right. Which way that is on the pitch
+      // depends on which goal he is in; turn him over if the script wants the other.
+      const recorded = turned(look, -1, 0)[1];
+      const wanted = (script.keeper === "wrong" ? -1 : 1) * Math.sign(script.target[2] || 1);
+      const flip = Math.sign(recorded) !== wanted;
+      // "wrong": at full stretch as the ball goes in the other side. "late": the right way, a moment too slow.
+      const tDive = tContact + BALL_FLIGHT - (script.keeper === "wrong" ? 0.95 : 0.6);
+      const into = ease((t - (tDive - 0.15)) / 0.15);
+      const [left, front] = t > tDive ? travelAt(dive, t - tDive) : [0, 0];
+      const [mx, mz] = turned(look, (flip ? -left : left) * tall, front * tall);
+      stopper.group.position.set(lineX + mx, 0, mz);
+      stopper.group.rotation.y = look;
+      stopper.group.scale.x = flip ? -1 : 1;
+      stopper.play(blend(playing("keeper-ready", atmo.time), playing("keeper-dive", Math.max(0, t - tDive)), into));
+    }
+
     // The ball: waiting, flying, then lying in the net
     if (ball) {
       if (t < tContact) ball.position.set(script.ball[0], BALL_R, script.ball[1]);
@@ -385,6 +410,7 @@ export default function Cast() {
     <group>
       <Player ref={saini} kit={KITS.saini} />
       {guestWho && <Player key={guestWho} ref={guest} kit={KITS[guestWho]} />}
+      {guestWho && GOALS[guestWho].keeper && <Player ref={keeper} kit={KITS.keeper} />}
 
       {/* the ball under number 8's foot at the centre spot */}
       <group ref={centreBall} position={[-0.14, BALL_R, 0.27]}>
