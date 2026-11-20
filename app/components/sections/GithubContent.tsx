@@ -1,6 +1,6 @@
 "use client";
 
-import { profile } from "../../data/portfolio";
+import { githubText, profile } from "../../data/portfolio";
 import { LEVEL_HEX, LEVEL_HEX_LIGHT } from "../../lib/github";
 import { useWorld } from "../../lib/store";
 import { Arrow, ExternalLink, Stats } from "./parts";
@@ -27,9 +27,9 @@ export default function GithubContent() {
   const busiest = data ? Math.max(0, ...data.counts.flat()) : 0;
 
   return (
-    <div className="space-y-6">
-      <p className="leading-relaxed text-ink-soft">
-        <span className="text-ink">Every square is a day.</span> The greener it is, the more I committed. Across the pitch, the seats of the main stand show the same picture.
+    <div className="sec">
+      <p className="text-ink-soft">
+        <span className="text-ink">{githubText.lead}</span> {githubText.body}
       </p>
 
       {data ? (
@@ -41,7 +41,7 @@ export default function GithubContent() {
               { value: String(busiest), label: "most in one day" },
             ]}
           />
-          <div className="scroll-area overflow-x-auto rounded-2xl border border-line bg-bg-raised/40 p-3.5">
+          <div className="card scroll-area overflow-x-auto">
             <div role="img" aria-label={`GitHub contribution chart for ${data.user}: ${data.total} contributions in the last year, on ${activeDays} days.`} className="grid w-max grid-flow-col grid-rows-7 gap-[3px]">
               {data.levels.map((week, w) =>
                 week.map((level, d) => (
@@ -57,19 +57,19 @@ export default function GithubContent() {
               <span>More</span>
             </div>
           </div>
-          {!data.live && <p className="text-xs text-ink-faint">GitHub could not be reached just now, so this is a saved copy.</p>}
+          {!data.live && <p className="meta">{githubText.saved}</p>}
         </>
       ) : (
-        <p className="rounded-2xl border border-line bg-bg-raised/40 px-4 py-6 text-center text-sm text-ink-soft" role="status">
-          Counting the cards…
+        <p className="card text-center text-ink-soft" role="status">
+          Loading contributions…
         </p>
       )}
 
       <div className="flex flex-wrap gap-2.5">
-        <ExternalLink href={profile.githubUrl} className="btn btn-primary !min-h-10 !px-4 !text-sm">
+        <ExternalLink href={profile.githubUrl} className="btn btn-primary !min-h-10 !px-3.5 !text-base">
           My GitHub profile <Arrow />
         </ExternalLink>
-        <ExternalLink href={profile.siteRepoUrl} className="btn !min-h-10 !px-4 !text-sm">
+        <ExternalLink href={profile.siteRepoUrl} className="btn !min-h-10 !px-3.5 !text-base">
           This site&apos;s code <Arrow />
         </ExternalLink>
       </div>

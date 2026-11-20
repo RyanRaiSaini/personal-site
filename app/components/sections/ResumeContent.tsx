@@ -1,4 +1,4 @@
-import { profile } from "../../data/portfolio";
+import { profile, resumeText } from "../../data/portfolio";
 import { resume } from "../../data/resume";
 import ResumePage from "../resume/ResumePage";
 import { Arrow } from "./parts";
@@ -7,7 +7,7 @@ import { Arrow } from "./parts";
 // app/data/resume.ts, and so is the PDF behind the download button.
 export default function ResumeContent() {
   return (
-    <div className="space-y-5">
+    <div className="sec !gap-5">
       <div className="flex flex-wrap items-center gap-3">
         <a href={profile.resumeUrl} download={resume.pdf.file} className="btn btn-primary">
           Download PDF
@@ -18,7 +18,7 @@ export default function ResumeContent() {
         </a>
       </div>
       <ResumePage />
-      <p className="text-xs text-ink-faint">This public copy leaves my phone number off. Email me and I will send the full version.</p>
+      <p className="meta">{resumeText.note}</p>
     </div>
   );
 }
