@@ -33,7 +33,9 @@ export type PlayerHandle = {
 };
 
 const WHITE = "#f6f6f4";
+// the print: navy on the white kit, white on any other
 const INK = "#10224a";
+const PALE = "#f4f4f1";
 
 // The print on the back, in metres up the player's back
 const PRINT = {
@@ -124,7 +126,7 @@ function printedShirt(base: Texture, notes: PlayerNotes, kit: Kit, family: strin
       const across = (x: number, z: number) => (u[0] + u[1] * x + u[2] * z) * size;
       const down = (x: number, z: number) => (1 - (v[0] + v[1] * x + v[2] * z)) * size;
       const perMetre = Math.abs(v[2]) * size;
-      ctx.fillStyle = INK;
+      ctx.fillStyle = kit.colour ? PALE : INK;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       // the heading font's capitals are about 0.7 of its size
