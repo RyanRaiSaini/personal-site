@@ -191,6 +191,10 @@ export default function StadiumModel() {
     // to left, so the picture is flipped to read the right way.
     const repeats = Math.max(1, Math.round(perimeter(SCREEN_D) / made.worldLength));
     made.texture.repeat.set(-repeats, 1);
+    // A model counts a picture's rows from the top, a painted canvas
+    // from the bottom. Without this the words hang upside down.
+    made.texture.flipY = false;
+    made.texture.needsUpdate = true;
     return made.texture;
   }, [family, show]);
 
