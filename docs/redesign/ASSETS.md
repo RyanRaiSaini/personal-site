@@ -1,6 +1,6 @@
 # Assets, sources and licences
 
-Everything the redesigned stadium is made from, where it came from and what its licence asks for. Checked on 2026-11-19. No paid asset or service is used.
+Everything the redesigned stadium is made from, where it came from and what its licence asks for. Checked on 2026-11-19; the players and the résumé's typeface added on 2026-11-20. No paid asset or service is used.
 
 ## The stadium model
 
@@ -23,6 +23,20 @@ The model is original geometry. Its overall proportions (252.6 m by 205.3 m, 58.
 | Credit shown on the site | In the small print on the home screen and the match view (`colophon.credits` in `app/data/portfolio.ts`) |
 
 A second model, "santiago bernabeu" by Michael Persi (mikmikoni), CC BY 4.0, was examined and not used. See [MODELS.md](MODELS.md).
+
+## The players (Mixamo)
+
+| | |
+|---|---|
+| What | The footballers: number 8, the two guest scorers, number 66 and the goalkeeper. All are copies of one model. |
+| Base character | "Remy", from Adobe's [Mixamo](https://www.mixamo.com) library, used for his body and skeleton only |
+| Movement | Mixamo motion capture: its "Soccer Game Pack" (penalty kick, strike, jog, goalkeeper stance and dive, the long pass) and the single clips Breathing Idle, Running, Sitting Idle and Victory |
+| Made by | Rebuilt for this site in Blender 5.3 by [`blender/build_players.py`](../../blender/build_players.py): an athlete's build, the thighs the base comes without, the plain white kit, dark hair and eyes, a second hairstyle, three beards and four standing poses |
+| Web version | [`public/players/player.glb`](../../public/players/player.glb), 1.57 MB, with its timings in `player.json` |
+| Licence | Adobe's [Mixamo FAQ](https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html) allows characters and animations to be used "royalty free for personal, commercial, and non-profit projects". A free Adobe account is needed to download them. |
+| What is not in this repo | The files as downloaded from Mixamo. They are kept in `C:\Users\ryanr\stadium-work\mixamo\` and can be downloaded again from Mixamo at any time. Only the rebuilt model is here; it is part of this site and is not offered for reuse on its own. |
+
+No player's face is taken from a photograph. Each is told apart by his number, skin tone, hair, beard, height and celebration (`app/components/world3d/players/kits.ts`). The goalkeeper is nobody in particular.
 
 ## Surfaces and sky (Poly Haven)
 
@@ -48,17 +62,22 @@ How they are handled:
 | Font | Source | Licence |
 |---|---|---|
 | Barlow and Barlow Condensed, by Jeremy Tribby | Google Fonts, loaded through `next/font` (`app/fonts.ts`) | SIL Open Font License 1.1 |
+| CMU Serif (Computer Modern Unicode), by Andrey V. Panov after Donald Knuth | The `computer-modern` package on npm; three files kept in [`scripts/fonts/`](../../scripts/fonts) | SIL Open Font License 1.1 (`scripts/fonts/OFL.txt`) |
+
+CMU Serif is used only to set the résumé PDF (`scripts/build-resume-pdf.mjs`), so that it matches the LaTeX original. It is not loaded by the site's pages.
 
 ## Tools
 
 | Tool | Used for | Cost |
 |---|---|---|
-| Blender 5.3 | Building the stadium and working out its light | Free |
-| glTF-Transform, meshoptimizer | Packing the model for the web (`scripts/pack-stadium.mjs`) | Free, open source |
+| Blender 5.3 | Building the stadium and working out its light; rebuilding the player | Free |
+| glTF-Transform, meshoptimizer, sharp | Packing the models for the web (`scripts/pack-stadium.mjs`, `scripts/pack-players.mjs`) | Free, open source |
+| pdfkit | Setting the résumé PDF | Free, open source |
 | Three.js, React Three Fiber, drei | Drawing it in the browser | Free, open source |
 | puppeteer-core with the Chrome already installed | Screenshots and measurements (`scripts/shots.mjs`, `scripts/measure.mjs`) | Free |
 
 ## Not used, on purpose
 
 - No club crest, kit design, sponsor mark or anthem. The boards round the pitch and the ring of screens are blank.
+- No photographs of players, and no player's likeness taken from one.
 - No photographs of the real stadium. The three reference pictures looked at during the work were for proportion only and are not in the repo or on the site.
