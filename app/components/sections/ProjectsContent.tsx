@@ -1,13 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { projects } from "../../data/portfolio";
+import { projects, projectText } from "../../data/portfolio";
 import { useWorld } from "../../lib/store";
-import { Arrow, Chips, ExternalLink, Stats } from "./parts";
+import Tabs from "../ui/Tabs";
+import { Arrow, Bullets, Chips, ExternalLink, Stats } from "./parts";
 
 // Projects: the goal. Every project in `projects`
 // (app/data/portfolio.ts) is a goal. Opening one plays its replay in
 // the 3D world: number 8 scores it again.
+//
+// An open project is split into two tabs, what it is and what I did,
+// so that it fits on a screen without a long scroll.
 export default function ProjectsContent() {
   const [open, setOpen] = useState<string>(projects[0].id);
 
@@ -24,63 +28,87 @@ export default function ProjectsContent() {
   };
 
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-ink-soft">
-        <span className="font-display text-lg font-bold uppercase tracking-wide text-gold">{projects.length} goals.</span> A hat-trick so far. Choose one to see the replay.
-      </p>
-      <ol role="list" className="space-y-3">
-        {projects.map((project) => {
-          const expanded = open === project.id;
-          return (
-            <li key={project.id} className={`rounded-2xl border bg-bg-raised/40 transition-colors ${expanded ? "border-gold" : "border-line"}`}>
-              <h2>
-                <button type="button" aria-expanded={expanded} aria-controls={`project-${project.id}`} onClick={() => choose(project.id, project.title)} className="flex w-full items-center gap-4 rounded-2xl px-4 py-3.5 text-left sm:px-5">
-                  <span className="flex-none text-center">
-                    <span className="block font-mono text-xs text-ink-faint">{project.minute}</span>
-                    <span className="block font-display text-sm font-bold uppercase tracking-[0.16em] text-gold">Goal</span>
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block font-display text-3xl font-bold uppercase leading-none tracking-wide">{project.title}</span>
-                    <span className="mt-1 block text-xs text-ink-faint">{project.kicker}</span>
-                  </span>
-                  <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true" className={`flex-none text-ink-soft transition-transform ${expanded ? "rotate-180" : ""}`}>
-                    <path d="m3 6 5 5 5-5" />
-                  </svg>
-                </button>
-              </h2>
-              <p className="px-4 pb-3.5 text-sm leading-relaxed text-ink-soft sm:px-5">{project.summary}</p>
+    <ol role="list" className="sec !gap-3">
+      {projects.map((project) => {
+        const expanded = open === project.id;
+        const hasResults = project.stats.length > 0 || Boolean(project.role);
 
-              <div id={`project-${project.id}`} hidden={!expanded} className="space-y-4 border-t border-line px-4 py-4 sm:px-5">
-                <p className="text-sm leading-relaxed">{project.description}</p>
-                <Stats items={project.stats} />
-                <ul className="space-y-2 text-sm leading-relaxed">
-                  {project.features.map((feature) => (
-                    <li key={feature.slice(0, 32)} className="flex gap-2.5">
-                      <span aria-hidden="true" className="mt-[0.55em] h-1.5 w-1.5 flex-none rounded-full bg-gold" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                {project.role && (
-                  <p className="rounded-xl border border-line bg-bg/40 px-3.5 py-3 text-sm leading-relaxed">
-                    <span className="kicker mb-1 block">My part</span>
-                    {project.role}
-                  </p>
-                )}
-                <Chips items={project.technologies} label="Built with" />
-                <div className="flex flex-wrap gap-2.5">
-                  {project.links.map((link) => (
-                    <ExternalLink key={link.href} href={link.href} className="btn !min-h-10 !px-4 !text-sm">
-                      {link.label}
-                      <Arrow />
-                    </ExternalLink>
-                  ))}
-                </div>
+        const builtWith = (
+          <div className="grid gap-2">
+            <p className="label">{projectText.builtWith}</p>
+            <Chips items={project.technologies} label={projectText.builtWith} />
+          </div>
+        );
+        const links = (
+          <div className="flex flex-wrap gap-2.5">
+            {project.links.map((link) => (
+              <ExternalLink key={link.href} href={link.href} className="btn !min-h-10 !px-3.5 !text-base">
+                {link.label}
+                <Arrow />
+              </ExternalLink>
+            ))}
+          </div>
+        );
+        const overview = (
+          <div className="grid gap-4">
+            <p>{project.description}</p>
+            {project.features.length > 0 && <Bullets items={project.features} />}
+            {!hasResults && builtWith}
+            {!hasResults && links}
+          </div>
+        );
+        const results = (
+          <div className="grid gap-4">
+            <Stats items={project.stats} />
+            {project.role && (
+              <div className="grid gap-1.5">
+                <p className="label">{projectText.role}</p>
+                <p className="text-[0.9375rem] leading-[1.55]">{project.role}</p>
               </div>
-            </li>
-          );
-        })}
-      </ol>
-    </div>
+            )}
+            {builtWith}
+            {links}
+          </div>
+        );
+
+        return (
+          <li key={project.id} className={`card !p-0 transition-colors ${expanded ? "!border-gold" : ""}`}>
+            <h2>
+              <button type="button" aria-expanded={expanded} aria-controls={`project-${project.id}`} onClick={() => choose(project.id, project.title)} className="flex w-full items-center gap-4 rounded-[10px] px-[1.125rem] pb-2 pt-4 text-left">
+                <span className="flex-none text-center leading-none">
+                  <span className="block font-display text-sm font-semibold text-ink-faint">{project.minute}</span>
+                  <span className="mt-1 block font-display text-base font-bold tracking-wide text-gold">{projectText.goal}</span>
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="card-title block">{project.title}</span>
+                  <span className="meta mt-1 block">{project.kicker}</span>
+                </span>
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true" className={`flex-none text-ink-soft transition-transform ${expanded ? "rotate-180" : ""}`}>
+                  <path d="m3 6 5 5 5-5" />
+                </svg>
+              </button>
+            </h2>
+            <div className="grid gap-2 px-[1.125rem] pb-4">
+              {project.award && <p className="font-display text-[1.0625rem] font-semibold leading-snug tracking-wide text-gold">{project.award}</p>}
+              <p className="text-[0.9375rem] leading-[1.55] text-ink-soft">{project.summary}</p>
+            </div>
+
+            <div id={`project-${project.id}`} hidden={!expanded} className="border-t border-line px-[1.125rem] py-4">
+              {hasResults ? (
+                <Tabs
+                  label={project.title}
+                  tabs={[
+                    { id: "overview", title: projectText.overviewTab, content: overview },
+                    { id: "results", title: projectText.resultsTab, content: results },
+                  ]}
+                />
+              ) : (
+                overview
+              )}
+            </div>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
