@@ -31,7 +31,7 @@ import { rig } from "./camera/CameraRig";
 const FULL_FOR = 1500;
 const AMBIENT_GAP = 1000 / 30;
 // ms after the last input before the picture stops altogether
-const REST_AFTER = { home: 45_000, section: 15_000, reducedMotion: 4_000 };
+const REST_AFTER = { home: 45_000, section: 15_000, reducedMotion: 4_000, start: 4_000 };
 // Under this many frames a second at full rate, step the quality down.
 // (Some laptops cap browsers at 30 to save battery, so 30 must not count as slow.)
 const SLOW = 24;
@@ -39,11 +39,13 @@ const SLOW = 24;
 function paceNow(now: number): Pace {
   if (document.hidden) return "rest";
   const state = useWorld.getState();
-  if (!state.worldReady || !state.introDone || state.show || state.curtain) return "full";
-  if (rig.dragging || rig.override || now < activity.busyUntil) return "full";
+  // On the start screen the camera stands still in the tunnel: a picture, not a film
+  const atStart = !state.introDone && !state.introStarted;
+  if (!state.worldReady || (!state.introDone && !atStart) || state.show || state.curtain) return "full";
+  if (rig.dragging || (rig.override && !rig.holdStill) || now < activity.busyUntil) return "full";
   const since = now - activity.lastInput;
   if (since < FULL_FOR) return "full";
-  const limit = state.reducedMotion ? REST_AFTER.reducedMotion : state.section === "home" ? REST_AFTER.home : REST_AFTER.section;
+  const limit = atStart ? REST_AFTER.start : state.reducedMotion ? REST_AFTER.reducedMotion : state.section === "home" ? REST_AFTER.home : REST_AFTER.section;
   return since < limit ? "ambient" : "rest";
 }
 

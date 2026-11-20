@@ -27,6 +27,9 @@ export const rig = {
   overrideStiffness: 5,
   // Set to true to jump straight to the override instead of easing to it
   snapOverride: false,
+  // The override is a fixed view (the start screen): once the camera is
+  // there, nothing is moving and the picture need not be redrawn
+  holdStill: false,
   azimuth: ORBIT.startAzimuth,
   dragging: false,
   lastInput: -100,
@@ -158,7 +161,7 @@ export default function CameraRig() {
       c.fov += (rig.override.fov - c.fov) * k;
       f.active = false;
       wasOverridden.current = true;
-      stir();
+      if (!rig.holdStill) stir();
     } else {
       if (wasOverridden.current) {
         // The show is over: fly back to where the page says we are
