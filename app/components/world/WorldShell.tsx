@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
 import { Component, useEffect, useState, type ReactNode } from "react";
-import { shell } from "../../data/portfolio";
+import { eggs, shell } from "../../data/portfolio";
 import { finishIntro } from "../../lib/intro";
 import type { EggId, RoofMode } from "../../lib/store";
 import { useWorld } from "../../lib/store";
@@ -84,8 +84,9 @@ export default function WorldShell() {
     try {
       const saved = params.get("roof") ?? localStorage.getItem("roof");
       if (saved === "open" || saved === "closed" || saved === "auto") store.setRoofMode(saved as RoofMode);
-      const eggs = JSON.parse(localStorage.getItem("eggs") ?? "[]");
-      if (Array.isArray(eggs)) store.loadEggs(eggs as EggId[]);
+      const found = JSON.parse(localStorage.getItem("eggs") ?? "[]");
+      // an older visit may have saved eggs under names that are no longer used
+      if (Array.isArray(found)) store.loadEggs(found.filter((id): id is EggId => eggs.some((egg) => egg.id === id)));
     } catch {
       // Private browsing: start fresh
     }

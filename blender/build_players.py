@@ -145,7 +145,7 @@ def main():
         tone_linear = [look.to_linear(c) for c in tone]
         for tag, skin_tone, wears, full in (
             ("eight", (0.725, 0.522, 0.353), ("HairMedium", "BeardGoatee"), True),
-            ("five", (0.655, 0.467, 0.310), ("HairCurls", "BeardChin"), True),
+            ("six", (0.655, 0.467, 0.310), ("HairCurls", "BeardChin"), True),
             ("ten", (0.486, 0.298, 0.188), (), False),
             ("sixty-six", (0.690, 0.502, 0.353), ("HairCurls", "BeardStrap"), False),
         ):

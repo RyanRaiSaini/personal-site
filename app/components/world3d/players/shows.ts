@@ -17,7 +17,7 @@ import type { Stance } from "./moves";
 // distance from the ball to `party`.
 // ------------------------------------------------------------------
 
-export type Scorer = "jude" | "mbappe" | "saini";
+export type Scorer = "six" | "ten" | "saini";
 
 export type GoalScript = {
   goal: "north" | "south";
@@ -44,7 +44,7 @@ const NORTH = PITCH.halfLength;
 
 export const GOALS: Record<Scorer, GoalScript> = {
   // A penalty at the south end, then off to the corner with his arms out
-  jude: {
+  six: {
     goal: "south",
     ball: [SOUTH + PITCH.penaltySpot, 0],
     target: [SOUTH - 1.5, 1.7, 2.7],
@@ -60,7 +60,7 @@ export const GOALS: Record<Scorer, GoalScript> = {
   },
   // In from the left wing, a shot across the keeper, then toward the
   // corner flag with his arms folded
-  mbappe: {
+  ten: {
     goal: "south",
     ball: [SOUTH + 12, 7],
     target: [SOUTH - 1.6, 0.7, -2.9],
@@ -99,7 +99,7 @@ export function goalLength(script: GoalScript): number {
   return script.contact + AWAY_AFTER + script.runOff + 0.5 + script.hold;
 }
 
-// Number 66's long pass from the touchline (eggs/TrentShirt.tsx)
+// Number 66's long pass from the touchline (eggs/BenchShirt.tsx)
 export const LONG_PASS = { contact: 1.9, flight: 2.5, length: 5.6 };
 
 // How long each kind of show lasts before the world goes back to normal

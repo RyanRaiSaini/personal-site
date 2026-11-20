@@ -79,7 +79,7 @@ export type Interest = {
 };
 
 export type Egg = {
-  id: "jude" | "mbappe" | "hala" | "var" | "fifteen" | "basketball" | "trent";
+  id: "penalty" | "corner" | "hala" | "var" | "fifteen" | "basketball" | "pass";
   name: string;
   hint: string;
 };
@@ -138,7 +138,7 @@ export const about = {
 export const interests: Interest[] = [
   {
     name: "Football",
-    description: "A long-standing Real Madrid supporter. My favourite player is Trent Alexander-Arnold.",
+    description: "A long-standing Real Madrid supporter. My favourite player\u2019s old number, 66, is somewhere in this stadium.",
   },
   {
     name: "Basketball",
@@ -546,13 +546,13 @@ export const matchText = {
 // ------------------------------------------------------------------
 
 export const eggs: Egg[] = [
-  { id: "jude", name: "Hey Jude", hint: "Something is waiting on a penalty spot." },
-  { id: "mbappe", name: "Corner specialist", hint: "One of the corner flags is worth a click." },
+  { id: "penalty", name: "From the spot", hint: "Something is waiting on a penalty spot." },
+  { id: "corner", name: "Corner specialist", hint: "One of the corner flags is worth a click." },
   { id: "hala", name: "Hala!", hint: "Type the first word of the anthem, anywhere." },
   { id: "var", name: "VAR check", hint: "Visit a page that does not exist." },
   { id: "fifteen", name: "La Decimoquinta", hint: "The trophy cabinet likes attention. Fifteen clicks of it." },
   { id: "basketball", name: "Wrong sport", hint: "Someone left a basketball in the press room." },
-  { id: "trent", name: "Number 66", hint: "A shirt has been left on a seat in the dugout." },
+  { id: "pass", name: "Number 66", hint: "A shirt has been left on a seat in the dugout." },
 ];
 
 // ------------------------------------------------------------------

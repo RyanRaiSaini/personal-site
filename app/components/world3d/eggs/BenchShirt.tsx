@@ -53,13 +53,13 @@ function turned(facing: number, left: number, front: number): [number, number] {
   return [left * c + front * s, -left * s + front * c];
 }
 
-export default function TrentShirt() {
+export default function BenchShirt() {
   const family = useDisplayFont();
   const show = useWorld((s) => s.show);
   const pass = useRef<Group>(null);
   const passer = useRef<PlayerHandle>(null);
   const directing = useRef(false);
-  const texture = useMemo(() => (family ? shirtTexture(family, "Alexander-Arnold", 66) : null), [family]);
+  const texture = useMemo(() => (family ? shirtTexture(family, "", 66) : null), [family]);
   useEffect(() => () => texture?.dispose(), [texture]);
 
   // the numbers that come with the player model
@@ -78,7 +78,7 @@ export default function TrentShirt() {
   const plan = useMemo(() => {
     const clip = notes?.clips["long-pass"];
     if (!notes || !clip?.kick) return null;
-    const size = (KITS.trent.height ?? notes.height) / notes.height;
+    const size = (KITS.sixtySix.height ?? notes.height) / notes.height;
     const dx = LANDING[0] - BALL[0];
     const dz = LANDING[2] - BALL[1];
     const reach = Math.hypot(dx, dz);
@@ -93,13 +93,13 @@ export default function TrentShirt() {
     if (event.delta > 6) return;
     const world = useWorld.getState();
     if (world.show || !world.introDone) return;
-    world.findEgg("trent");
-    world.startShow({ kind: "trent" });
+    world.findEgg("pass");
+    world.startShow({ kind: "pass" });
   };
 
   useFrame(() => {
     const current = useWorld.getState().show;
-    if (current?.kind !== "trent") {
+    if (current?.kind !== "pass") {
       if (pass.current) pass.current.visible = false;
       if (directing.current) {
         directing.current = false;
@@ -154,7 +154,7 @@ export default function TrentShirt() {
         </mesh>
       </group>
       {/* he is only here while the pass is being hit */}
-      {show?.kind === "trent" && <Player ref={passer} kit={KITS.trent} />}
+      {show?.kind === "pass" && <Player ref={passer} kit={KITS.sixtySix} />}
       <group ref={pass} visible={false}>
         <mesh castShadow>
           <sphereGeometry args={[BALL_R, 20, 14]} />

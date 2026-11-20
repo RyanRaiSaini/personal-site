@@ -20,10 +20,10 @@ export type EggId = Egg["id"];
 
 // A one-off thing the 3D world should act out
 export type Show =
-  | { kind: "goal"; scorer: "jude" | "mbappe" | "saini"; label: string; startedAt: number }
+  | { kind: "goal"; scorer: "six" | "ten" | "saini"; label: string; startedAt: number }
   | { kind: "fireworks"; label: string; startedAt: number }
   | { kind: "fifteen"; startedAt: number }
-  | { kind: "trent"; startedAt: number };
+  | { kind: "pass"; startedAt: number };
 
 // How the site is being viewed: the 3D tour or the flat match view.
 // "pending" is the moment before the page has looked at the device.
@@ -31,10 +31,10 @@ export type Mode = "pending" | "tour" | "flat";
 
 // A show as it is asked for; the store stamps the start time itself
 export type ShowRequest =
-  | { kind: "goal"; scorer: "jude" | "mbappe" | "saini"; label: string }
+  | { kind: "goal"; scorer: "six" | "ten" | "saini"; label: string }
   | { kind: "fireworks"; label: string }
   | { kind: "fifteen" }
-  | { kind: "trent" };
+  | { kind: "pass" };
 
 type State = {
   mode: Mode;

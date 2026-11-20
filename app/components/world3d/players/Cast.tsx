@@ -21,9 +21,9 @@ import { AWAY_AFTER, BALL_FLIGHT, GOALS, goalLength, showLength, type GoalScript
 // The players out on the pitch, and the director of every goal.
 //
 //   - Number 8 (me) stands wherever the open section is.
-//   - Clicking the ball on the south penalty spot brings on Jude
-//     Bellingham; clicking the south-east corner flag brings on
-//     Kylian Mbappé. Each scores past a goalkeeper and celebrates.
+//   - Clicking the ball on the south penalty spot brings on number 6;
+//     clicking the south-east corner flag brings on number 10. Each
+//     scores past a goalkeeper and celebrates. Neither is named.
 //   - Opening a project replays a goal by number 8 at the north end.
 //
 // The scripts (positions, timings, celebrations) are in shows.ts. The
@@ -199,19 +199,19 @@ export default function Cast() {
 
   const plans = useMemo(() => {
     if (!notes) return null;
-    return { saini: planOf(GOALS.saini, notes, KITS.saini), jude: planOf(GOALS.jude, notes, KITS.jude), mbappe: planOf(GOALS.mbappe, notes, KITS.mbappe) };
+    return { saini: planOf(GOALS.saini, notes, KITS.saini), six: planOf(GOALS.six, notes, KITS.six), ten: planOf(GOALS.ten, notes, KITS.ten) };
   }, [notes]);
 
-  const start = (scorer: "jude" | "mbappe") => {
+  const start = (scorer: "six" | "ten") => {
     const world = useWorld.getState();
     if (world.show || !world.introDone) return;
-    world.findEgg(scorer);
-    world.startShow({ kind: "goal", scorer, label: scorer === "jude" ? "BELLINGHAM  5" : "MBAPPÉ  10" });
+    world.findEgg(scorer === "six" ? "penalty" : "corner");
+    world.startShow({ kind: "goal", scorer, label: `NUMBER ${KITS[scorer].number}` });
   };
 
   // A click only counts if the pointer stayed put. Letting go at the end
   // of a drag that turned the camera should not set off a goal.
-  const click = (event: ThreeEvent<MouseEvent>, scorer: "jude" | "mbappe") => {
+  const click = (event: ThreeEvent<MouseEvent>, scorer: "six" | "ten") => {
     if (event.delta > 6) return;
     start(scorer);
   };
@@ -245,7 +245,7 @@ export default function Cast() {
     if (!goal || !plan || !notes) {
       // Everything back to its mark
       if (balls.north) balls.north.position.set(GOALS.saini.ball[0], BALL_R, GOALS.saini.ball[1]);
-      if (balls.south) balls.south.position.set(GOALS.jude.ball[0], BALL_R, GOALS.jude.ball[1]);
+      if (balls.south) balls.south.position.set(GOALS.six.ball[0], BALL_R, GOALS.six.ball[1]);
       if (directing.current) {
         directing.current = false;
         rig.override = null;
@@ -427,25 +427,25 @@ export default function Cast() {
         </mesh>
       </group>
       {/* the ball on the south penalty spot: click it */}
-      <group ref={southBall} position={[GOALS.jude.ball[0], BALL_R, GOALS.jude.ball[1]]}>
+      <group ref={southBall} position={[GOALS.six.ball[0], BALL_R, GOALS.six.ball[1]]}>
         <mesh castShadow>
           <sphereGeometry args={[BALL_R, 24, 16]} />
           <meshStandardMaterial map={leather} roughness={0.42} />
         </mesh>
         {/* a generous invisible target, so it is easy to hit from far away */}
-        <mesh onClick={(e) => click(e, "jude")} {...clickable}>
+        <mesh onClick={(e) => click(e, "six")} {...clickable}>
           <sphereGeometry args={[2.2, 12, 8]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>
       </group>
       {/* the south-east corner flag: click it. The target is much bigger than
           the flag, which is only a few pixels wide from across the stadium */}
-      <mesh position={[-PITCH.halfLength, 2.4, PITCH.halfWidth]} onClick={(e) => click(e, "mbappe")} {...clickable}>
+      <mesh position={[-PITCH.halfLength, 2.4, PITCH.halfWidth]} onClick={(e) => click(e, "ten")} {...clickable}>
         <cylinderGeometry args={[3, 3, 4.8, 12]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
 
-      {idleNow && <HintRing x={GOALS.jude.ball[0]} z={GOALS.jude.ball[1]} />}
+      {idleNow && <HintRing x={GOALS.six.ball[0]} z={GOALS.six.ball[1]} />}
       {idleNow && <HintRing x={-PITCH.halfLength} z={PITCH.halfWidth} />}
     </group>
   );
