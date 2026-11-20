@@ -26,7 +26,8 @@ export default function SoundEngine() {
       engine.current ??= new StadiumSound();
       engine.current.start();
       engine.current.setIndoors(sceneOf(useWorld.getState().section) !== "bowl");
-      engine.current.whistle(0.45);
+      // It fades in by itself. (It used to announce itself with a
+      // referee's whistle, which made people jump.)
     } else engine.current?.stop();
   }, [sound, mode]);
 
