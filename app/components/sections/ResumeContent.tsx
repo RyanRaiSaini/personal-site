@@ -10,10 +10,10 @@ export default function ResumeContent() {
     <div className="sec !gap-5">
       <div className="flex flex-wrap items-center gap-3">
         <a href={profile.resumeUrl} download={resume.pdf.file} className="btn btn-primary">
-          Download PDF
+          {resumeText.download}
         </a>
         <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" className="btn">
-          Open in a new tab <Arrow />
+          {resumeText.open} <Arrow />
           <span className="sr-only"> (opens in a new tab)</span>
         </a>
       </div>

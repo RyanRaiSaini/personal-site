@@ -516,6 +516,8 @@ export const githubText = {
 };
 
 export const resumeText = {
+  download: "Download PDF",
+  open: "Open in a new tab",
   note: "A complete copy, including my telephone number, is available on request.",
 };
 
