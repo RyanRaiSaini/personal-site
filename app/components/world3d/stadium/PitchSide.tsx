@@ -2,7 +2,7 @@
 
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { BoxGeometry, Color, CylinderGeometry, DoubleSide, Float32BufferAttribute, type BufferGeometry, type Group } from "three";
+import { AdditiveBlending, BoxGeometry, Color, CylinderGeometry, DoubleSide, Float32BufferAttribute, PlaneGeometry, type BufferGeometry, type Group, type MeshBasicMaterial } from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { atmo } from "../atmosphere/state";
 import { canvasTexture } from "../textures/canvas";
@@ -156,15 +156,61 @@ function wallTexture() {
     // grey painted wall above a dark lower band, with a joint every two
     // metres; brighter toward the ceiling, where the strip lights are
     const paint = ctx.createLinearGradient(0, 0, 0, h * 0.62);
-    paint.addColorStop(0, "#636872");
+    paint.addColorStop(0, "#6a6f79");
     paint.addColorStop(1, "#3d4149");
     ctx.fillStyle = paint;
     ctx.fillRect(0, 0, w, h);
     ctx.fillStyle = "#10131b";
     ctx.fillRect(0, h * 0.62, w, h * 0.38);
+    // a pale line where the two paints meet
+    ctx.fillStyle = "rgba(214,220,232,0.5)";
+    ctx.fillRect(0, h * 0.62 - 1, w, 2);
     ctx.fillStyle = "rgba(0,0,0,0.22)";
     ctx.fillRect(0, 0, 2, h);
   });
+}
+
+// A soft round glow, bright in the middle
+function glowTexture() {
+  return canvasTexture(
+    128,
+    128,
+    (ctx, w, h) => {
+      const glow = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+      glow.addColorStop(0, "rgba(255,255,255,0.85)");
+      glow.addColorStop(0.35, "rgba(255,255,255,0.3)");
+      glow.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, w, h);
+    },
+    { repeat: false },
+  );
+}
+
+// How much daylight reaches a spot `metres` back from the tunnel's
+// mouth: all of it at the opening, very little by the far end. This is
+// what makes the tunnel dark and the pitch bright at the end of it.
+const DEEP = 0.2;
+function spill(metres: number) {
+  return DEEP + (1 - DEEP) * Math.exp(-Math.max(0, metres) / 6.5);
+}
+
+// A flat strip running the length of the tunnel, shaded by how far each
+// part of it is from the mouth. `run` is the tunnel's length, `width`
+// the strip's own width; `toMouth` says which end of the strip is at
+// the mouth once it has been turned into place (+1 or -1).
+function shadedStrip(run: number, width: number, lengthwise: "x" | "y", toMouth: 1 | -1, tint: [number, number, number] = [1, 1, 1]) {
+  const steps = 26;
+  const geometry = lengthwise === "x" ? new PlaneGeometry(run, width, steps, 1) : new PlaneGeometry(width, run, 1, steps);
+  const position = geometry.attributes.position;
+  const colours = new Float32Array(position.count * 3);
+  for (let i = 0; i < position.count; i++) {
+    const along = lengthwise === "x" ? position.getX(i) : position.getY(i);
+    const light = spill(run / 2 - along * toMouth);
+    colours.set([tint[0] * light, tint[1] * light, tint[2] * light], i * 3);
+  }
+  geometry.setAttribute("color", new Float32BufferAttribute(colours, 3));
+  return geometry;
 }
 
 function Tunnel() {
@@ -173,48 +219,74 @@ function Tunnel() {
   const endZ = WALL_Z - length;
   const midZ = (mouthZ + endZ) / 2;
   const run = mouthZ - endZ;
-  const walls = useMemo(() => {
-    const t = wallTexture();
-    t.repeat.set(run / 2, 1);
-    return t;
-  }, [run]);
+  const glow = useRef<MeshBasicMaterial>(null);
+
+  const made = useMemo(() => {
+    const walls = wallTexture();
+    walls.repeat.set(run / 2, 1);
+    return {
+      walls,
+      glow: glowTexture(),
+      // each wall is turned to face inward, which puts the mouth at opposite ends of the two
+      wall: { 1: shadedStrip(run, height, "x", 1), [-1]: shadedStrip(run, height, "x", -1) } as Record<number, BufferGeometry>,
+      floor: shadedStrip(run, halfWidth * 2, "y", -1, [1.25, 1.3, 1.4]),
+      ceiling: shadedStrip(run, halfWidth * 2, "y", 1),
+    };
+  }, [run, height, halfWidth]);
+
+  useEffect(() => {
+    return () => {
+      made.walls.dispose();
+      made.glow.dispose();
+      made.wall[1].dispose();
+      made.wall[-1].dispose();
+      made.floor.dispose();
+      made.ceiling.dispose();
+    };
+  }, [made]);
+
+  // the haze of light in the mouth follows the day: strong at noon, softer under the floodlights
+  useFrame(() => {
+    if (glow.current) glow.current.opacity = 0.16 + 0.34 * Math.max(atmo.daylight, atmo.floodlights * 0.55);
+  });
 
   return (
     <group>
       {/* inside: floor, walls, ceiling. They carry their own light,
-          because no lamp reaches in here; kept dim, so the tunnel reads
-          as indoors against the daylight on the pitch. */}
-      <mesh position={[0, 0.01, midZ]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[halfWidth * 2, run]} />
-        <meshBasicMaterial color="#2a2d33" />
+          because no lamp reaches in here: dim at the back, lit by the
+          day (or the floodlights) toward the mouth. */}
+      <mesh geometry={made.floor} position={[0, 0.01, midZ]} rotation={[-Math.PI / 2, 0, 0]}>
+        <meshBasicMaterial color="#2a2d33" vertexColors />
       </mesh>
       {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * halfWidth, height / 2, midZ]} rotation={[0, (-s * Math.PI) / 2, 0]}>
-          <planeGeometry args={[run, height]} />
-          <meshBasicMaterial map={walls} />
+        <mesh key={s} geometry={made.wall[s]} position={[s * halfWidth, height / 2, midZ]} rotation={[0, (-s * Math.PI) / 2, 0]}>
+          <meshBasicMaterial map={made.walls} vertexColors />
         </mesh>
       ))}
-      <mesh position={[0, height, midZ]} rotation={[Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[halfWidth * 2, run]} />
-        <meshBasicMaterial color="#14161c" />
+      <mesh geometry={made.ceiling} position={[0, height, midZ]} rotation={[Math.PI / 2, 0, 0]}>
+        <meshBasicMaterial color="#1b1e25" vertexColors />
       </mesh>
       {/* strip lights along the ceiling */}
       {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * (halfWidth - 0.5), height - 0.02, midZ]} rotation={[Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[0.16, run - 1]} />
-          <meshBasicMaterial color={[1.9, 1.95, 2.05]} toneMapped={false} />
+        <mesh key={s} position={[s * (halfWidth - 0.55), height - 0.02, midZ]} rotation={[Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.09, run - 1]} />
+          <meshBasicMaterial color={[1.15, 1.2, 1.32]} toneMapped={false} />
         </mesh>
       ))}
       {/* the far end: a lit doorway back toward the dressing rooms */}
       <mesh position={[0, height / 2, endZ]}>
         <planeGeometry args={[halfWidth * 2, height]} />
-        <meshBasicMaterial color="#12151c" />
+        <meshBasicMaterial color="#0b0d12" />
       </mesh>
       <mesh position={[0, 1.15, endZ + 0.02]}>
         <planeGeometry args={[1.5, 2.3]} />
-        <meshBasicMaterial color={[1.25, 1.2, 1.1]} toneMapped={false} />
+        <meshBasicMaterial color={[0.7, 0.67, 0.6]} toneMapped={false} />
       </mesh>
-
+      {/* a haze of light in the mouth, seen only from inside */}
+      <mesh position={[0, height / 2, mouthZ - 0.4]} rotation={[0, Math.PI, 0]}>
+        <planeGeometry args={[halfWidth * 2 + 5, height + 3.2]} />
+        <meshBasicMaterial ref={glow} map={made.glow} transparent opacity={0.4} blending={AdditiveBlending} depthWrite={false} toneMapped={false} />
+      </mesh>
     </group>
   );
 }
