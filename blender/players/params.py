@@ -29,8 +29,12 @@ THIGH = [
     (0.535, 0.0570),
     (0.575, 0.0560),
     (0.630, 0.0630),
-    (0.690, 0.0690),
-    (0.745, 0.0640),  # out of sight inside the shorts by here, and drawn in
+    (0.668, 0.0665),  # the hem of the shorts
+    # Above the hem the thigh is out of sight, so it is drawn well in:
+    # when a leg is lifted the cloth at the front stays with the hips,
+    # and a full thigh would come through it.
+    (0.700, 0.0540),
+    (0.745, 0.0380),
 ]
 # Above this height the leg follows the thigh bone alone; below it the
 # shin has a say, so the knee bends smoothly.
@@ -43,7 +47,7 @@ SOCK_BAND = 0.034  # the gold band at the top of the sock
 SHORTS_HEM = 0.665  # the bottom of the shorts: mid-thigh
 SHORTS_KEEP_ABOVE = 0.90  # the shorts keep their shape above this height; below it they are shortened
 SHORTS_SLIM = 0.90  # how much narrower the leg of the shorts is than the base model's
-SHORTS_CLEAR = 0.012  # the least gap between the thigh and the cloth round it
+SHORTS_CLEAR = 0.019  # the least gap between the thigh and the cloth round it (less, and a lifted knee shows through)
 BOOT_SQUASH = 0.84  # the base model wears thick-soled trainers: boots sit lower
 
 # Colours, as the site's own (0 to 1, the way a screen stores them)
