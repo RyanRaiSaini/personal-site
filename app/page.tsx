@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Colophon from "./components/ui/Colophon";
 import PlaceIcon from "./components/ui/PlaceIcon";
+import StartScreen from "./components/world/StartScreen";
 import { home, profile } from "./data/portfolio";
 import { places, sectionMetadata } from "./sections/registry";
 
@@ -10,8 +11,9 @@ const newTab = <span className="sr-only"> (opens in a new tab)</span>;
 
 // The home screen: the whole stadium, with my name set in the corner
 // of the picture the way a broadcast captions a player, and the four
-// things a visitor most likely came for. Everything here waits for the
-// walk out of the tunnel to finish (the "after-intro" class).
+// things a visitor most likely came for. On a first visit the start
+// screen comes first (StartScreen.tsx); everything else here waits for
+// the walk out of the tunnel to finish (the "after-intro" class).
 //
 // Only the caption and the links take clicks; everywhere else a click
 // or drag goes through to the stadium behind. `data-tag-avoid` marks
@@ -20,6 +22,7 @@ const newTab = <span className="sr-only"> (opens in a new tab)</span>;
 export default function Home() {
   return (
     <main className="pointer-events-none fixed inset-0 flex flex-col justify-end">
+      <StartScreen />
       <div className="after-intro flex flex-col gap-3 px-3 pb-3 sm:px-5 sm:pb-5 lg:flex-row lg:items-end lg:justify-between">
         <section aria-labelledby="home-name" data-tag-avoid className="home-plate pointer-events-auto">
           <p className="home-where">{profile.location}</p>

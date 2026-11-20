@@ -563,6 +563,9 @@ export const home = {
   resume: "Résumé",
   contact: "Contact",
   hint: "Drag to look around. Click a sign to go there.",
+  // the start screen, shown once per visit before the walk out of the tunnel
+  startNote: "A short walk out of the players' tunnel, then each section in turn.",
+  skipStart: "Skip to the stadium",
   // opens the small print
   credits: "Credits and small print",
 };

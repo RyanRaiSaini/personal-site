@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
 import { Component, useEffect, useState, type ReactNode } from "react";
 import { shell } from "../../data/portfolio";
+import { finishIntro } from "../../lib/intro";
 import type { EggId, RoofMode } from "../../lib/store";
 import { useWorld } from "../../lib/store";
 import { detectQuality, hasWebGL, isNarrowScreen, isPhone } from "../../lib/quality";
@@ -47,22 +48,13 @@ class WorldBoundary extends Component<{ children: ReactNode }, { failed: boolean
   }
 }
 
-function finishIntro() {
-  try {
-    sessionStorage.setItem("intro", "1");
-  } catch {
-    // Private browsing: it will just play again next time
-  }
-  document.documentElement.dataset.intro = "done";
-  useWorld.getState().setIntroDone(true);
-}
-
 export default function WorldShell() {
   const pathname = usePathname();
   const router = useRouter();
   const mode = useWorld((s) => s.mode);
   const worldReady = useWorld((s) => s.worldReady);
   const curtain = useWorld((s) => s.curtain);
+  const introStarted = useWorld((s) => s.introStarted);
   const introDone = useWorld((s) => s.introDone);
   const loadProgress = useWorld((s) => s.loadProgress);
   const [slow, setSlow] = useState(false);
@@ -123,19 +115,33 @@ export default function WorldShell() {
     router.replace(target.id === "home" ? "/match" : `/match#${target.id}`);
   }, [mode, target, router]);
 
-  // The walk-out only plays on the home page, once per visit. The
-  // inline script in layout.tsx has already decided; mirror it here.
+  // The start screen is only offered on the home page, once per visit.
+  // The inline script in layout.tsx has already decided; mirror it here.
+  // Going anywhere else (the top bar is always there) ends it.
   useEffect(() => {
     if (mode === "pending") return;
-    const playing = document.documentElement.dataset.intro === "play";
-    if (!playing || mode !== "tour" || !onTourRoute) {
+    const offered = document.documentElement.dataset.intro !== "done";
+    if (!offered || mode !== "tour" || pathname !== "/") finishIntro();
+  }, [mode, pathname]);
+
+  // Opens the tour's first section. (The intro is marked finished by the
+  // effect above when the new page arrives, so the home screen does not
+  // flash up in between.)
+  const openTour = () => {
+    useWorld.getState().setSection("about");
+    router.push("/about");
+  };
+
+  // The visitor pressed start before the stadium had arrived. If it
+  // never does, open the first section anyway.
+  useEffect(() => {
+    if (!introStarted || introDone || worldReady) return;
+    const failsafe = window.setTimeout(() => {
       finishIntro();
-      return;
-    }
-    // If the 3D world never arrives, show the page anyway
-    const failsafe = window.setTimeout(finishIntro, 14_000);
+      router.push("/about");
+    }, 14_000);
     return () => window.clearTimeout(failsafe);
-  }, [mode, onTourRoute]);
+  }, [introStarted, introDone, worldReady, router]);
 
   // Keep the 3D world in step with the address bar
   const targetId = target?.id ?? null;
@@ -228,9 +234,9 @@ export default function WorldShell() {
           )}
         </div>
       )}
-      {showWorld && worldReady && !introDone && (
+      {showWorld && worldReady && introStarted && !introDone && (
         <div className="pointer-events-none fixed inset-x-0 bottom-8 z-20 flex justify-center">
-          <button type="button" className="btn pointer-events-auto !border-white/30 !bg-black/40 !text-white" onClick={finishIntro}>
+          <button type="button" className="btn pointer-events-auto !border-white/30 !bg-black/40 !text-white" onClick={openTour}>
             {shell.skipIntro}
           </button>
         </div>

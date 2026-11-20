@@ -896,10 +896,12 @@ body {
   opacity: 1;
 }
 
-/* The home screen waits for the walk out of the tunnel to finish.
-   The inline script in app/layout.tsx sets data-intro before paint. */
-html[data-intro="play"] .after-intro {
+/* The home screen waits for the start screen and the walk out of the
+   tunnel to finish. The inline script in app/layout.tsx sets data-intro
+   before paint: "start", then "play", then "done" (app/lib/intro.ts). */
+html:not([data-intro="done"]) .after-intro {
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
   transform: translateY(10px);
 }
@@ -907,6 +909,117 @@ html[data-intro="play"] .after-intro {
   transition:
     opacity 0.9s ease,
     transform 0.9s ease;
+}
+
+/* ------------------------------------------------------------------
+   The start screen (app/components/world/StartScreen.tsx): my name
+   over the view down the players' tunnel, and the button that begins
+   the walk out. Shown only while <html data-intro="start">.
+------------------------------------------------------------------- */
+.start {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(5.5rem, 14vh, 9rem) 1.25rem clamp(6.5rem, 15vh, 8.5rem);
+  text-align: center;
+  color: #f4f6f8;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.6s ease,
+    visibility 0s 0.6s;
+}
+/* darker above and below, so the words are read against the dark of
+   the tunnel and the lit pitch in the middle is left clear */
+.start::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(3, 5, 10, 0.66) 0%, rgba(3, 5, 10, 0.22) 32%, rgba(3, 5, 10, 0) 45%, rgba(3, 5, 10, 0) 60%, rgba(3, 5, 10, 0.55) 100%);
+}
+.start > * {
+  position: relative;
+}
+html[data-intro="start"] .start {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.6s ease;
+}
+html[data-intro="start"] .start-actions {
+  pointer-events: auto;
+}
+.start-where {
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 600;
+  font-size: 1.125rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #e6c56c;
+}
+.start-name {
+  margin-top: 0.3rem;
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 800;
+  font-size: clamp(3.25rem, 9.5vw, 7.75rem);
+  line-height: 0.9;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  text-shadow: 0 6px 44px rgba(0, 0, 0, 0.65);
+}
+.start-line {
+  margin: 0.95rem auto 0;
+  max-width: 35rem;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: rgba(244, 246, 248, 0.88);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
+}
+.start-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+}
+.start-actions .start-go {
+  min-height: 3.25rem;
+  padding: 0.6rem 2rem;
+  font-size: 1.375rem;
+  background: #e6c56c;
+  border-color: #e6c56c;
+  color: #12100a;
+  box-shadow: 0 12px 44px rgba(0, 0, 0, 0.5);
+}
+.start-actions .start-go:hover {
+  filter: brightness(1.08);
+}
+.start-note {
+  font-size: 0.9375rem;
+  color: rgba(244, 246, 248, 0.72);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.85);
+}
+.start-skip {
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: 0.03em;
+  color: rgba(244, 246, 248, 0.86);
+  text-decoration: underline;
+  text-decoration-color: rgba(244, 246, 248, 0.4);
+  text-underline-offset: 4px;
+}
+.start-skip:hover {
+  color: #e6c56c;
+  text-decoration-color: #e6c56c;
+}
+/* on a short window the name gives way before the button does */
+@media (max-height: 620px) {
+  .start-line {
+    display: none;
+  }
 }
 
 /* Panels slide in */
