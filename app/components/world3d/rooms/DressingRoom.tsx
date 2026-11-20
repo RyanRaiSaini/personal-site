@@ -4,11 +4,10 @@ import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { DoubleSide, type CanvasTexture, type Group } from "three";
 import { bench, squad } from "../../../data/portfolio";
-import { useWorld } from "../../../lib/store";
 import { atmo } from "../atmosphere/state";
 import { canvasTexture } from "../textures/canvas";
 import { useDisplayFont } from "../textures/text";
-import { Box, clickable, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign } from "./common";
+import { Box, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign } from "./common";
 
 // The dressing room (Skills). A shirt hangs on every peg: the starting
 // eleven along the back wall, the bench down the left. The names and
@@ -141,84 +140,6 @@ function Bay({ x, name, number, index }: { x: number; name: string; number: numb
   );
 }
 
-// Number 66: a closed locker, door ajar, boots inside, warm light in the gap
-function TrentLocker({ x }: { x: number }) {
-  const door = useRef<Group>(null);
-  const show = useWorld((s) => s.show);
-  const open = show?.kind === "trent";
-
-  useFrame((_, dt) => {
-    if (!door.current) return;
-    const target = open ? -1.5 : -0.3 - Math.sin(atmo.time * 1.3) * 0.03;
-    door.current.rotation.y += (target - door.current.rotation.y) * Math.min(1, dt * 5);
-  });
-
-  const trigger = () => {
-    const world = useWorld.getState();
-    if (world.show) return;
-    world.findEgg("trent");
-    world.startShow({ kind: "trent" });
-  };
-
-  return (
-    <group position={[x, 0, 0]}>
-      <Box size={[0.06, 2.35, 0.62]} position={[-BAY / 2, 1.175, 0.31]} color={WOOD} roughness={0.55} />
-      <Box size={[BAY, 0.06, 0.62]} position={[0, 2.32, 0.31]} color={WOOD} roughness={0.55} />
-      <Box size={[BAY, 0.07, 0.56]} position={[0, 0.46, 0.3]} color={WOOD} roughness={0.5} />
-      <Box size={[BAY, 0.42, 0.5]} position={[0, 0.21, 0.27]} color={WOOD_DARK} roughness={0.6} />
-      <Box size={[BAY - 0.06, 1.86, 0.03]} position={[0, 1.4, 0.03]} color={CREAM} roughness={0.8} />
-      <Glow size={[BAY - 0.2, 0.02, 0.04]} position={[0, 2.27, 0.45]} color={[2.6, 2.1, 1.2]} />
-      <Shirt name="Alexander-Arnold" number={66} position={[0, 1.5, 0.26]} index={66} />
-      {/* his boots on the bench */}
-      {[-0.16, 0.16].map((bx) => (
-        <group key={bx} position={[bx, 0.55, 0.3]}>
-          <Box size={[0.11, 0.09, 0.28]} position={[0, 0, 0]} color="#f2f2ee" roughness={0.4} />
-          <Box size={[0.11, 0.05, 0.1]} position={[0, 0.06, -0.08]} color="#f2f2ee" roughness={0.4} />
-          <Box size={[0.115, 0.02, 0.29]} position={[0, -0.05, 0]} color={GOLD} roughness={0.4} metalness={0.5} />
-        </group>
-      ))}
-      <Sign lines={[{ text: "66", size: 0.9, color: NAVY, weight: 800 }]} width={0.3} height={0.2} position={[0, 2.5, 0.06]} background={CREAM} border={GOLD} />
-      {/* the door, hinged on the left, standing a little open */}
-      <group ref={door} position={[-BAY / 2 + 0.03, 0, 0.62]} rotation={[0, -0.3, 0]}>
-        <mesh position={[BAY / 2 - 0.03, 1.42, 0]} onClick={trigger} {...clickable}>
-          <boxGeometry args={[BAY - 0.08, 1.8, 0.04]} />
-          <meshStandardMaterial color={WOOD} roughness={0.5} />
-        </mesh>
-        <Box size={[0.03, 0.16, 0.05]} position={[BAY - 0.2, 1.4, 0.04]} color="#d8dadf" metalness={0.8} roughness={0.3} />
-      </group>
-    </group>
-  );
-}
-
-// The Easter egg's pay-off: a ball pinged out of locker 66 and clean
-// across the room, the way he hits them
-function TrentPass() {
-  const ball = useRef<Group>(null);
-  useFrame(() => {
-    if (!ball.current) return;
-    const show = useWorld.getState().show;
-    if (show?.kind !== "trent") {
-      ball.current.visible = false;
-      return;
-    }
-    const t = (performance.now() - show.startedAt) / 1000;
-    const u = (t - 0.4) / 1.05;
-    ball.current.visible = u > 0 && u < 1.25;
-    if (u <= 0) return;
-    // out of the locker at the left of the back wall, over the room, to the far right
-    ball.current.position.set(-5.7 + 11.4 * u, 0.85 + 1.4 * u - 1.9 * u * u + Math.sin(Math.PI * Math.min(1, u)) * 0.9, -3.9 + 7.6 * u);
-    ball.current.rotation.set(t * 9, t * 4, 0);
-  });
-  return (
-    <group ref={ball} visible={false}>
-      <mesh>
-        <sphereGeometry args={[0.11, 20, 14]} />
-        <meshStandardMaterial color="#f4f4f1" roughness={0.45} />
-      </mesh>
-    </group>
-  );
-}
-
 function floorTexture(family: string | null) {
   return canvasTexture(
     1024,
@@ -256,9 +177,8 @@ export default function DressingRoom() {
 
   // Bench players wear the numbers after the starting eleven
   const benchNumbers = [12, 14, 15, 17, 18, 19, 20];
-  // twelve bays along the back wall: number 66 first, then the eleven
-  const firstX = -(squad.length * BAY) / 2;
-  const startX = firstX + BAY;
+  // eleven bays along the back wall, centred
+  const startX = -((squad.length - 1) * BAY) / 2;
 
   return (
     <group>
@@ -281,11 +201,10 @@ export default function DressingRoom() {
 
       {/* a gold line and my name above the lockers */}
       <Glow size={[13.4, 0.03, 0.02]} position={[0, 2.82, -4.47]} color={[1.6, 1.3, 0.6]} />
-      <Sign lines={[{ text: "THE STARTING ELEVEN", size: 1, color: CREAM, spacing: 0.3 }]} width={6} height={0.36} position={[BAY / 2, 3.14, -4.46]} background={null} />
+      <Sign lines={[{ text: "THE STARTING ELEVEN", size: 1, color: CREAM, spacing: 0.3 }]} width={6} height={0.36} position={[0, 3.14, -4.46]} background={null} />
 
-      {/* back wall: number 66, then the starting eleven */}
+      {/* back wall: the starting eleven */}
       <group position={[0, 0, -4.48]}>
-        <TrentLocker x={firstX} />
         {squad.map((player, i) => (
           <Bay key={player.number} x={startX + i * BAY} name={player.name} number={player.number} index={i} />
         ))}
@@ -300,8 +219,6 @@ export default function DressingRoom() {
         <Box size={[0.06, 2.35, 0.62]} position={[-3.4 + (bench.length - 0.5) * BAY, 1.175, 0.31]} color={WOOD} roughness={0.55} />
       </group>
       <Sign lines={[{ text: "THE BENCH", size: 1, color: CREAM, spacing: 0.3 }]} width={3.4} height={0.34} position={[-6.66, 3.14, -0.4]} rotation={[0, Math.PI / 2, 0]} background={null} />
-
-      <TrentPass />
 
       {/* a bench and a tactics table in the middle */}
       <Box size={[2.6, 0.08, 0.5]} position={[0, 0.46, 3.2]} color={WOOD} roughness={0.5} />

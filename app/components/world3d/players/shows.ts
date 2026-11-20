@@ -93,5 +93,6 @@ export function showLength(show: Show): number {
   if (show.kind === "goal") return goalLength(GOALS[show.scorer]);
   if (show.kind === "fireworks") return 9;
   if (show.kind === "fifteen") return 8;
-  return 3.2;
+  // number 66's pass: long enough for the ball to land
+  return 4.4;
 }

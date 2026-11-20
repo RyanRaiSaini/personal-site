@@ -6,6 +6,7 @@ import Lights from "./atmosphere/Lights";
 import Precipitation from "./atmosphere/Precipitation";
 import Cast from "./players/Cast";
 import Sky from "./atmosphere/Sky";
+import TrentShirt from "./eggs/TrentShirt";
 import { sceneOf } from "./spots";
 import AdBoards from "./stadium/AdBoards";
 import Goals from "./stadium/Goals";
@@ -45,6 +46,7 @@ export default function Bowl({ children }: { children?: React.ReactNode }) {
         <PitchSide />
         <AdBoards />
         <Cast />
+        <TrentShirt />
       </GroundLit>
       <Precipitation />
       {children}

@@ -24,7 +24,7 @@ function bannerFor(show: Show): { title: string; line: string; delay: number; sm
   }
   if (show.kind === "fireworks") return { title: "¡Hala Madrid!", line: "Y nada más", delay: 0.4 };
   if (show.kind === "fifteen") return { title: "15", line: "La Decimoquinta. Kings of Europe.", delay: 0.8 };
-  return { title: "66", line: "Still the best pass in the building.", delay: 0.5, small: true };
+  return { title: "66", line: "Still the best pass in the building.", delay: 1.1, small: true };
 }
 
 // Coloured paper for the flat pages, where there is no 3D sky to light up

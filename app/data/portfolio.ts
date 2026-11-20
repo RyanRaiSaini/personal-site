@@ -550,7 +550,7 @@ export const eggs: Egg[] = [
   { id: "var", name: "VAR check", hint: "Visit a page that does not exist." },
   { id: "fifteen", name: "La Decimoquinta", hint: "The trophy cabinet likes attention. Fifteen clicks of it." },
   { id: "basketball", name: "Wrong sport", hint: "Someone left a basketball in the press room." },
-  { id: "trent", name: "Locker 66", hint: "One locker in the dressing room is not quite shut." },
+  { id: "trent", name: "Number 66", hint: "A shirt has been left on a seat in the dugout." },
 ];
 
 // ------------------------------------------------------------------
