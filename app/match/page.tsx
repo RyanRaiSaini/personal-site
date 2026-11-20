@@ -14,7 +14,7 @@ import ResumeContent from "../components/sections/ResumeContent";
 import SkillsContent from "../components/sections/SkillsContent";
 import Colophon from "../components/ui/Colophon";
 import PlaceIcon from "../components/ui/PlaceIcon";
-import { profile } from "../data/portfolio";
+import { home, matchText, profile } from "../data/portfolio";
 import { matchOrder, section, type SectionId } from "../sections/registry";
 
 // ------------------------------------------------------------------
@@ -55,7 +55,7 @@ export default function MatchPage() {
       {/* A pitch seen from above, faint, behind the top of the page */}
       <div aria-hidden="true" className="match-pitch absolute inset-x-0 top-0 h-[38rem]" />
 
-      <div className="relative mx-auto max-w-3xl px-5 pb-28 pt-28 sm:px-8 sm:pt-36">
+      <div className="relative mx-auto max-w-[54rem] px-5 pb-28 pt-28 sm:px-8 sm:pt-36">
         <header className="pb-14 sm:pb-20">
           <p className="kicker">{profile.location}</p>
           <h1 className="mt-2 font-display text-6xl font-extrabold uppercase leading-[0.9] tracking-tight sm:text-8xl">{profile.name}</h1>
@@ -63,16 +63,17 @@ export default function MatchPage() {
           <p className="mt-2 max-w-xl text-ink-soft">{profile.seeking}</p>
           <div className="mt-6 flex flex-wrap gap-3">
             <a href="#projects" className="btn btn-primary">
-              View projects
+              {home.projects}
             </a>
             <a href="#contact" className="btn">
-              Contact
+              {home.contact}
             </a>
             <a href={profile.resumeUrl} className="btn" target="_blank" rel="noopener noreferrer">
-              Résumé{newTab}
+              {home.resume}
+              {newTab}
             </a>
           </div>
-          <ul aria-label="Links" className="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-sm">
+          <ul aria-label="Links" className="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-[0.9375rem]">
             <li>
               <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="link">
                 GitHub{newTab}
@@ -90,14 +91,15 @@ export default function MatchPage() {
             </li>
           </ul>
 
-          {/* The team sheet: every section, in match order */}
+          {/* The team sheet: every section, in match order. The minute
+              sits above the name, so no name is ever cut short. */}
           <nav aria-label="Sections" className="mt-10">
-            <ol role="list" className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+            <ol role="list" className="match-index">
               {sections.map((s) => (
                 <li key={s.id}>
-                  <a href={`#${s.id}`} className="flex items-center gap-2.5 rounded-xl border border-line bg-bg-raised/50 px-3 py-2.5 transition-colors hover:border-gold">
-                    <span className="w-9 flex-none font-mono text-xs text-gold">{s.minute}</span>
-                    <span className="truncate font-display text-base font-semibold uppercase tracking-wide">{s.title}</span>
+                  <a href={`#${s.id}`}>
+                    <span className="match-index-minute">{s.minute}</span>
+                    <span className="match-index-title">{s.title}</span>
                   </a>
                 </li>
               ))}
@@ -106,26 +108,33 @@ export default function MatchPage() {
         </header>
 
         {/* The match, minute by minute */}
-        <ol role="list" className="match-timeline space-y-16 sm:space-y-24">
+        {/* Each section has the minute in a gutter on its left. The line
+            that joins one minute to the next runs down that gutter, clear
+            of the text. On a phone the gutter goes and the minute sits
+            beside the title. */}
+        <ol role="list" className="match-timeline">
           {sections.map((s) => {
             const Content = CONTENT[s.id as Exclude<SectionId, "home">];
             return (
               <li key={s.id}>
                 <section id={s.id} data-minute={s.minute} data-event={s.matchEvent} aria-labelledby={`${s.id}-title`} className="match-event scroll-mt-24">
-                  <div className="mb-6 flex items-center gap-4">
-                    <span className="grid h-14 w-14 flex-none place-items-center rounded-full border border-gold bg-bg font-mono text-sm font-semibold text-gold">{s.minute}</span>
-                    <div className="min-w-0">
-                      <p className="kicker flex items-center gap-2">
-                        <PlaceIcon id={s.id} className="h-4 w-4" />
-                        {s.matchEvent} · {s.place}
+                  <div className="match-rail" aria-hidden="true">
+                    <span className="match-minute">{s.minute}</span>
+                  </div>
+                  <div className="min-w-0">
+                    <header className="match-head">
+                      <p className="sign">
+                        <PlaceIcon id={s.id} className="h-[1.125rem] w-[1.125rem] flex-none text-gold" />
+                        <span className="sign-place">{s.place}</span>
+                        <span className="sign-what">{s.matchEvent}</span>
                       </p>
-                      <h2 id={`${s.id}-title`} className="font-display text-5xl font-bold uppercase leading-none tracking-wide sm:text-6xl">
+                      <h2 id={`${s.id}-title`} className="mt-1 font-display text-[2.75rem] font-bold uppercase leading-[0.95] tracking-[0.01em] sm:text-[3.5rem]">
                         {s.title}
                       </h2>
-                    </div>
+                      {s.intro && <p className="mt-2 text-ink-soft">{s.intro}</p>}
+                    </header>
+                    <Content />
                   </div>
-                  {s.intro && <p className="mb-6 text-ink-soft">{s.intro}</p>}
-                  <Content />
                 </section>
               </li>
             );
@@ -134,9 +143,9 @@ export default function MatchPage() {
 
         <footer className="mt-24 space-y-6 border-t border-line pt-8">
           <div>
-            <p className="kicker">Full time</p>
-            <p className="mt-1 font-display text-3xl font-bold uppercase tracking-wide">Thanks for watching.</p>
-            <p className="mt-2 text-ink-soft">On a bigger screen this whole site is a 3D stadium you can walk around.</p>
+            <p className="kicker">{matchText.fullTime}</p>
+            <p className="mt-1 font-display text-3xl font-bold uppercase tracking-wide">{matchText.thanks}</p>
+            <p className="mt-2 text-ink-soft">{matchText.tourNote}</p>
             <div className="mt-4">
               <EnterTour />
             </div>
