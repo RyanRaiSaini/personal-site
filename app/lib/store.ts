@@ -58,7 +58,9 @@ type State = {
   worldReady: boolean;
   // How much of the stadium has downloaded so far, from 0 to 1
   loadProgress: number;
-  // The walk out of the tunnel has finished (or was skipped)
+  // The visitor has pressed "Start the tour" on the start screen
+  introStarted: boolean;
+  // The walk out of the tunnel has finished (or was skipped, or never offered)
   introDone: boolean;
   quality: Quality;
   // Even the lightest quality level was too slow (a laptop on battery,
@@ -96,6 +98,7 @@ type State = {
   setReducedMotion: (reduced: boolean) => void;
   setWorldReady: (ready: boolean) => void;
   setLoadProgress: (progress: number) => void;
+  setIntroStarted: (started: boolean) => void;
   setIntroDone: (done: boolean) => void;
   setQuality: (quality: Quality) => void;
   setLean: (lean: boolean) => void;
@@ -125,6 +128,7 @@ export const useWorld = create<State>((set, get) => ({
   reducedMotion: false,
   worldReady: false,
   loadProgress: 0,
+  introStarted: false,
   introDone: false,
   quality: "medium",
   lean: false,
@@ -159,6 +163,7 @@ export const useWorld = create<State>((set, get) => ({
   setLoadProgress: (loadProgress) => {
     if (get().loadProgress !== loadProgress) set({ loadProgress });
   },
+  setIntroStarted: (introStarted) => set({ introStarted }),
   setIntroDone: (introDone) => set({ introDone }),
   setQuality: (quality) => set({ quality }),
   setLean: (lean) => set({ lean }),
