@@ -64,6 +64,26 @@ Because of these readings one more automatic step was added afterwards: if even 
 
 Each picture of the overview is about 244 drawing steps and 770,000 triangles; About is about 156 and 308,000.
 
+## 4. With the motion-captured players (2026-11-20)
+
+Development server, on mains power, "medium" quality, 6 seconds a reading. The players are skinned models now, not shapes drawn in code.
+
+| Situation | 1280 × 720 at 1× | | 1920 × 1080 dots | |
+|---|---|---|---|---|
+| | Drawn / s | Busy | Drawn / s | Busy |
+| Overview, pointer moving | 48.3 | 34% | 27.0 | 23% |
+| Overview at night, pointer moving | 53.0 | 31% | 32.6 | 21% |
+| Overview, hands off (capped at 30) | 30.0 | 11% | 29.8 | 18% |
+| Overview, left alone 60 s | **0** | **0%** | **0** | **0%** |
+| About, pointer moving | 60.1 | 23% | 43.6 | 21% |
+| About, left alone 25 s | **0** | **0%** | **0** | **0%** |
+
+What number 8 himself costs was measured on the overview at 1920 × 1080 dots by hiding him and showing him again, four readings in a row: 29.5 shown, 31.8 hidden, 31.1 shown, 34.1 hidden. So about **two to three pictures a second**, under a tenth of the total. The main thread is three-quarters idle, so the limit is still the graphics chip filling the screen.
+
+The full-size overview reads lower here than in section 2 (27 against 39). The player accounts for two or three of that. The rest cannot be pinned on the site: section 2's power state was not recorded, and this reading was taken at the end of a night of builds with the battery charging. The small-window figures, taken minutes apart in this same session, are the ones to compare against later.
+
+Each picture of the overview is now about 213 drawing steps and 800,000 triangles; About is about 127 and 360,000.
+
 ## What each change was worth
 
 These were measured on one page, seconds apart, by switching one thing off at a time, so they can be compared with each other.
@@ -88,6 +108,8 @@ These were measured on one page, seconds apart, by switching one thing off at a 
 | Sky photo and sky light | 0.58 MB |
 | Ground light picture and measurements | 0.02 MB |
 | **Total for the stadium** | **about 4.8 MB**, before the network's own compression |
+| `player.glb`, every player (one model, copied) | 1.64 MB |
+| `player.json`, its timings | 0.01 MB |
 
 The page's text, links and the flat view do not wait for any of it. A bar shows the progress.
 
