@@ -15,6 +15,7 @@
     "stadium:build": "blender --background --factory-startup --python blender/build.py -- --blend ../stadium-work/bernabeu-stadium.blend --site public/stadium",
     "stadium:assets": "node scripts/fetch-polyhaven.mjs",
     "players:build": "blender --background --factory-startup --python blender/build_players.py -- --source ../stadium-work/mixamo/source --blend ../stadium-work/mixamo/footballer.blend --site public/players",
+    "players:check": "blender --background ../stadium-work/mixamo/footballer.blend --python blender/check_players.py",
     "players:pack": "node scripts/pack-players.mjs",
     "peek": "node scripts/peek.mjs",
     "measure": "node scripts/measure.mjs"

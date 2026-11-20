@@ -220,7 +220,8 @@ Every player is a copy of one model (`public/players/player.glb`), moved by moti
 | Where number 8 stands in each outdoor section, and how he stands | `REST` | `app/components/world3d/players/Cast.tsx` |
 | Where number 8 is in each room, and what he is doing | `MARKS` | `app/components/world3d/players/RoomSaini.tsx` |
 | The camera during a goal | "The camera, for the two guest stars" | `app/components/world3d/players/Cast.tsx` |
-| The body's build (shoulders, chest, waist, arms, neck, calves, thighs) | `SHAPE` and `THIGH`, then rebuild (section 11) | `blender/players/params.py` |
+| The body's build (shoulders, chest, waist, arms, neck, calves, thighs) | `SHAPE`, and `THIGH` (each row: a height, the thigh's radius there, and how far forward it sits), then rebuild (section 11) | `blender/players/params.py` |
+| The shorts: how long, how narrow at the hem, how close to the thigh | `SHORTS_HEM`, `SHORTS_SLIM`, `SHORTS_CLEAR`, then rebuild and run the check | `blender/players/params.py` |
 | How even and how smooth the skin is (a blotchy skin goes rusty under a brown tint) | `SKIN_EVEN`, `SKIN_SMOOTH`, then rebuild | `blender/players/params.py` |
 | The cut of the kit, the hairstyles and beards | the numbers in `params.py`, and the file beside it for each part, then rebuild | `blender/players/` |
 | The goatee's outline | `_circle` (the other two beards are `_jaw` and `_chin`), then rebuild | `blender/players/head.py` |
@@ -325,6 +326,7 @@ npm run stadium:pack     # squeeze the model for the web
 npm run stadium:assets   # fetch the Poly Haven textures and sky again
 
 npm run players:build    # rebuild the player model in Blender (section 11)
+npm run players:check    # play every movement and make sure no thigh shows through the shorts
 npm run players:pack     # squeeze the player model for the web
 ```
 
@@ -392,13 +394,21 @@ The player is built from a stock character in Adobe's Mixamo library ("Remy") an
    "C:/Program Files/Blender Foundation/Blender 5.3/blender.exe" --background --factory-startup --python blender/build_players.py -- --source "C:/Users/ryanr/stadium-work/mixamo/source" --blend "C:/Users/ryanr/stadium-work/mixamo/footballer.blend" --site public/players
    ```
 
-3. Squeeze the model for the web:
+3. After a change to the thighs or the shorts, or a new clip, check that no thigh shows through the cloth. This plays every clip and pose and measures (about a minute; it ends with "passed" or names the clip and frame):
+
+   ```bash
+   "C:/Program Files/Blender Foundation/Blender 5.3/blender.exe" --background "C:/Users/ryanr/stadium-work/mixamo/footballer.blend" --python blender/check_players.py
+   ```
+
+4. Squeeze the model for the web:
 
    ```bash
    npm run players:pack
    ```
 
-4. Look at it (`npm run dev`), then take the pictures again (`npm run shots -- http://localhost:3000 docs/redesign/after`).
+5. Look at it (`npm run dev`), then take the pictures again (`npm run shots -- http://localhost:3000 docs/redesign/after`).
+
+For a quick look at the body and kit alone, add `--no-clips` to the build and point `--blend` and `--site` at a spare folder: it takes five seconds, and leaves the site's own files as they were.
 
 What the build writes into `public/players/`:
 
