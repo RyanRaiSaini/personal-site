@@ -58,9 +58,9 @@ A record of what was built and what was decided. Newest at the bottom. For where
 ### Phase 7: players and Easter eggs
 
 - A jointed player figure with poses for running, shooting and three celebrations.
-- Seven eggs: Jude's penalty, Mbappé's corner-flag goal, the "hala" fireworks (also the classic cheat code), the VAR 404 page, the fifteenth click on the trophy cabinet, the basketball, and locker 66.
+- Seven eggs: the penalty, the corner-flag goal, the "hala" fireworks (also the classic cheat code), the VAR 404 page, the fifteenth click on the trophy cabinet, the basketball, and locker 66.
 - Opening a project replays a goal by number 8.
-- Five were set off with real clicks that night: Jude's ball, locker 66, the basketball, the trophy cabinet and the VAR page. Mbappé's corner flag and the "hala" fireworks were only started from code; both were set off for real the next morning (see below).
+- Five were set off with real clicks that night: the ball on the penalty spot, locker 66, the basketball, the trophy cabinet and the VAR page. The corner flag and the "hala" fireworks were only started from code; both were set off for real the next morning (see below).
 
 ### Phase 8: match view, 404, extras
 
@@ -89,14 +89,14 @@ A record of what was built and what was decided. Newest at the bottom. For where
 
 ### Easter eggs, checked again
 
-- **Mbappé:** a real click on the south-east corner flag starts the goal. From the normal overview the flag was a small moving target (about 14 pixels wide from across the stadium, and off the bottom of the screen when the camera is near it), so the test click was made with the camera parked beside it.
+- **The corner flag:** a real click on the south-east corner flag starts the goal. From the normal overview the flag was a small moving target (about 14 pixels wide from across the stadium, and off the bottom of the screen when the camera is near it), so the test click was made with the camera parked beside it.
 - **"hala":** real key presses (h, a, l, a) start the fireworks.
 - **Bigger targets:** the invisible click targets on the ball and the corner flag were enlarged (`players/Cast.tsx`), and a click at the end of a drag no longer counts.
 - Not tried with real keys: the cheat code (up up down down left right left right B A).
 
 ### Seen while testing, not yet changed
 
-- In Mbappé's close-up, the "GOOOOOOL!" banner sits over his head.
+- In the corner-flag scorer's close-up, the "GOOOOOOL!" banner sits over his head.
 - On the home view, name tags can drift across the name and the opening lines at some camera angles.
 
 ## 2026-11-19, the realism redesign
@@ -147,8 +147,8 @@ Ryan's verdict on the first build was "cartoony". This pass rebuilt the stadium 
 - The player figure and the five rooms are still the earlier code-drawn versions.
 - The stadium is empty. A believable crowd is a job of its own.
 - The outside of the stadium is not modelled, because no camera goes there.
-- Ryan's content decisions from the same day (dropping Skills and Now, folding GitHub into Projects, the formal rewrite, the start screen in the tunnel, the résumé from his LaTeX original, moving Trent's egg) are waiting for his go.
-- In Mbappé's close-up, the "GOOOOOOL!" banner still sits over his head.
+- Ryan's content decisions from the same day (dropping Skills and Now, folding GitHub into Projects, the formal rewrite, the start screen in the tunnel, the résumé from his LaTeX original, moving number 66's egg) are waiting for his go.
+- In the corner-flag scorer's close-up, the "GOOOOOOL!" banner still sits over his head.
 
 ## 2026-11-19 and 20, the content pass and the new players
 

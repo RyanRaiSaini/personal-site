@@ -212,7 +212,7 @@ Every player is a copy of one model (`public/players/player.glb`), moved by moti
 
 | I want to change… | Look for | File |
 |---|---|---|
-| A player's name, number, skin tone, hair colour, hairstyle, beard, height | `KITS` (the choices for hair and beard are listed at the top of the file) | `app/components/world3d/players/kits.ts` |
+| A player's number, skin tone, hair colour, hairstyle, beard, height | `KITS` (the choices for hair and beard are listed at the top of the file). Only number 8 has a `name`. | `app/components/world3d/players/kits.ts` |
 | My own figure (number 8) | `KITS.saini` | `app/components/world3d/players/kits.ts` |
 | The print on the back of the shirt (size, place, colour) | `PRINT`, `INK` | `app/components/world3d/players/Player.tsx` |
 | The kit's colour for someone not in white (the goalkeeper) | `colour` in `KITS` | `app/components/world3d/players/kits.ts` |
@@ -234,15 +234,17 @@ How a player moves is a short list of clips to mix, written in `players/moves.ts
 
 | Egg | How it is triggered | Where the code is |
 |---|---|---|
-| **Hey Jude** (number 5, a penalty, arms wide) | Click the ball on the south penalty spot | trigger and direction: `players/Cast.tsx`; script: `GOALS.jude` in `players/shows.ts` |
-| **Corner specialist** (Mbappé, number 10, arms folded) | Click the south-east corner flag | trigger: `players/Cast.tsx`; script: `GOALS.mbappe` in `players/shows.ts` |
+| **From the spot** (number 6, a penalty, arms wide) | Click the ball on the south penalty spot | trigger and direction: `players/Cast.tsx`; script: `GOALS.six` in `players/shows.ts` |
+| **Corner specialist** (number 10, arms folded) | Click the south-east corner flag | trigger: `players/Cast.tsx`; script: `GOALS.ten` in `players/shows.ts` |
 | **Hala!** (fireworks, "GOOOL" on the big screen) | Type `hala` anywhere, or ↑ ↑ ↓ ↓ ← → ← → B A | keys: `app/components/world/ShowOverlay.tsx`; fireworks: `world3d/eggs/Fireworks.tsx` |
 | **VAR check** (red card) | Visit any address that does not exist | `app/not-found.tsx` |
 | **La Decimoquinta** (the big cup) | Click the trophy cabinet 15 times | `Cabinet` and `BigCup` in `world3d/rooms/TrophyRoom.tsx` |
 | **Wrong sport** (opens the All-Star album) | Click the basketball on the desk in the press room | `Basketball` in `world3d/rooms/PressRoom.tsx` |
-| **Number 66** (Trent's long pass) | Click the shirt left on a seat in the south dugout | `world3d/eggs/TrentShirt.tsx` (where the shirt is, where the pass is hit from and lands); its timing is `LONG_PASS` in `players/shows.ts` |
+| **Number 66** (the long pass) | Click the shirt left on a seat in the south dugout | `world3d/eggs/BenchShirt.tsx` (where the shirt is, where the pass is hit from and lands); its timing is `LONG_PASS` in `players/shows.ts` |
 
-The two goals are scored past a goalkeeper, who is nobody in particular and is on the pitch only for those two Easter eggs.
+The two goals are scored past a goalkeeper (number 1), who is nobody in particular and is on the pitch only for those two Easter eggs.
+
+**Only number 8 has a name on his shirt.** Every other player is a number and nothing more, on the shirt, in the goal banner and on the ring of screens. No other player is named anywhere on the site, in the code or in these notes.
 
 Also: opening a project in the Projects panel replays a goal by number 8 (`ProjectsContent.tsx` starts it, `GOALS.saini` scripts it).
 
