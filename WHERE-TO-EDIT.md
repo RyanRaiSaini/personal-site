@@ -206,23 +206,24 @@ The shirts in the dressing room come from `squad` and `bench`. The trophies come
 
 ### Players
 
-| I want to change… | Look for | File |
-|---|---|---|
 Every player is a copy of one model (`public/players/player.glb`), moved by motion capture. Each has his own skin tone, hair, beard, height and shirt print.
 
 | I want to change… | Look for | File |
 |---|---|---|
 | A player's number, skin tone, hair colour, hairstyle, beard, height | `KITS` (the choices for hair and beard are listed at the top of the file). Only number 8 has a `name`. | `app/components/world3d/players/kits.ts` |
-| My own figure (number 8) | `KITS.saini` | `app/components/world3d/players/kits.ts` |
-| The print on the back of the shirt (size, place, colour) | `PRINT`, `INK` | `app/components/world3d/players/Player.tsx` |
+| My own figure (number 8): 1.85 m, brown skin, a goatee | `KITS.saini` (`height`, `skin`, `beard`) | `app/components/world3d/players/kits.ts` |
+| The print on the back of the shirt (size, place, colour) | `PRINT`; `INK` is the navy on the white kit, `PALE` the white on any other | `app/components/world3d/players/Player.tsx` |
 | The kit's colour for someone not in white (the goalkeeper) | `colour` in `KITS` | `app/components/world3d/players/kits.ts` |
 | A celebration | `celebration` in `GOALS`: a standing pose (`"wide"`, `"folded"`, `"hips"`) or the motion-captured `"victory"` | `app/components/world3d/players/shows.ts` |
 | Where a goal is scored from, how the scorer arrives, where he runs, how long he celebrates | `GOALS` (keep the running speeds human: the note at the top says how) | `app/components/world3d/players/shows.ts` |
-| The goalkeeper: who he is, and which way he dives | `KITS.keeper`; `keeper` in `GOALS` (`"wrong"` or `"late"`) | `players/kits.ts`, `players/shows.ts` |
+| The goalkeeper: who he is, and which way he dives | `KITS.keeper`; `keeper` in `GOALS` (`"wrong"` or `"late"`). His dive was recorded one way only, so for the other he is shown as in a mirror (`keeperMirrored`), with his number printed to suit. | `players/kits.ts`, `players/shows.ts`, `players/Cast.tsx` |
 | Where number 8 stands in each outdoor section, and how he stands | `REST` | `app/components/world3d/players/Cast.tsx` |
 | Where number 8 is in each room, and what he is doing | `MARKS` | `app/components/world3d/players/RoomSaini.tsx` |
 | The camera during a goal | "The camera, for the two guest stars" | `app/components/world3d/players/Cast.tsx` |
-| The body's build, the cut of the kit, the hairstyles and beards | `blender/players/params.py`, and the file beside it for each part, then rebuild (section 11) | `blender/players/` |
+| The body's build (shoulders, chest, waist, arms, neck, calves, thighs) | `SHAPE` and `THIGH`, then rebuild (section 11) | `blender/players/params.py` |
+| How even and how smooth the skin is (a blotchy skin goes rusty under a brown tint) | `SKIN_EVEN`, `SKIN_SMOOTH`, then rebuild | `blender/players/params.py` |
+| The cut of the kit, the hairstyles and beards | the numbers in `params.py`, and the file beside it for each part, then rebuild | `blender/players/` |
+| The goatee's outline | `_circle` (the other two beards are `_jaw` and `_chin`), then rebuild | `blender/players/head.py` |
 | A standing pose (where the hands or the foot go) | `hands_on_hips`, `arms_folded`, `arms_wide`, `foot_on_ball`, then rebuild | `blender/players/stances.py` |
 | Which motion-capture clips the model carries | `CLIPS`, then rebuild | `blender/build_players.py` |
 
