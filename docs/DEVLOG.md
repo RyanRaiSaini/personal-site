@@ -149,3 +149,44 @@ Ryan's verdict on the first build was "cartoony". This pass rebuilt the stadium 
 - The outside of the stadium is not modelled, because no camera goes there.
 - Ryan's content decisions from the same day (dropping Skills and Now, folding GitHub into Projects, the formal rewrite, the start screen in the tunnel, the résumé from his LaTeX original, moving Trent's egg) are waiting for his go.
 - In Mbappé's close-up, the "GOOOOOOL!" banner still sits over his head.
+
+## 2026-11-19 and 20, the content pass and the new players
+
+Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, formal wording, his earlier content decisions except removing sections, and realistic players from Mixamo.
+
+### Words and layout
+
+- Every section is written in a formal register, and built from one set of parts with one set of gaps (`.sec`, `.part`, `--gap-block`, `--gap-item`). The long sections are split with tabs (`Tabs.tsx`): Projects, Skills, Awards and In the News.
+- Skills, Now and GitHub stay as sections (Ryan reversed the earlier decision to drop them).
+- The quote under the photo album is a second, different one from the same published article.
+- The sound is about ten decibels quieter and no longer one steady hum: a low murmur with far-off swells, claps and a drum at random.
+
+### The players
+
+- The code-drawn figures are gone. Every player is a copy of one model, rebuilt in Blender from Mixamo's "Remy" (body and skeleton only) and moved by Mixamo motion capture: `blender/build_players.py`, section 11 of WHERE-TO-EDIT.md.
+- What the build does to the base: an athlete's build; the thighs the base model comes without; shorts shortened and cleared of pockets; long socks cut level under the knee; the shirt's picture made white with a gold collar and cuffs; hair and eyebrows near black, eyes brown, one skin colour all over so a single tint suits it; short curls and three beards as separate pieces; four standing poses worked out from where the hands and feet should be.
+- Each player is told apart by `kits.ts`: skin tone, hair, beard, height, name and number. No face is taken from a photograph.
+- The clips had their travel over the ground taken out and written down, with the moment and place of each kick, so the site can stand a player where his boot will meet the ball.
+- The goals are re-timed to speeds a person can run. The two guest goals are scored past a goalkeeper. Number 66's Easter egg moved from a locker to a shirt on the bench, and he now comes on to hit the pass himself.
+- Mixamo's own files are not in the repo.
+
+### The start of a visit
+
+- A first visit opens in the players' tunnel: my name, "Start the tour", and the pitch lit at the far end. Pressing it plays the walk-out and opens About. The top bar is there throughout, and visitors who prefer less motion never see it.
+- The tunnel is lit from its mouth: dark at the back, brighter toward the pitch.
+
+### The résumé
+
+- The PDF is set to match the LaTeX original: Computer Modern, the same margins, sizes and spacing, so its lines turn where the original's do. Two differences only: the email address where the phone number was, and "Plater" spelt correctly.
+
+### Found on the way
+
+- The lettering on the ring of screens was upside down (a model counts a picture's rows from the top, a painted canvas from the bottom).
+- The goal banner sat over the scorer's face in his close-up; it is now in the lower third.
+- The shirt on the bench could be clicked from the start screen, through the tunnel wall.
+
+### Not done
+
+- The stadium is still empty: no crowd.
+- The players share one face. Hair, beard, skin tone, height and build do the work of telling them apart.
+- The on-page résumé (the web version of the sheet) is still set in Times, not Computer Modern.
