@@ -42,6 +42,6 @@ export const KITS: Record<"saini" | "six" | "ten" | "sixtySix" | "keeper", Kit> 
   ten: { name: "", number: 10, skin: "#7c4c30", hair: "#120d0a", hairStyle: "crop", height: 1.78 },
   // Number 66: the long pass from the touchline
   sixtySix: { name: "", number: 66, skin: "#b08058", hair: "#15100d", hairStyle: "curls", beard: "strap", height: 1.8 },
-  // The goalkeeper the two guests score past
-  keeper: { name: "", number: null, skin: "#c08e68", hair: "#1a1410", hairStyle: "crop", colour: "#2c6a55", height: 1.9 },
+  // Number 1: the goalkeeper the two guests score past
+  keeper: { name: "", number: 1, skin: "#c08e68", hair: "#1a1410", hairStyle: "crop", colour: "#2c6a55", height: 1.9 },
 };
