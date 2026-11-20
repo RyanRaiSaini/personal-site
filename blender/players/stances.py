@@ -21,6 +21,7 @@ from .clips import use
 
 ARM = ("Shoulder", "Arm", "ForeArm", "Hand")
 LEG = ("UpLeg", "Leg", "Foot", "ToeBase")
+FINGERS = tuple(f"Hand{finger}{joint}" for finger in ("Thumb", "Index", "Middle", "Ring", "Pinky") for joint in (1, 2, 3))
 
 
 def _update():
@@ -97,11 +98,20 @@ def arms_folded(arm):
     return ARM
 
 
+def _open_hand(arm, side):
+    """Fingers out straight, as the skeleton has them at rest. Left to
+    the breathing clip they hang half curled, which reads as limp at the
+    end of an outstretched arm."""
+    for part in FINGERS:
+        arm.pose.bones[f"{P.BONE}{side}{part}"].rotation_quaternion = (1.0, 0.0, 0.0, 0.0)
+
+
 def arms_wide(arm):
-    # out to the sides, a little up and a little back: chest open
+    # out to the sides, a little up and a little back: chest open, hands open
     for side, s in (("Left", 1), ("Right", -1)):
         _stretch(arm, side, (s * 0.94, 0.16, 0.30), (0.0, 0.4, -1.0))
-    return ARM
+        _open_hand(arm, side)
+    return ARM + FINGERS
 
 
 def foot_on_ball(arm):
@@ -123,7 +133,7 @@ def foot_on_ball(arm):
 STANCES = {
     "stance-hips": (hands_on_hips, ARM, ("Left", "Right")),
     "stance-folded": (arms_folded, ARM, ("Left", "Right")),
-    "stance-wide": (arms_wide, ARM, ("Left", "Right")),
+    "stance-wide": (arms_wide, ARM + FINGERS, ("Left", "Right")),
     "stance-foot": (foot_on_ball, LEG, ("Right",)),
 }
 
