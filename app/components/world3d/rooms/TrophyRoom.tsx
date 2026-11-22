@@ -13,8 +13,10 @@ import { Box, clickable, CREAM, Glow, GOLD, Shell, Sign } from "./common";
 // (app/data/portfolio.ts) stands in its own lit case. The big cabinet
 // on the back wall hides an Easter egg: click it fifteen times.
 
-const GOLD_METAL = { color: "#e8c463", metalness: 1, roughness: 0.22 } as const;
-const SILVER_METAL = { color: "#d7dbe2", metalness: 1, roughness: 0.2 } as const;
+const GOLD_METAL = { color: "#e8c463", metalness: 1, roughness: 0.32 } as const;
+const SILVER_METAL = { color: "#d7dbe2", metalness: 1, roughness: 0.3 } as const;
+// display glass: barely there, and without a mirror finish to catch the lamps
+const GLASS = { color: "#dfe9f7", transparent: true, opacity: 0.06, roughness: 0.12, metalness: 0, depthWrite: false } as const;
 
 // Outlines that are spun round to make each trophy
 function cupProfile(): Vector2[] {
@@ -140,17 +142,17 @@ function Case({ x, z, turn, index }: { x: number; z: number; turn: number; index
       {/* glass */}
       <mesh position={[0, 1.5, 0]}>
         <boxGeometry args={[0.86, 0.92, 0.86]} />
-        <meshStandardMaterial color="#cfe2ff" transparent opacity={0.1} roughness={0.02} metalness={0.3} depthWrite={false} />
+        <meshStandardMaterial {...GLASS} />
       </mesh>
       <Sign
         lines={[
-          { text: award.title.toUpperCase(), size: 0.34, color: CREAM, weight: 700 },
-          { text: [award.from, award.amount].filter(Boolean).join("  ·  ").toUpperCase() || award.note.toUpperCase(), size: 0.24, color: GOLD, weight: 600, spacing: 0.1 },
+          { text: award.title.toUpperCase(), size: 0.36, color: CREAM, weight: 700 },
+          { text: [award.from, award.amount].filter(Boolean).join("  ·  ").toUpperCase() || award.note.toUpperCase(), size: 0.26, color: GOLD, weight: 600, spacing: 0.08 },
         ]}
-        width={0.82}
-        height={0.3}
-        position={[0, 0.62, 0.456]}
-        background="#14161c"
+        width={0.84}
+        height={0.4}
+        position={[0, 0.6, 0.456]}
+        background="#0e1015"
         border={GOLD}
       />
     </group>
@@ -182,7 +184,7 @@ function Cabinet() {
     flash.current = Math.max(0, flash.current - dt * 4);
     if (glass.current) {
       const m = glass.current.material as { opacity: number };
-      m.opacity = 0.08 + flash.current * 0.25;
+      m.opacity = GLASS.opacity + flash.current * 0.25;
     }
   });
 
@@ -205,7 +207,7 @@ function Cabinet() {
       ))}
       <mesh ref={glass} position={[0, 1.6, 0.46]} onClick={click} {...clickable}>
         <boxGeometry args={[4.4, 2.6, 0.03]} />
-        <meshStandardMaterial color="#cfe2ff" transparent opacity={0.08} roughness={0.02} metalness={0.4} depthWrite={false} />
+        <meshStandardMaterial {...GLASS} />
       </mesh>
     </group>
   );
@@ -243,55 +245,48 @@ function BigCup() {
   );
 }
 
-function marbleTexture() {
+// Polished dark stone in large square tiles
+function floorTexture() {
   return canvasTexture(512, 512, (ctx, w, h) => {
-    ctx.fillStyle = "#0a0b0f";
+    ctx.fillStyle = "#0c0d11";
     ctx.fillRect(0, 0, w, h);
-    ctx.strokeStyle = "rgba(255,255,255,0.05)";
-    for (let i = 0; i < 26; i++) {
-      ctx.lineWidth = 0.6 + (i % 3);
-      ctx.beginPath();
-      let x = (i * 97) % w;
-      let y = 0;
-      ctx.moveTo(x, y);
-      while (y < h) {
-        x += Math.sin(y * 0.03 + i) * 14 + 4;
-        y += 26;
-        ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-    }
-    // tile joints
-    ctx.strokeStyle = "rgba(255,255,255,0.07)";
+    // a faint cloud, so the stone is not flat paint
+    const cloud = ctx.createRadialGradient(w * 0.3, h * 0.35, 10, w * 0.5, h * 0.5, w * 0.75);
+    cloud.addColorStop(0, "rgba(255,255,255,0.035)");
+    cloud.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = cloud;
+    ctx.fillRect(0, 0, w, h);
+    // the joint between tiles
+    ctx.strokeStyle = "rgba(255,255,255,0.06)";
     ctx.lineWidth = 2;
-    ctx.strokeRect(0, 0, w, h);
+    ctx.strokeRect(1, 1, w - 2, h - 2);
   });
 }
 
 export default function TrophyRoom() {
-  const marble = useMemo(() => {
-    const t = marbleTexture();
-    t.repeat.set(5, 5);
+  const stone = useMemo(() => {
+    const t = floorTexture();
+    t.repeat.set(6, 6);
     return t;
   }, []);
-  useEffect(() => () => marble.dispose(), [marble]);
+  useEffect(() => () => stone.dispose(), [stone]);
 
   const places: { x: number; z: number; turn: number }[] = [
-    { x: -3.6, z: -1.0, turn: 0.35 },
-    { x: -1.25, z: -1.9, turn: 0.12 },
-    { x: 1.25, z: -1.9, turn: -0.12 },
-    { x: 3.6, z: -1.0, turn: -0.35 },
+    { x: -2.4, z: -1.05, turn: 0.2 },
+    { x: -0.8, z: -1.4, turn: 0.06 },
+    { x: 0.8, z: -1.4, turn: -0.06 },
+    { x: 2.4, z: -1.05, turn: -0.2 },
   ];
 
   return (
     <group>
-      <ambientLight intensity={0.5} color="#ffe9c9" />
+      <hemisphereLight intensity={0.55} color="#fff1dc" groundColor="#1a140c" />
       {places.map((p, i) => (
-        <pointLight key={i} position={[p.x, 3.0, p.z + 1.1]} intensity={22} distance={7} decay={1.5} color="#ffe6bd" />
+        <pointLight key={i} position={[p.x, 2.85, p.z + 0.5]} intensity={9} distance={6} decay={1.6} color="#ffe6bd" />
       ))}
-      <pointLight position={[0, 2.8, 3.6]} intensity={20} distance={14} decay={1.5} color="#ffe0b0" />
+      <pointLight position={[0, 2.6, 4.5]} intensity={12} distance={14} decay={1.4} color="#ffe0b0" />
 
-      <Shell width={12} depth={12} back={4.5} height={3.6} floor="#0a0b0f" wall="#15120e" ceiling="#070709" floorMap={marble} floorRoughness={0.14} floorMetalness={0.35} />
+      <Shell width={12} depth={12} back={4.5} height={3.6} floor="#0a0b0f" wall="#15120e" ceiling="#070709" floorMap={stone} floorRoughness={0.22} floorMetalness={0.2} />
 
       {/* slatted side walls with a warm line of light */}
       {[-1, 1].map((s) => (
