@@ -191,6 +191,13 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 
 - Number 1 had been built for the two hidden goals only, so the goal visitors see most, number 8's replay when a project is opened, went into an empty net. Ryan pointed this out. He is now in goal for it too, and dives the right way a moment too late (`keeper: "late"` in `GOALS.saini`, `players/shows.ts`). At first he came on only while the replay played, so the Projects view still showed an empty net; he now waits on his line the whole time Projects is open (`Cast.tsx`).
 
+### Four rooms made cleaner (2026-11-22)
+
+- **GitHub:** the picture in the seats is gone. With only a few active days it was a handful of white seats that showed as torn chunks in the rows. An LED scoreboard now hangs under the main stand's second tier (`stadium/GithubBoard.tsx`), and the panel shows the last 16 weeks instead of a mostly empty year.
+- **Trophy room:** the four cases stand closer, so all show beside the panel; matt glass and softer lamps take away the glare; larger plaques; a plain stone floor; a navy runner, velvet ropes and a warm-lit cabinet.
+- **Ticket office:** the programme's frame no longer covers the TICKETS sign and its glare is gone; a matchday board and two pendant lamps fill the dark ceiling.
+- **Press room:** a lighting rig over the stage, a softbox, two broadcast cameras with red lights, a centre aisle, a navy carpet and PRESS on the chair backs; the ceiling panels are dimmed so the light falls on the desk.
+
 ### The start of a visit
 
 - A first visit opens in the players' tunnel: my name, "Start the tour", and the pitch lit at the far end. Pressing it plays the walk-out and opens About. The top bar is there throughout, and visitors who prefer less motion never see it.
