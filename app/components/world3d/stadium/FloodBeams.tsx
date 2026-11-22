@@ -45,7 +45,10 @@ const fragment = /* glsl */ `
   varying vec2 vUv;
   void main() {
     float u = vUv.x; // metres round the bowl
-    float v = vUv.y; // 0 at the lamps, 1 on the pitch
+    // 0 at the lamps, 1 on the pitch; kept in range, since a power of a
+    // number a hair below zero is not a number, and the glow pass would
+    // smear that one pixel over the whole picture
+    float v = clamp( vUv.y, 0.0, 1.0 );
     // separate shafts of differing widths, as from lamps aimed a little apart
     float shafts = 0.5 + 0.5 * sin(u * 0.85 + 2.0 * sin(u * 0.21));
     shafts = 0.22 + 0.78 * pow(shafts, 4.0);
