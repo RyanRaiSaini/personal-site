@@ -3,7 +3,6 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { use, useEffect, useMemo, useRef } from "react";
 import { BufferGeometry, Color, Group, InstancedBufferAttribute, InstancedMesh, MeshStandardMaterial, Sphere, Vector3 } from "three";
-import { useWorld } from "../../../lib/store";
 import { withBakedLight } from "./bakedLight";
 import { SEAT_COLOR } from "./materials";
 import { loadSeatData, type SeatData } from "./seatData";
@@ -15,17 +14,10 @@ import { loadSeatData, type SeatData } from "./seatData";
 // the blocks behind the camera cost nothing. A chunk close to the
 // camera uses the detailed seat; the rest use a plain block, which
 // looks the same from a distance.
-//
-// The seats in the second tier of the main stand also make a picture:
-// a year of my GitHub contributions, one column of seats per week. A
-// seat is whiter the more I committed that day.
 // ------------------------------------------------------------------
 
 // Closer than this (metres from the edge of a chunk), use the detailed seat
 const DETAIL_DISTANCE = 38;
-
-// From "nothing that day" to "a lot": navy, through pale blue, to white
-const PICTURE = ["#22398a", "#5068ac", "#8fa1d2", "#c7d0ea", "#f3f5fa"].map((hex) => new Color(hex));
 
 type Chunk = { centre: Vector3; radius: number; detailed: InstancedMesh; plain: InstancedMesh; colors: InstancedBufferAttribute; start: number; count: number };
 
@@ -93,9 +85,7 @@ function build(data: SeatData, detailedSeat: BufferGeometry, plainSeat: BufferGe
 
 export default function Seats({ detailedSeat, plainSeat }: { detailedSeat: BufferGeometry; plainSeat: BufferGeometry }) {
   const data = use(loadSeatData());
-  const contributions = useWorld((s) => s.contributions);
   const camera = useThree((s) => s.camera);
-  const invalidate = useThree((s) => s.invalidate);
   const lastCheck = useRef(new Vector3(1e9, 0, 0));
 
   const material = useMemo(() => {
@@ -117,30 +107,6 @@ export default function Seats({ detailedSeat, plainSeat }: { detailedSeat: Buffe
       material.dispose();
     };
   }, [chunks, material]);
-
-  // The picture on the main stand
-  useEffect(() => {
-    const { details } = data;
-    const base = new Color(SEAT_COLOR);
-    const color = new Color();
-    for (const chunk of chunks) {
-      let touched = false;
-      for (let i = 0; i < chunk.count; i++) {
-        const seat = chunk.start + i;
-        const week = details[seat * 8 + 4];
-        const day = details[seat * 8 + 5];
-        if (week === 255) continue;
-        // Until the real numbers arrive, a faint dotted pattern holds the place
-        const level = contributions ? (contributions.levels[week]?.[day] ?? 0) : (week * 7 + day * 3) % 11 === 0 ? 1 : 0;
-        const shade = 0.95 + 0.1 * (((seat * 2654435761) >>> 0) / 4294967295);
-        color.copy(level > 0 ? PICTURE[Math.min(4, level)] : base).multiplyScalar(shade);
-        chunk.colors.setXYZ(i, color.r, color.g, color.b);
-        touched = true;
-      }
-      if (touched) chunk.colors.needsUpdate = true;
-    }
-    invalidate();
-  }, [data, chunks, contributions, invalidate]);
 
   // Swap in the detailed seat for the chunks near the camera. Only
   // checked once the camera has moved a little.
