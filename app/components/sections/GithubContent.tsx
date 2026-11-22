@@ -5,9 +5,9 @@ import { LEVEL_HEX, LEVEL_HEX_LIGHT } from "../../lib/github";
 import { useWorld } from "../../lib/store";
 import { Arrow, ExternalLink, Stats } from "./parts";
 
-// GitHub: the stands. The same contribution grid the seats of the main
-// stand show, as a normal chart. The data comes from
-// app/api/contributions/route.ts.
+// GitHub: the stands. The year's figures and the last few weeks as a
+// chart; the scoreboard on the main stand (world3d/stadium/GithubBoard.tsx)
+// shows the same. The data comes from app/api/contributions/route.ts.
 
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -25,6 +25,9 @@ export default function GithubContent() {
 
   const activeDays = data ? data.levels.flat().filter((level) => level > 0).length : 0;
   const busiest = data ? Math.max(0, ...data.counts.flat()) : 0;
+  // only the last few weeks: a whole year is mostly empty squares
+  const from = data ? Math.max(0, data.levels.length - githubText.recentWeeks) : 0;
+  const weeks = data ? data.levels.slice(from) : [];
 
   return (
     <div className="sec">
@@ -36,25 +39,28 @@ export default function GithubContent() {
         <>
           <Stats
             items={[
-              { value: String(data.total), label: "contributions in the last year" },
-              { value: String(activeDays), label: "days with a commit" },
-              { value: String(busiest), label: "most in one day" },
+              { value: String(data.total), label: githubText.total },
+              { value: String(activeDays), label: githubText.active },
+              { value: String(busiest), label: githubText.best },
             ]}
           />
-          <div className="card scroll-area overflow-x-auto">
-            <div role="img" aria-label={`GitHub contribution chart for ${data.user}: ${data.total} contributions in the last year, on ${activeDays} days.`} className="grid w-max grid-flow-col grid-rows-7 gap-[3px]">
-              {data.levels.map((week, w) =>
+          <div className="card">
+            <div role="img" aria-label={`GitHub contribution chart for ${data.user}, the last ${weeks.length} weeks. ${data.total} contributions in the last year, on ${activeDays} days.`} className="grid grid-flow-col grid-rows-7 gap-[4px]" style={{ gridTemplateColumns: `repeat(${weeks.length}, minmax(0, 1fr))` }}>
+              {weeks.map((week, i) =>
                 week.map((level, d) => (
-                  <span key={`${w}-${d}`} title={describe(data.dates[w]?.[d] ?? "", data.counts[w]?.[d] ?? -1) || undefined} className="h-[11px] w-[11px] rounded-[2px]" style={{ background: level < 0 ? "transparent" : palette[Math.min(4, level)] }} data-day={DAY_NAMES[d]} />
+                  <span key={`${i}-${d}`} title={describe(data.dates[from + i]?.[d] ?? "", data.counts[from + i]?.[d] ?? -1) || undefined} className="aspect-square w-full rounded-[3px]" style={{ background: level < 0 ? "transparent" : palette[Math.min(4, level)] }} data-day={DAY_NAMES[d]} />
                 )),
               )}
             </div>
-            <div className="mt-3 flex items-center justify-end gap-1.5 text-xs text-ink-faint">
-              <span>Less</span>
-              {palette.map((hex) => (
-                <span key={hex} className="h-[11px] w-[11px] rounded-[2px]" style={{ background: hex }} />
-              ))}
-              <span>More</span>
+            <div className="mt-3 flex items-center justify-between gap-1.5 text-xs text-ink-faint">
+              <span>{githubText.board.recent}</span>
+              <span className="flex items-center gap-1.5">
+                <span>Less</span>
+                {palette.map((hex) => (
+                  <span key={hex} className="h-[11px] w-[11px] rounded-[2px]" style={{ background: hex }} />
+                ))}
+                <span>More</span>
+              </span>
             </div>
           </div>
           {!data.live && <p className="meta">{githubText.saved}</p>}
