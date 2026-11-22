@@ -25,6 +25,7 @@ My portfolio, set inside a real-time 3D football stadium. I'm a Mathematics stud
 - **Light worked out ahead of time.** Blender answers the expensive questions once (where does the roof's shadow fall, how much sky can each seat see) and stores the answers on the model, so a laptop gets soft, correct shade for almost nothing.
 - **The roof is the dark-mode switch.** Closing the retractable roof switches the site to its dark theme and brings the floodlights up. Left alone, the roof follows Brampton: shut at night and in rain or snow.
 - **Live from Brampton.** Day or night follows Brampton's real clock, and the weather comes from Open-Meteo. If it is snowing there, it snows through the open roof here.
+- **A full ground.** About 54,000 fans fill the stands, drawn in a single step, and they jump when a goal goes in.
 - **My GitHub contributions on a scoreboard.** An LED board hung under the main stand's second tier shows the year's contributions, the best day and the last 16 weeks, read from GitHub's public calendar and refreshed hourly.
 - **It stops drawing when nothing moves.** The 3D picture is drawn every frame only while something is in motion or you are doing something, 30 times a second for a while after, and then not at all. Measurements are in [docs/redesign/PERFORMANCE.md](docs/redesign/PERFORMANCE.md).
 - **A camera tour with real addresses.** Each section has its own URL (`/projects`, `/skills`…) and its own page of real text, so it can be linked, searched and read by a screen reader. The 3D view flies between them.

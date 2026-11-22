@@ -185,6 +185,9 @@ By day the stadium is lit by one photographed sky and one fixed sun. The real cl
 | How bright the stands are at night and with the roof closed | the `bake.` lines | `app/components/world3d/atmosphere/AtmosphereDriver.tsx` |
 | Night sky colours, haze | the colour constants at the top | `app/components/world3d/atmosphere/AtmosphereDriver.tsx` |
 | Stars, and the painted clouds used at night and when overcast | | `app/components/world3d/atmosphere/Sky.tsx` |
+| The crowd: how full the ground is | `OCCUPANCY` | `app/components/world3d/stadium/crowdPlan.ts` |
+| The crowd: shirt colours, the fans' size and poses, how long they jump after a goal | `SHIRTS`, `WIDTH`, `HEIGHT`, `posesTexture`, `CHEER_SECONDS` | `app/components/world3d/stadium/Crowd.tsx` |
+| The colour a taken seat is darkened to | `TAKEN` | `app/components/world3d/stadium/Seats.tsx` |
 | The floodlights' beams and the halo along the lamp bar at night (off at "low" quality) | `STRENGTH`, and `shafts` in the shader | `app/components/world3d/stadium/FloodBeams.tsx` |
 | The glow round bright lights ("high" quality only) | `intensity`, `luminanceThreshold` | `app/components/world3d/atmosphere/Effects.tsx` |
 | Rain and snow (how much, how fast) | `COUNT`, `fall` | `app/components/world3d/atmosphere/Precipitation.tsx` |

@@ -200,6 +200,13 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **Mixed zone:** four broadcasters' microphones (plain coloured cubes, no names) clamped to the barrier, and a TV camera on the player; the pole microphones and the glaring ceiling strips are gone.
 - **Press room:** a lighting rig over the stage, a softbox, two broadcast cameras with red lights, a centre aisle, a navy carpet and PRESS on the chair backs; the ceiling panels are dimmed so the light falls on the desk.
 
+### A full ground (2026-11-22)
+
+- About 54,000 fans now sit in 86% of the seats (`stadium/Crowd.tsx`). Each is a flat cut-out facing the pitch, all drawn in one step: four poses (arms down, an arm up, arms folded, clapping), seven shirt colours led by the home white, a range of skin tones, a little variation in size. They take the same worked-out light as the seats, so they sit in the roof's shade by day and under the floodlights at night.
+- Seen from far off, the blue of the seats showed round every fan and the stands still looked empty, so a taken seat is now darkened to the colour of legs and coats (`TAKEN` in `Seats.tsx`); which seats are taken is shared in `stadium/crowdPlan.ts`.
+- When a goal goes in, the crowd jumps for a few seconds, each fan in his own time.
+- Cost, on the overview by day (1280 x 720, development server): about 40 pictures a second against 48 before; About is unchanged at 60; nothing at rest. The "low" quality level goes without the crowd.
+
 ### Floodlight beams at night (2026-11-22)
 
 - At night, shafts of light now fall from the ring of lamps under the roof, brightest at the lamps and fading toward the pitch, with a halo along the lamp bar (`stadium/FloodBeams.tsx`). It is one see-through surface swept round the bowl and painted in its shader, so it never hides anything. By day it fades away.
@@ -222,6 +229,6 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 
 ### Not done
 
-- The stadium is still empty: no crowd.
+- ~~The stadium is still empty: no crowd.~~ Done on 2026-11-22: see "A full ground" below.
 - The players share one face. Hair, beard, skin tone, height and build do the work of telling them apart.
 - The on-page résumé (the web version of the sheet) is still set in Times, not Computer Modern.

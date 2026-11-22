@@ -4,6 +4,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { use, useEffect, useMemo, useRef } from "react";
 import { BufferGeometry, Color, Group, InstancedBufferAttribute, InstancedMesh, MeshStandardMaterial, Sphere, Vector3 } from "three";
 import { withBakedLight } from "./bakedLight";
+import { isTaken } from "./crowdPlan";
 import { SEAT_COLOR } from "./materials";
 import { loadSeatData, type SeatData } from "./seatData";
 
@@ -14,7 +15,14 @@ import { loadSeatData, type SeatData } from "./seatData";
 // the blocks behind the camera cost nothing. A chunk close to the
 // camera uses the detailed seat; the rest use a plain block, which
 // looks the same from a distance.
+//
+// A seat with a fan in it (crowdPlan.ts, Crowd.tsx) is darkened, as the
+// legs and coats of a full ground would cover it; only empty seats show
+// their own blue.
 // ------------------------------------------------------------------
+
+// The colour of a taken seat: what shows of the person sitting in it
+const TAKEN = new Color("#23262e");
 
 // Closer than this (metres from the edge of a chunk), use the detailed seat
 const DETAIL_DISTANCE = 38;
@@ -57,7 +65,8 @@ function build(data: SeatData, detailedSeat: BufferGeometry, plainSeat: BufferGe
       matrices.set([c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, x, y, z, 1], i * 16);
       // no two seats fade quite alike: a small, repeatable difference in shade
       const shade = 0.93 + 0.14 * (((seat * 2654435761) >>> 0) / 4294967295);
-      colors.set([base.r * shade, base.g * shade, base.b * shade], i * 3);
+      const own = isTaken(seat) ? TAKEN : base;
+      colors.set([own.r * shade, own.g * shade, own.b * shade], i * 3);
       // sky, pitch and sun, as worked out in Blender
       light.set([details[seat * 8 + 2] / 255, details[seat * 8 + 3] / 255, details[seat * 8 + 6] / 255], i * 3);
     }
