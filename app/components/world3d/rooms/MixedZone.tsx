@@ -4,11 +4,11 @@ import { useEffect, useMemo } from "react";
 import { profile } from "../../../data/portfolio";
 import { canvasTexture } from "../textures/canvas";
 import { useDisplayFont } from "../textures/text";
-import { Box, CREAM, Glow, GOLD, NAVY, Shell, Sign } from "./common";
+import { Box, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign, TvCamera } from "./common";
 
 // The mixed zone (Contact): the corridor where players stop to talk to
-// reporters on the way out. An interview board, a crowd barrier, and
-// microphones waiting.
+// reporters on the way out. An interview board, a crowd barrier with
+// the broadcasters' microphones clamped to it, and a camera rolling.
 
 function boardTexture(family: string | null) {
   return canvasTexture(512, 256, (ctx, w, h) => {
@@ -56,18 +56,27 @@ function Fence({ x, z }: { x: number; z: number }) {
   );
 }
 
-// A microphone held out on a boom
-function Boom({ x, lean }: { x: number; lean: number }) {
+// A broadcaster's microphone clamped to the top rail of the barrier,
+// leaning toward the player, with a coloured cube on it (no names)
+function Mic({ x, flag, lean }: { x: number; flag: string; lean: number }) {
   return (
-    <group position={[x, 0, 1.75]} rotation={[0, 0, lean]}>
-      <mesh position={[0, 0.85, -0.5]} rotation={[-0.75, 0, 0]}>
-        <cylinderGeometry args={[0.012, 0.012, 1.9, 8]} />
+    <group position={[x, 1.07, 0.6]} rotation={[0, lean, 0]}>
+      <Box size={[0.07, 0.05, 0.07]} position={[0, 0, 0]} color="#1c1f25" metalness={0.6} roughness={0.4} />
+      <mesh position={[0, 0.12, 0]}>
+        <cylinderGeometry args={[0.008, 0.008, 0.22, 6]} />
         <meshStandardMaterial color="#2b2e35" metalness={0.7} roughness={0.4} />
       </mesh>
-      <mesh position={[0, 1.52, -1.15]} rotation={[-0.75, 0, 0]}>
-        <capsuleGeometry args={[0.045, 0.16, 4, 10]} />
-        <meshStandardMaterial color="#3a3d44" roughness={0.95} />
-      </mesh>
+      <group position={[0, 0.25, -0.06]} rotation={[-1.05, 0, 0]}>
+        <mesh>
+          <cylinderGeometry args={[0.018, 0.014, 0.2, 12]} />
+          <meshStandardMaterial color="#17191e" roughness={0.5} />
+        </mesh>
+        <mesh position={[0, 0.13, 0]}>
+          <sphereGeometry args={[0.034, 14, 10]} />
+          <meshStandardMaterial color="#3a3d44" roughness={0.95} />
+        </mesh>
+        <Box size={[0.075, 0.075, 0.075]} position={[0, 0.03, 0]} color={flag} roughness={0.55} />
+      </group>
     </group>
   );
 }
@@ -83,15 +92,15 @@ export default function MixedZone() {
 
   return (
     <group>
-      <ambientLight intensity={0.5} color="#e6ecff" />
-      <pointLight position={[0, 3.1, 0.5]} intensity={26} distance={13} decay={1.5} color="#ffffff" />
+      <hemisphereLight intensity={0.55} color="#e6ecff" groundColor="#121a30" />
+      <pointLight position={[0, 2.7, 0.5]} intensity={18} distance={13} decay={1.5} color="#ffffff" />
       <pointLight position={[-3, 2, 2.5]} intensity={9} distance={8} decay={1.7} color="#cfe0ff" />
 
       <Shell width={12} depth={12} back={4.5} height={3.5} floor="#0e1a38" wall="#1a1e27" ceiling="#0b0d11" floorRoughness={0.95} />
 
       {/* ceiling strip lights */}
       {[-2.4, 0.6, 3.6].map((z) => (
-        <Glow key={z} size={[7, 0.02, 0.12]} position={[0, 3.48, z]} color={[2.5, 2.5, 2.7]} />
+        <Glow key={z} size={[7, 0.02, 0.12]} position={[0, 3.48, z]} color={[0.7, 0.7, 0.75]} />
       ))}
 
       {/* the interview board */}
@@ -141,9 +150,12 @@ export default function MixedZone() {
       <Fence x={-2.3} z={0.6} />
       <Fence x={0} z={0.6} />
       <Fence x={2.3} z={0.6} />
-      <Boom x={-0.9} lean={0.12} />
-      <Boom x={0.2} lean={-0.05} />
-      <Boom x={1.2} lean={-0.16} />
+      <Mic x={-1.05} flag={ROYAL} lean={-0.35} />
+      <Mic x={-0.4} flag={GOLD} lean={-0.12} />
+      <Mic x={0.45} flag={CREAM} lean={0.1} />
+      <Mic x={1.1} flag="#7a1020" lean={0.3} />
+      {/* a camera behind the barrier, on the player */}
+      <TvCamera position={[-1.3, 0, 1.95]} turn={-0.38} />
 
       {/* a camera light on a stand */}
       <group position={[3.4, 0, 2.3]}>
