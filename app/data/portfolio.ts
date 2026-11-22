@@ -534,6 +534,12 @@ export const resumeText = {
   download: "Download PDF",
   open: "Open in a new tab",
   note: "A complete copy, including my telephone number, is available on request.",
+  // the matchday board hanging in the ticket office
+  board: {
+    heading: "Today's fixture",
+    fixture: "The Résumé Issue",
+    gate: "Gate A  ·  Programmes on sale now",
+  },
 };
 
 export const contactText = {

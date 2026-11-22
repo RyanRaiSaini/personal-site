@@ -1,6 +1,6 @@
 "use client";
 
-import { profile } from "../../../data/portfolio";
+import { profile, resumeText } from "../../../data/portfolio";
 import { Box, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign } from "./common";
 
 // The ticket office (Résumé). Two lit windows in the concourse wall
@@ -27,6 +27,49 @@ function Window({ x }: { x: number }) {
         <sphereGeometry args={[0.13, 16, 12]} />
         <meshStandardMaterial color="#3a2d1c" roughness={1} />
       </mesh>
+    </group>
+  );
+}
+
+// The matchday board, hung from the ceiling on two rods
+function FixtureBoard() {
+  const text = resumeText.board;
+  return (
+    <group position={[0, 3.38, -1.0]}>
+      {[-1.7, 1.7].map((x) => (
+        <Box key={x} size={[0.025, 0.5, 0.025]} position={[x, 0.6, 0]} color="#1a1c22" metalness={0.7} roughness={0.35} />
+      ))}
+      <Box size={[4.3, 0.78, 0.12]} position={[0, 0, -0.07]} color="#0a0c11" metalness={0.4} roughness={0.4} />
+      <Sign
+        lines={[
+          { text: text.heading.toUpperCase(), size: 0.2, color: GOLD, weight: 700, spacing: 0.3 },
+          { text: `${profile.shortName.toUpperCase()}  ·  ${text.fixture.toUpperCase()}`, size: 0.34, color: "#ffffff", weight: 800, spacing: 0.08 },
+          { text: text.gate.toUpperCase(), size: 0.2, color: "#9db8ff", weight: 600, spacing: 0.2 },
+        ]}
+        width={4.16}
+        height={0.66}
+        position={[0, 0, 0.0]}
+        background="#070a14"
+        border={GOLD}
+        glow={1.2}
+      />
+    </group>
+  );
+}
+
+// A lamp on a cord, its shade lit from underneath
+function Pendant({ x, z }: { x: number; z: number }) {
+  return (
+    <group position={[x, 0, z]}>
+      <mesh position={[0, 3.45, 0]}>
+        <cylinderGeometry args={[0.006, 0.006, 0.7, 6]} />
+        <meshStandardMaterial color="#111" />
+      </mesh>
+      <mesh position={[0, 3.0, 0]}>
+        <cylinderGeometry args={[0.06, 0.26, 0.24, 24, 1, true]} />
+        <meshStandardMaterial color="#1a2a5c" metalness={0.5} roughness={0.35} side={2} />
+      </mesh>
+      <Glow size={[0.3, 0.005, 0.3]} position={[0, 2.9, 0]} rotation={[0, Math.PI / 4, 0]} color={[2.2, 1.9, 1.4]} />
     </group>
   );
 }
@@ -69,6 +112,9 @@ export default function TicketOffice() {
 
       <Window x={-3.9} />
       <Window x={3.9} />
+      <Pendant x={-3.9} z={-3.1} />
+      <Pendant x={3.9} z={-3.1} />
+      <FixtureBoard />
 
       {/* the programme cover, in a frame between the windows; its top stays
           below the line of light, clear of the sign */}
