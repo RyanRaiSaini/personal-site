@@ -2,7 +2,7 @@
 
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { ExtrudeGeometry, LatheGeometry, Shape, Vector2, type Group, type Mesh } from "three";
+import { CatmullRomCurve3, ExtrudeGeometry, LatheGeometry, Shape, TubeGeometry, Vector2, Vector3, type Group, type Mesh } from "three";
 import { awards } from "../../../data/portfolio";
 import { useWorld } from "../../../lib/store";
 import { atmo } from "../atmosphere/state";
@@ -192,7 +192,8 @@ function Cabinet() {
   return (
     <group position={[0, 0, -4.2]}>
       <Box size={[4.6, 2.9, 0.5]} position={[0, 1.55, -0.05]} color="#0b0c10" roughness={0.4} />
-      <Box size={[4.4, 2.6, 0.06]} position={[0, 1.6, 0.0]} color="#1b1509" roughness={0.6} />
+      {/* the back of the cabinet, lit warm from behind the shelves */}
+      <Box size={[4.4, 2.6, 0.06]} position={[0, 1.6, 0.0]} color="#2a1d0b" roughness={0.6} emissive="#5a3c12" emissiveIntensity={0.55} />
       <Box size={[4.7, 0.08, 0.6]} position={[0, 3.02, 0]} color={GOLD} metalness={0.9} roughness={0.3} />
       {shelves.map((y) => (
         <group key={y}>
@@ -209,6 +210,46 @@ function Cabinet() {
         <boxGeometry args={[4.4, 2.6, 0.03]} />
         <meshStandardMaterial {...GLASS} />
       </mesh>
+    </group>
+  );
+}
+
+// Brass posts with a red velvet rope sagging between them, in front of
+// the cases
+function Ropes({ posts }: { posts: [number, number][] }) {
+  const ropes = useMemo(
+    () =>
+      posts.slice(1).map(([x1, z1], i) => {
+        const [x0, z0] = posts[i];
+        const curve = new CatmullRomCurve3([new Vector3(x0, 0.86, z0), new Vector3((x0 + x1) / 2, 0.68, (z0 + z1) / 2), new Vector3(x1, 0.86, z1)]);
+        return new TubeGeometry(curve, 20, 0.022, 8, false);
+      }),
+    [posts],
+  );
+  useEffect(() => () => ropes.forEach((rope) => rope.dispose()), [ropes]);
+  return (
+    <group>
+      {posts.map(([x, z]) => (
+        <group key={`${x}${z}`} position={[x, 0, z]}>
+          <mesh position={[0, 0.02, 0]}>
+            <cylinderGeometry args={[0.13, 0.15, 0.04, 20]} />
+            <meshStandardMaterial {...GOLD_METAL} />
+          </mesh>
+          <mesh position={[0, 0.45, 0]}>
+            <cylinderGeometry args={[0.025, 0.03, 0.86, 12]} />
+            <meshStandardMaterial {...GOLD_METAL} />
+          </mesh>
+          <mesh position={[0, 0.9, 0]}>
+            <sphereGeometry args={[0.05, 16, 12]} />
+            <meshStandardMaterial {...GOLD_METAL} />
+          </mesh>
+        </group>
+      ))}
+      {ropes.map((rope, i) => (
+        <mesh key={i} geometry={rope}>
+          <meshStandardMaterial color="#7a1020" roughness={0.85} />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -299,6 +340,15 @@ export default function TrophyRoom() {
       ))}
 
       <Sign lines={[{ text: "SILVERWARE", size: 1, color: GOLD, spacing: 0.5 }]} width={3.4} height={0.3} position={[0, 3.3, -4.38]} background={null} glow={1.6} />
+
+      {/* a runner up the middle of the room to the cabinet */}
+      <Box size={[1.5, 0.012, 9.2]} position={[0, 0.006, 1.0]} color="#13204a" roughness={0.95} />
+      {[-1, 1].map((side) => (
+        <Box key={side} size={[0.05, 0.014, 9.2]} position={[side * 0.75, 0.007, 1.0]} color="#8a6d2a" roughness={0.6} />
+      ))}
+      {/* far enough forward that, from the door, they pass under the plaques */}
+      <Ropes posts={[[-3.3, 1.25], [-1.9, 1.6], [-0.8, 1.6]]} />
+      <Ropes posts={[[0.8, 1.6], [1.9, 1.6], [3.3, 1.25]]} />
 
       <Cabinet />
       {places.map((p, i) => (awards[i] ? <Case key={awards[i].id} x={p.x} z={p.z} turn={p.turn} index={i} /> : null))}
