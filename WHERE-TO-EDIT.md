@@ -161,7 +161,8 @@ The stands, roof and seats are a model built in Blender. Its shape is changed in
 | What each surface looks like (colour, shine, which photographed texture) | `LOOKS`, `SURFACES` | `app/components/world3d/stadium/materials.ts` |
 | Seat colour | `SEAT_COLOR` | `app/components/world3d/stadium/materials.ts` |
 | How near the camera must be for the detailed seat | `DETAIL_DISTANCE` | `app/components/world3d/stadium/Seats.tsx` |
-| The GitHub picture in the seats (its five colours) | `PICTURE` | `app/components/world3d/stadium/Seats.tsx` |
+| The GitHub scoreboard under the main stand's second tier (its size, colours, layout) | `WIDTH`, `LEVELS`, `paint` | `app/components/world3d/stadium/GithubBoard.tsx` |
+| The scoreboard's words, and how many recent weeks it and the GitHub panel show | `githubText.board`, `githubText.recentWeeks` | `app/data/portfolio.ts` |
 | How deep the shade under the roof is | `bake` | `app/components/world3d/stadium/bakedLight.ts` |
 | The roof panels sliding, the lamps' brightness | | `app/components/world3d/stadium/StadiumModel.tsx` |
 | How long the roof takes to open or close | `ROOF_SECONDS` | `app/components/world3d/atmosphere/AtmosphereDriver.tsx` |
@@ -196,9 +197,9 @@ By day the stadium is lit by one photographed sky and one fixed sun. The real cl
 | Room | Section | File |
 |---|---|---|
 | Dressing room | Skills | `app/components/world3d/rooms/DressingRoom.tsx` |
-| Trophy room | Awards | `app/components/world3d/rooms/TrophyRoom.tsx` |
-| Press room | In the News | `app/components/world3d/rooms/PressRoom.tsx` |
-| Ticket office | Résumé | `app/components/world3d/rooms/TicketOffice.tsx` |
+| Trophy room (four cases, the cabinet, velvet ropes and runner) | Awards | `app/components/world3d/rooms/TrophyRoom.tsx` |
+| Press room (lighting rig, studio light, TV cameras, PRESS chairs) | In the News | `app/components/world3d/rooms/PressRoom.tsx` |
+| Ticket office (the matchday board: its words are `resumeText.board` in `portfolio.ts`) | Résumé | `app/components/world3d/rooms/TicketOffice.tsx` |
 | Mixed zone | Contact | `app/components/world3d/rooms/MixedZone.tsx` |
 | Shared building blocks (boxes, lit signs, the room shell) | | `app/components/world3d/rooms/common.tsx` |
 
