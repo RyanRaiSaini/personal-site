@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { DoubleSide, type CanvasTexture, type Group } from "three";
 import { bench, squad } from "../../../data/portfolio";
 import { atmo } from "../atmosphere/state";
+import { ballTexture } from "../players/Cast";
 import { canvasTexture } from "../textures/canvas";
 import { useDisplayFont } from "../textures/text";
 import { Box, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign } from "./common";
@@ -12,7 +13,8 @@ import { Box, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign } from "./common";
 // The dressing room (Skills). A shirt hangs on every peg: the starting
 // eleven along the back wall, the bench down the left. The names and
 // numbers come from `squad` and `bench` in app/data/portfolio.ts.
-// The last locker on the right is number 66, and it is not quite shut.
+// Boots wait under every locker, the match ball sits in a pool of light
+// at the front of the crest, and a bag of balls is left in the corner.
 
 const BAY = 1.04; // width of one locker bay
 const WOOD = "#7a5a3c";
@@ -140,6 +142,67 @@ function Bay({ x, name, number, index }: { x: number; name: string; number: numb
   );
 }
 
+// A pair of boots, left under a locker
+function Boots({ x, z, turn }: { x: number; z: number; turn: number }) {
+  return (
+    <group position={[x, 0, z]} rotation={[0, turn, 0]}>
+      {[-0.07, 0.07].map((side) => (
+        <group key={side} position={[side, 0, side * 0.3]}>
+          <Box size={[0.1, 0.022, 0.28]} position={[0, 0.011, 0]} color={GOLD} roughness={0.5} />
+          <Box size={[0.095, 0.075, 0.26]} position={[0, 0.06, 0.01]} color="#16181d" roughness={0.35} metalness={0.1} />
+          <Box size={[0.09, 0.06, 0.08]} position={[0, 0.12, 0.1]} color="#16181d" roughness={0.35} />
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// The match ball, on the front edge of the crest in a pool of light
+function MatchBall() {
+  const ball = useRef<Group>(null);
+  const leather = useMemo(() => ballTexture(), []);
+  useEffect(() => () => leather.dispose(), [leather]);
+  useFrame(() => {
+    if (ball.current) ball.current.rotation.y = atmo.time * 0.3;
+  });
+  return (
+    <group position={[0, 0, 2.75]}>
+      <group ref={ball} position={[0, 0.115, 0]}>
+        <mesh castShadow>
+          <sphereGeometry args={[0.115, 28, 20]} />
+          <meshStandardMaterial map={leather} roughness={0.42} />
+        </mesh>
+      </group>
+      <pointLight position={[0, 1.6, 0.2]} intensity={3} distance={2.6} decay={1.6} color="#fff3dc" />
+    </group>
+  );
+}
+
+// A mesh bag of training balls, slumped in the corner
+function BallBag({ x, z }: { x: number; z: number }) {
+  const balls: [number, number, number][] = [
+    [0, 0.11, 0],
+    [0.2, 0.11, 0.05],
+    [0.09, 0.11, 0.2],
+    [0.1, 0.3, 0.08],
+  ];
+  return (
+    <group position={[x, 0, z]}>
+      {balls.map((p, i) => (
+        <mesh key={i} position={p}>
+          <sphereGeometry args={[0.11, 18, 12]} />
+          <meshStandardMaterial color={i % 2 ? "#f2f2ee" : "#d8b24e"} roughness={0.5} />
+        </mesh>
+      ))}
+      {/* the net round them */}
+      <mesh position={[0.1, 0.2, 0.08]}>
+        <sphereGeometry args={[0.3, 12, 10]} />
+        <meshStandardMaterial color="#10182e" wireframe transparent opacity={0.55} />
+      </mesh>
+    </group>
+  );
+}
+
 function floorTexture(family: string | null) {
   return canvasTexture(
     1024,
@@ -182,8 +245,8 @@ export default function DressingRoom() {
 
   return (
     <group>
-      <ambientLight intensity={0.55} color="#dfe6ff" />
-      <pointLight position={[0, 3.1, 1.5]} intensity={26} distance={16} decay={1.6} color="#fff1dc" />
+      <hemisphereLight intensity={0.6} color="#e6ecff" groundColor="#121a30" />
+      <pointLight position={[0, 2.7, 1.5]} intensity={18} distance={16} decay={1.6} color="#fff1dc" />
       <pointLight position={[0, 2.4, -2.6]} intensity={10} distance={10} decay={1.8} color="#ffe2b8" />
 
       <Shell width={13.4} depth={11.5} back={4.5} height={3.6} floor="#0e1a38" wall={ROYAL} ceiling="#0a0f1e" />
@@ -195,8 +258,8 @@ export default function DressingRoom() {
 
       {/* the ring light in the ceiling */}
       <mesh position={[0, 3.52, 1.2]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[2.3, 0.07, 8, 64]} />
-        <meshBasicMaterial color={[3, 2.9, 2.6]} toneMapped={false} />
+        <torusGeometry args={[2.3, 0.04, 8, 64]} />
+        <meshBasicMaterial color={[0.8, 0.78, 0.72]} toneMapped={false} />
       </mesh>
 
       {/* a gold line and my name above the lockers */}
@@ -220,15 +283,15 @@ export default function DressingRoom() {
       </group>
       <Sign lines={[{ text: "THE BENCH", size: 1, color: CREAM, spacing: 0.3 }]} width={3.4} height={0.34} position={[-6.66, 3.14, -0.4]} rotation={[0, Math.PI / 2, 0]} background={null} />
 
-      {/* a bench and a tactics table in the middle */}
-      <Box size={[2.6, 0.08, 0.5]} position={[0, 0.46, 3.2]} color={WOOD} roughness={0.5} />
-      <Box size={[0.08, 0.44, 0.44]} position={[-1.1, 0.22, 3.2]} color={WOOD_DARK} />
-      <Box size={[0.08, 0.44, 0.44]} position={[1.1, 0.22, 3.2]} color={WOOD_DARK} />
-      {/* a match ball left on the bench */}
-      <mesh position={[0.7, 0.61, 3.2]}>
-        <sphereGeometry args={[0.11, 20, 14]} />
-        <meshStandardMaterial color="#f4f4f1" roughness={0.45} />
-      </mesh>
+      <MatchBall />
+      {/* boots under every locker, toes out */}
+      {squad.map((player, i) => (
+        <Boots key={player.number} x={startX + i * BAY} z={-3.55} turn={((i * 37) % 7) * 0.05 - 0.15} />
+      ))}
+      {bench.map((name, i) => (
+        <Boots key={name} x={-5.75} z={3.4 - i * BAY} turn={Math.PI / 2 + ((i * 23) % 5) * 0.06 - 0.12} />
+      ))}
+      <BallBag x={-5.4} z={4.6} />
     </group>
   );
 }

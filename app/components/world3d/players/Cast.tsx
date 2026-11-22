@@ -46,7 +46,7 @@ const REST: Partial<Record<SectionId, { at: [number, number]; facing: number; st
 // (the same place the "foot" pose was built for: blender/players/stances.py)
 const UNDER_FOOT = { x: -0.11, z: 0.31 };
 
-function ballTexture() {
+export function ballTexture() {
   return canvasTexture(
     256,
     128,
