@@ -70,10 +70,12 @@ export const SPOTS: Record<Exclude<SectionId, "home">, Spot> = {
   },
   github: {
     scene: "bowl",
-    // aimed at the newer end of the picture, which is where the commits are
-    pose: { position: [46, 28, -6], target: [10, 15, -64], fov: 34 },
-    narrow: { position: [34, 30, 2], target: [12, 19, -64], fov: 50 },
-    anchor: [0, 20.5, -66],
+    // the scoreboard under the main stand's second tier (stadium/GithubBoard.tsx)
+    // square on to the board (the camera rig itself moves it clear of the panel)
+    pose: { position: [0, 9, -26], target: [0, 9.6, -57.5], fov: 40 },
+    // on a phone the panel covers the lower half, so the board sits high
+    narrow: { position: [0, 9.6, -15], target: [0, 9, -57.5], fov: 60 },
+    anchor: [0, 11.8, -57.5],
   },
   live: {
     scene: "bowl",
