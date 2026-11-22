@@ -105,7 +105,7 @@ export const SPOTS: Record<Exclude<SectionId, "home">, Spot> = {
   resume: {
     scene: "tickets",
     pose: { position: inRoom("tickets", [0, 1.7, 7]), target: inRoom("tickets", [0, 1.7, -2]), fov: 46 },
-    narrow: { position: inRoom("tickets", [0, 1.8, 7.6]), target: inRoom("tickets", [0, 2.3, -2]), fov: 62 },
+    narrow: { position: inRoom("tickets", [0, 1.8, 7.6]), target: inRoom("tickets", [0, 2.75, -2]), fov: 64 },
     anchor: [66, 9.6, -44],
   },
   contact: {
