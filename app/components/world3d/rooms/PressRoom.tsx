@@ -12,9 +12,10 @@ import { useDisplayFont } from "../textures/text";
 import { Box, clickable, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign } from "./common";
 
 // The press room (In the News). A press-conference desk in front of a
-// sponsor-style backdrop, rows of chairs, my All-Star photos framed on
-// the wall, and a television showing the NBA film. Somebody left a
-// basketball on the desk: click it.
+// sponsor-style backdrop, lit like a set by two studio lights, with two
+// television cameras behind the rows of chairs. My All-Star photos are
+// framed on the wall and a television shows the NBA film. Somebody left
+// a basketball on the desk: click it.
 
 // The wall behind the desk: a chequerboard of my initials and number
 function backdropTexture(family: string | null) {
@@ -114,11 +115,111 @@ function Frame({ src, width, height, position, rotation }: { src: string; width:
   );
 }
 
+// Three thin legs splayed from a point, as under a light stand or a camera
+function Tripod({ height, spread }: { height: number; spread: number }) {
+  const leg = Math.hypot(height, spread);
+  const lean = Math.atan2(spread, height);
+  return (
+    <group>
+      {[0, 1, 2].map((i) => (
+        <group key={i} rotation={[0, (i * Math.PI * 2) / 3 + 0.5, 0]}>
+          <Box size={[0.025, leg, 0.025]} position={[0, height / 2, spread / 2]} rotation={[lean, 0, 0]} color="#1c1f25" metalness={0.7} roughness={0.35} />
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// A softbox on a stand, turned toward the desk, with a warm lamp in it
+function StudioLight({ position, turn }: { position: [number, number, number]; turn: number }) {
+  return (
+    <group position={position} rotation={[0, turn, 0]}>
+      <Tripod height={0.7} spread={0.45} />
+      <mesh position={[0, 1.15, 0]}>
+        <cylinderGeometry args={[0.018, 0.018, 1.0, 8]} />
+        <meshStandardMaterial color="#1c1f25" metalness={0.7} roughness={0.35} />
+      </mesh>
+      <group position={[0, 1.85, 0]} rotation={[0.18, 0, 0]}>
+        {/* the box, its face toward -Z, and the diffuser glowing */}
+        <Box size={[0.78, 0.56, 0.34]} position={[0, 0, 0.12]} color="#121418" roughness={0.6} />
+        <Glow size={[0.7, 0.48, 0.01]} position={[0, 0, -0.06]} color={[2.0, 1.85, 1.6]} />
+      </group>
+      <pointLight position={[0, 1.8, -0.5]} intensity={6} distance={6} decay={1.6} color="#ffe7c7" />
+    </group>
+  );
+}
+
+// A broadcast camera on a tripod, pointing at the desk (-Z), its red
+// light on
+function TvCamera({ position, turn, low = 0 }: { position: [number, number, number]; turn: number; low?: number }) {
+  return (
+    <group position={position} rotation={[0, turn, 0]}>
+      <Tripod height={1.05 - low} spread={0.5} />
+      <group position={[0, -low, 0]}>
+      <Box size={[0.16, 0.08, 0.16]} position={[0, 1.1, 0]} color="#1c1f25" metalness={0.6} roughness={0.4} />
+      {/* body, lens and lens hood */}
+      <Box size={[0.26, 0.3, 0.52]} position={[0, 1.3, 0.02]} color="#4a4f59" roughness={0.4} metalness={0.35} />
+      <mesh position={[0, 1.3, -0.36]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.075, 0.085, 0.3, 20]} />
+        <meshStandardMaterial color="#121418" roughness={0.35} metalness={0.4} />
+      </mesh>
+      <mesh position={[0, 1.3, -0.52]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.1, 0.085, 0.06, 20]} />
+        <meshStandardMaterial color="#0a0b0d" roughness={0.5} />
+      </mesh>
+      <mesh position={[0, 1.3, -0.552]}>
+        <circleGeometry args={[0.07, 20]} />
+        <meshStandardMaterial color="#0b1a33" roughness={0.05} metalness={0.8} />
+      </mesh>
+      {/* viewfinder, handle and the tally light */}
+      <Box size={[0.18, 0.13, 0.12]} position={[-0.17, 1.42, 0.16]} color="#2a2e35" roughness={0.5} />
+      {/* the operator's monitor, lit */}
+      <Glow size={[0.14, 0.09, 0.005]} position={[-0.17, 1.42, 0.223]} color={[0.55, 0.75, 1.1]} />
+      <Box size={[0.04, 0.04, 0.34]} position={[0, 1.48, 0.02]} color="#17191e" roughness={0.5} />
+      <Glow size={[0.04, 0.025, 0.02]} position={[0.06, 1.47, -0.18]} color={[3.2, 0.25, 0.2]} />
+      {/* the operator's handles */}
+      {[-1, 1].map((side) => (
+        <Box key={side} size={[0.02, 0.02, 0.4]} position={[side * 0.16, 1.18, 0.4]} rotation={[-0.35, side * 0.25, 0]} color="#17191e" roughness={0.5} />
+      ))}
+      </group>
+    </group>
+  );
+}
+
+// A lighting bar hung from the ceiling in front of the stage, its lamps
+// aimed down at the desk
+function LightingRig() {
+  const lamps = [-2.6, -1.3, 0, 1.3, 2.6];
+  return (
+    <group position={[0, 3.2, -1.3]}>
+      {[-2.9, 2.9].map((x) => (
+        <Box key={x} size={[0.03, 0.4, 0.03]} position={[x, 0.2, 0]} color="#1c1f25" metalness={0.7} roughness={0.35} />
+      ))}
+      <Box size={[6.2, 0.07, 0.07]} position={[0, 0, 0]} color="#1c1f25" metalness={0.7} roughness={0.35} />
+      {lamps.map((x) => (
+        <group key={x} position={[x, -0.2, 0]} rotation={[0.75, 0, 0]}>
+          <Box size={[0.03, 0.18, 0.03]} position={[0, 0.12, 0]} color="#1c1f25" metalness={0.7} roughness={0.35} />
+          <mesh>
+            <cylinderGeometry args={[0.1, 0.12, 0.3, 16]} />
+            <meshStandardMaterial color="#121418" metalness={0.5} roughness={0.4} />
+          </mesh>
+          {/* the lens, facing the desk */}
+          <mesh position={[0, -0.152, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <circleGeometry args={[0.1, 20]} />
+            <meshBasicMaterial color={[2.6, 2.3, 1.8]} toneMapped={false} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
 function Chair({ x, z }: { x: number; z: number }) {
   return (
     <group position={[x, 0, z]}>
       <Box size={[0.46, 0.06, 0.44]} position={[0, 0.46, 0]} color="#14161b" roughness={0.6} />
       <Box size={[0.46, 0.5, 0.05]} position={[0, 0.76, 0.21]} color="#14161b" roughness={0.6} />
+      <Sign lines={[{ text: "PRESS", size: 1, color: CREAM, spacing: 0.3 }]} width={0.3} height={0.07} position={[0, 0.9, 0.237]} background={null} />
       {[
         [-0.2, -0.19],
         [0.2, -0.19],
@@ -177,18 +278,34 @@ export default function PressRoom() {
 
   const film = news.find((item) => item.kind === "video") ?? news[0];
   const rows = [1.3, 2.5];
-  const seats = [-2.1, -1.4, -0.7, 0, 0.7, 1.4, 2.1];
+  // three a side, with an aisle down the middle
+  const seats = [-2.45, -1.75, -1.05, 1.05, 1.75, 2.45];
 
   return (
     <group>
-      <ambientLight intensity={0.6} color="#eef2ff" />
-      <pointLight position={[0, 3.2, -1.5]} intensity={30} distance={14} decay={1.5} color="#ffffff" />
-      <pointLight position={[0, 3.1, 3]} intensity={14} distance={12} decay={1.6} color="#fff1dc" />
+      <hemisphereLight intensity={0.4} color="#e8edff" groundColor="#14161b" />
+      {/* the set: light on the desk and the backdrop, the audience kept darker */}
+      <pointLight position={[0, 2.7, -1.2]} intensity={18} distance={9} decay={1.6} color="#fff6e8" />
+      <pointLight position={[0, 2.9, 3]} intensity={6} distance={10} decay={1.7} color="#dfe6ff" />
 
       <Shell width={12.6} depth={12} back={4.5} height={3.6} floor="#1a1d24" wall="#20242d" ceiling="#0c0e12" floorRoughness={0.6} />
 
       {/* ceiling light panels */}
-      {[-3, 0, 3].map((x) => [-2, 1.5].map((z) => <Glow key={`${x}${z}`} size={[1.5, 0.02, 0.7]} position={[x, 3.58, z]} color={[2.6, 2.6, 2.7]} />))}
+      {[-3, 0, 3].map((x) => [-2, 1.5].map((z) => <Glow key={`${x}${z}`} size={[1.5, 0.02, 0.7]} position={[x, 3.58, z]} color={[0.55, 0.56, 0.6]} />))}
+
+      {/* studio lights either side of the desk, and cameras behind the chairs */}
+      {/* lamps over the stage, a softbox and a camera on the right, and a
+          camera at the back of the centre aisle */}
+      <LightingRig />
+      <StudioLight position={[3.05, 0, -1.55]} turn={1.13} />
+      <TvCamera position={[3.25, 0, -0.25]} turn={0.87} />
+      <TvCamera position={[0, 0, 3.3]} turn={0} low={0.2} />
+
+      {/* carpet under the reporters' chairs, edged in gold */}
+      <Box size={[6.2, 0.012, 3.4]} position={[0, 0.006, 1.9]} color="#15214a" roughness={0.95} />
+      {[-1, 1].map((side) => (
+        <Box key={side} size={[6.2, 0.014, 0.05]} position={[0, 0.007, 1.9 + side * 1.7]} color="#8a6d2a" roughness={0.6} />
+      ))}
 
       {/* the backdrop */}
       <mesh position={[0.6, 1.95, -4.46]}>
