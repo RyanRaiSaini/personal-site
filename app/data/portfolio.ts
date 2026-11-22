@@ -511,8 +511,23 @@ export const now = {
 
 export const githubText = {
   lead: "Each square represents one day.",
-  body: "Darker squares indicate more contributions. The seats of the main stand show the same data.",
+  body: "Darker squares indicate more contributions. The scoreboard on the main stand shows the same figures.",
   saved: "GitHub is temporarily unavailable. A saved copy is shown.",
+  // the figures above the chart
+  total: "contributions in the last year",
+  active: "days with a commit",
+  best: "most in one day",
+  // how many recent weeks the chart and the scoreboard show
+  recentWeeks: 16,
+  // the scoreboard hung under the main stand's second tier
+  board: {
+    title: "GitHub",
+    total: "Contributions this year",
+    best: "Best day",
+    active: "Active days",
+    recent: "Last 16 weeks",
+    loading: "Loading contributions",
+  },
 };
 
 export const resumeText = {

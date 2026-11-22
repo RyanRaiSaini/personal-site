@@ -11,6 +11,7 @@ import { ledStrip, useDisplayFont, type StripSegment } from "../textures/text";
 import { makeMaterials, type StadiumMaterials } from "./materials";
 import { perimeter } from "./path";
 import { loadSeatData } from "./seatData";
+import GithubBoard from "./GithubBoard";
 import Seats from "./Seats";
 
 // ------------------------------------------------------------------
@@ -26,6 +27,8 @@ import Seats from "./Seats";
 //     (closing the roof is the site's dark mode)
 //   - the ring of screens is dark until a goal or the fireworks
 //   - the floodlights brighten as the daylight goes
+//
+// The GitHub scoreboard on the main stand is GithubBoard.tsx.
 // ------------------------------------------------------------------
 
 export const MODEL_URL = "/stadium/stadium.glb";
@@ -249,6 +252,7 @@ export default function StadiumModel() {
     <group>
       <primitive object={gltf.scene} />
       <Seats detailedSeat={parts.seatDetailed} plainSeat={parts.seatPlain} />
+      <GithubBoard />
     </group>
   );
 }

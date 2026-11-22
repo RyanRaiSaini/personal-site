@@ -45,9 +45,10 @@ export const ROOF = {
 // The ring of screens under the inner edge of the roof
 export const SCREEN = { d: -4.6, bottom: 43.4, top: 48.9 } as const;
 
-// Where the second tier of the main stand is: the seats there make the
-// picture of my GitHub contributions
-export const PICTURE_TIER = { d: 16, y: 12.4, top: 19 } as const;
+// The front edge of the main stand's second tier, where the GitHub
+// scoreboard hangs: `d` back from the front wall, the underside of its
+// slab at `bottom`
+export const SECOND_TIER = { d: 15.8, bottom: 11.4 } as const;
 
 // Pitch-side things
 export const TUNNEL = { halfWidth: 3, height: 3.1, length: 26 } as const;
