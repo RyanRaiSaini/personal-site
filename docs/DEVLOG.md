@@ -200,6 +200,11 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **Mixed zone:** four broadcasters' microphones (plain coloured cubes, no names) clamped to the barrier, and a TV camera on the player; the pole microphones and the glaring ceiling strips are gone.
 - **Press room:** a lighting rig over the stage, a softbox, two broadcast cameras with red lights, a centre aisle, a navy carpet and PRESS on the chair backs; the ceiling panels are dimmed so the light falls on the desk.
 
+### Floodlight beams at night (2026-11-22)
+
+- At night, shafts of light now fall from the ring of lamps under the roof, brightest at the lamps and fading toward the pitch, with a halo along the lamp bar (`stadium/FloodBeams.tsx`). It is one see-through surface swept round the bowl and painted in its shader, so it never hides anything. By day it fades away.
+- Cost, measured on the overview at night (1280 x 720, development server): about 43 pictures a second with the beams against about 50 without, and nothing at rest. The "low" quality level goes without them.
+
 ### The start of a visit
 
 - A first visit opens in the players' tunnel: my name, "Start the tour", and the pitch lit at the far end. Pressing it plays the walk-out and opens About. The top bar is there throughout, and visitors who prefer less motion never see it.

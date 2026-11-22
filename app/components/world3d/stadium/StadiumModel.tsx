@@ -11,6 +11,7 @@ import { ledStrip, useDisplayFont, type StripSegment } from "../textures/text";
 import { makeMaterials, type StadiumMaterials } from "./materials";
 import { perimeter } from "./path";
 import { loadSeatData } from "./seatData";
+import FloodBeams from "./FloodBeams";
 import GithubBoard from "./GithubBoard";
 import Seats from "./Seats";
 
@@ -28,7 +29,8 @@ import Seats from "./Seats";
 //   - the ring of screens is dark until a goal or the fireworks
 //   - the floodlights brighten as the daylight goes
 //
-// The GitHub scoreboard on the main stand is GithubBoard.tsx.
+// The GitHub scoreboard on the main stand is GithubBoard.tsx; the
+// floodlights' beams at night are FloodBeams.tsx.
 // ------------------------------------------------------------------
 
 export const MODEL_URL = "/stadium/stadium.glb";
@@ -253,6 +255,7 @@ export default function StadiumModel() {
       <primitive object={gltf.scene} />
       <Seats detailedSeat={parts.seatDetailed} plainSeat={parts.seatPlain} />
       <GithubBoard />
+      <FloodBeams />
     </group>
   );
 }

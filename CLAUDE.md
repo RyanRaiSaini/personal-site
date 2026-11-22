@@ -6,7 +6,7 @@ This is Ryan Rai Saini's personal site: a portfolio set inside a 3D football sta
 
 ## How Ryan wants work done here
 
-- **Commit after every single change, and push.** Small, real, well-named commits, each one doing one thing. Never make empty or filler commits.
+- **Commit each finished piece of work, and push.** One real, well-named commit per piece (a room, a feature, a fix with its docs), not a stream of tiny ones: Ryan asked on 2026-11-22 for commits to be batched together. Never make empty or filler commits.
 - **Commit to `main`.** Contributions only count on the default branch, and Vercel deploys from it.
 - Push in small batches (a few commits per push). Each push triggers a Vercel deployment, and the Hobby plan caps deployments per day.
 - Ask your questions before starting a big piece of work, and wait for a clear "go".
