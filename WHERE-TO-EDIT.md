@@ -196,12 +196,12 @@ By day the stadium is lit by one photographed sky and one fixed sun. The real cl
 
 | Room | Section | File |
 |---|---|---|
-| Dressing room | Skills | `app/components/world3d/rooms/DressingRoom.tsx` |
+| Dressing room (lockers, boots, the match ball on the crest, the ball bag) | Skills | `app/components/world3d/rooms/DressingRoom.tsx` |
 | Trophy room (four cases, the cabinet, velvet ropes and runner) | Awards | `app/components/world3d/rooms/TrophyRoom.tsx` |
 | Press room (lighting rig, studio light, TV cameras, PRESS chairs) | In the News | `app/components/world3d/rooms/PressRoom.tsx` |
 | Ticket office (the matchday board: its words are `resumeText.board` in `portfolio.ts`) | Résumé | `app/components/world3d/rooms/TicketOffice.tsx` |
-| Mixed zone | Contact | `app/components/world3d/rooms/MixedZone.tsx` |
-| Shared building blocks (boxes, lit signs, the room shell) | | `app/components/world3d/rooms/common.tsx` |
+| Mixed zone (interview board, barrier, broadcasters' microphones, TV camera) | Contact | `app/components/world3d/rooms/MixedZone.tsx` |
+| Shared building blocks (boxes, lit signs, the room shell, the TV camera on its tripod) | | `app/components/world3d/rooms/common.tsx` |
 
 The shirts in the dressing room come from `squad` and `bench`. The trophies come from `awards` (the first four). The programme cover in the ticket office and the signs in the mixed zone read from `profile`.
 

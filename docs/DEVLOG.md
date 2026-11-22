@@ -196,6 +196,8 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **GitHub:** the picture in the seats is gone. With only a few active days it was a handful of white seats that showed as torn chunks in the rows. An LED scoreboard now hangs under the main stand's second tier (`stadium/GithubBoard.tsx`), and the panel shows the last 16 weeks instead of a mostly empty year.
 - **Trophy room:** the four cases stand closer, so all show beside the panel; matt glass and softer lamps take away the glare; larger plaques; a plain stone floor; a navy runner, velvet ropes and a warm-lit cabinet.
 - **Ticket office:** the programme's frame no longer covers the TICKETS sign and its glare is gone; a matchday board and two pendant lamps fill the dark ceiling.
+- **Dressing room:** boots under every locker, the match ball on the edge of the crest in a pool of light, a bag of training balls in the corner; the plank bench that hid the crest is gone and the ceiling ring is dimmed.
+- **Mixed zone:** four broadcasters' microphones (plain coloured cubes, no names) clamped to the barrier, and a TV camera on the player; the pole microphones and the glaring ceiling strips are gone.
 - **Press room:** a lighting rig over the stage, a softbox, two broadcast cameras with red lights, a centre aisle, a navy carpet and PRESS on the chair backs; the ceiling panels are dimmed so the light falls on the desk.
 
 ### The start of a visit
