@@ -6,7 +6,8 @@ import { canvasTexture, grain } from "../textures/canvas";
 import { useDisplayFont } from "../textures/text";
 
 // Pieces every room is built from: a painted box, a flat sign with
-// text on it, and the shell of the room itself (floor, walls, ceiling).
+// text on it, the shell of the room itself (floor, walls, ceiling),
+// and a broadcast camera on a tripod.
 
 export const NAVY = "#10224a";
 export const ROYAL = "#12327e";
@@ -194,3 +195,55 @@ export const clickable = {
     document.body.style.cursor = "";
   },
 };
+
+// Three thin legs splayed from a point, as under a light stand or a camera
+export function Tripod({ height, spread }: { height: number; spread: number }) {
+  const leg = Math.hypot(height, spread);
+  const lean = Math.atan2(spread, height);
+  return (
+    <group>
+      {[0, 1, 2].map((i) => (
+        <group key={i} rotation={[0, (i * Math.PI * 2) / 3 + 0.5, 0]}>
+          <Box size={[0.025, leg, 0.025]} position={[0, height / 2, spread / 2]} rotation={[lean, 0, 0]} color="#1c1f25" metalness={0.7} roughness={0.35} />
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// A broadcast camera on a tripod, pointing at the desk (-Z), its red
+// light on
+export function TvCamera({ position, turn, low = 0 }: { position: [number, number, number]; turn: number; low?: number }) {
+  return (
+    <group position={position} rotation={[0, turn, 0]}>
+      <Tripod height={1.05 - low} spread={0.5} />
+      <group position={[0, -low, 0]}>
+      <Box size={[0.16, 0.08, 0.16]} position={[0, 1.1, 0]} color="#1c1f25" metalness={0.6} roughness={0.4} />
+      {/* body, lens and lens hood */}
+      <Box size={[0.26, 0.3, 0.52]} position={[0, 1.3, 0.02]} color="#4a4f59" roughness={0.4} metalness={0.35} />
+      <mesh position={[0, 1.3, -0.36]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.075, 0.085, 0.3, 20]} />
+        <meshStandardMaterial color="#121418" roughness={0.35} metalness={0.4} />
+      </mesh>
+      <mesh position={[0, 1.3, -0.52]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.1, 0.085, 0.06, 20]} />
+        <meshStandardMaterial color="#0a0b0d" roughness={0.5} />
+      </mesh>
+      <mesh position={[0, 1.3, -0.552]}>
+        <circleGeometry args={[0.07, 20]} />
+        <meshStandardMaterial color="#0b1a33" roughness={0.05} metalness={0.8} />
+      </mesh>
+      {/* viewfinder, handle and the tally light */}
+      <Box size={[0.18, 0.13, 0.12]} position={[-0.17, 1.42, 0.16]} color="#2a2e35" roughness={0.5} />
+      {/* the operator's monitor, lit */}
+      <Glow size={[0.14, 0.09, 0.005]} position={[-0.17, 1.42, 0.223]} color={[0.55, 0.75, 1.1]} />
+      <Box size={[0.04, 0.04, 0.34]} position={[0, 1.48, 0.02]} color="#17191e" roughness={0.5} />
+      <Glow size={[0.04, 0.025, 0.02]} position={[0.06, 1.47, -0.18]} color={[3.2, 0.25, 0.2]} />
+      {/* the operator's handles */}
+      {[-1, 1].map((side) => (
+        <Box key={side} size={[0.02, 0.02, 0.4]} position={[side * 0.16, 1.18, 0.4]} rotation={[-0.35, side * 0.25, 0]} color="#17191e" roughness={0.5} />
+      ))}
+      </group>
+    </group>
+  );
+}
