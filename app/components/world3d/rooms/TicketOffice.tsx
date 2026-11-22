@@ -55,11 +55,12 @@ function Barrier({ x, z, length }: { x: number; z: number; length: number }) {
 export default function TicketOffice() {
   return (
     <group>
-      <ambientLight intensity={0.5} color="#e6ecff" />
-      <pointLight position={[0, 3.2, 1]} intensity={26} distance={14} decay={1.5} color="#fff3e0" />
-      <pointLight position={[0, 2.2, -3]} intensity={12} distance={8} decay={1.7} color="#ffd79a" />
+      <hemisphereLight intensity={0.6} color="#eef2ff" groundColor="#1c1e24" />
+      {/* lamps kept well below the ceiling, so they do not make a hot spot on it */}
+      <pointLight position={[0, 2.7, 2]} intensity={16} distance={14} decay={1.5} color="#fff3e0" />
+      <pointLight position={[0, 2.0, -2.6]} intensity={8} distance={7} decay={1.7} color="#ffd79a" />
 
-      <Shell width={13} depth={12} back={4.5} height={3.8} floor="#3a3d44" wall="#2b2f38" ceiling="#101216" floorRoughness={0.35} floorMetalness={0.1} />
+      <Shell width={13} depth={12} back={4.5} height={3.8} floor="#3a3d44" wall="#2b2f38" ceiling="#101216" floorRoughness={0.6} floorMetalness={0.05} />
 
       {/* the wall band and the lit sign over the windows */}
       <Box size={[13, 0.9, 0.06]} position={[0, 3.25, -4.44]} color={NAVY} roughness={0.6} />
@@ -69,9 +70,10 @@ export default function TicketOffice() {
       <Window x={-3.9} />
       <Window x={3.9} />
 
-      {/* the programme cover, in a lit frame between the windows */}
-      <group position={[0, 1.75, -4.38]}>
-        <Box size={[2.3, 3.0, 0.08]} position={[0, 0, 0]} color="#0c0d11" metalness={0.5} roughness={0.4} />
+      {/* the programme cover, in a frame between the windows; its top stays
+          below the line of light, clear of the sign */}
+      <group position={[0, 1.5, -4.38]}>
+        <Box size={[1.9, 2.5, 0.08]} position={[0, 0, 0]} color="#0c0d11" metalness={0.5} roughness={0.4} />
         <Sign
           lines={[
             { text: "OFFICIAL MATCHDAY PROGRAMME", size: 0.07, color: GOLD, weight: 600, spacing: 0.3 },
@@ -83,14 +85,13 @@ export default function TicketOffice() {
             { text: "MATHEMATICS · AI · SOFTWARE", size: 0.06, color: "#9db8ff", weight: 600, spacing: 0.2 },
             { text: "FREE  ·  TAKE ONE", size: 0.06, color: GOLD, weight: 600, spacing: 0.3 },
           ]}
-          width={2.1}
-          height={2.8}
+          width={1.74}
+          height={2.32}
           position={[0, 0, 0.05]}
           background={ROYAL}
           border={GOLD}
-          glow={1.15}
+          glow={1.05}
         />
-        <Glow size={[1.6, 0.04, 0.08]} position={[0, 1.62, 0.2]} color={[2.4, 2.1, 1.5]} />
       </group>
 
       {/* a rack of programmes */}
@@ -111,8 +112,8 @@ export default function TicketOffice() {
       <Barrier x={-5.2} z={-2.2} length={3.4} />
       <Barrier x={5.2} z={-2.2} length={3.4} />
 
-      {/* floor line leading to the windows */}
-      <Box size={[0.12, 0.004, 9]} position={[0, 0.003, 0.4]} color={GOLD} roughness={0.5} />
+      {/* a brass inlay in the floor, leading to the windows */}
+      <Box size={[0.06, 0.004, 9]} position={[0, 0.003, 0.4]} color="#5a4824" metalness={0.15} roughness={0.7} />
     </group>
   );
 }
