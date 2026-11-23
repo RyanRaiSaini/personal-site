@@ -4,7 +4,7 @@ import { useGLTF } from "@react-three/drei";
 import { Component, forwardRef, Suspense, use, useEffect, useImperativeHandle, useMemo, useRef, type ReactNode } from "react";
 import { AnimationClip, AnimationMixer, Color, DoubleSide, LoopRepeat, MeshBasicMaterial, MeshStandardMaterial, SRGBColorSpace, type AnimationAction, type Group, type Material, type Object3D, type SkinnedMesh, type Texture } from "three";
 import { clone as cloneFigure } from "three/examples/jsm/utils/SkeletonUtils.js";
-import { canvasTexture } from "../textures/canvas";
+import { canvasTexture, seeded } from "../textures/canvas";
 import { useDisplayFont } from "../textures/text";
 import type { Kit } from "./kits";
 import type { Layer, Stance } from "./moves";
@@ -161,6 +161,37 @@ function printedShirt(base: Texture, notes: PlayerNotes, kit: Kit, family: strin
   return texture;
 }
 
+// Fine grain for a beard: thousands of short dark hairs, so skin shows
+// between them and the edge is broken up, not a painted shape
+const beardGrain = (() => {
+  let made: Texture | null = null;
+  return () =>
+    (made ??= canvasTexture(
+      256,
+      256,
+      (ctx, w, h) => {
+        // a thin cover everywhere, thicker along each hair
+        ctx.fillStyle = "#9a9a9a";
+        ctx.fillRect(0, 0, w, h);
+        const random = seeded(23);
+        for (let i = 0; i < 5200; i++) {
+          const x = random() * w;
+          const y = random() * h;
+          const length = 2 + random() * 4;
+          const tilt = (random() - 0.5) * 0.9;
+          const shade = 150 + random() * 105;
+          ctx.strokeStyle = `rgb(${shade},${shade},${shade})`;
+          ctx.lineWidth = 0.8 + random() * 0.8;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + Math.sin(tilt) * length, y + Math.cos(tilt) * length);
+          ctx.stroke();
+        }
+      },
+      { data: true, anisotropy: 4 },
+    ));
+})();
+
 // Four soft shadows in a star, the way floodlights throw them
 function shadowTexture() {
   return canvasTexture(
@@ -225,17 +256,21 @@ const Figure = forwardRef<PlayerHandle, { kit: Kit; shadow: boolean; mirrored: b
   // his own materials, hair and beard
   useEffect(() => {
     const cloth = kit.colour ?? WHITE;
+    const grain = beardGrain();
+    grain.repeat.set(36, 36);
     const maps = library.maps;
     const materials: Record<string, MeshStandardMaterial> = {
       Body: new MeshStandardMaterial({ map: maps.skin, color: skinTint(kit, notes), roughness: 0.62 }),
-      Eyes: new MeshStandardMaterial({ map: maps.skin, roughness: 0.3 }),
+      // a touch darker than the picture, so the whites do not stare
+      Eyes: new MeshStandardMaterial({ map: maps.skin, roughness: 0.3, color: "#d9d4cc" }),
       Shirt: new MeshStandardMaterial({ map: shirt ?? maps.shirt, normalMap: maps.folds, roughness: 0.8 }),
       Shorts: new MeshStandardMaterial({ color: cloth, roughness: 0.82, side: DoubleSide }),
       Socks: new MeshStandardMaterial({ color: kit.colour ?? "#ffffff", vertexColors: true, roughness: 0.86, side: DoubleSide }),
       Boots: new MeshStandardMaterial({ map: maps.boots, roughness: 0.42 }),
       HairMedium: new MeshStandardMaterial({ map: maps.hair, color: kit.hair, alphaTest: 0.42, side: DoubleSide, roughness: 0.55 }),
       HairCurls: new MeshStandardMaterial({ color: kit.hair, normalMap: maps.curls, roughness: 0.86 }),
-      Beard: new MeshStandardMaterial({ color: kit.hair, vertexColors: true, transparent: true, depthWrite: false, roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }),
+      // a very dark brown, broken into fine hairs so skin shows through
+      Beard: new MeshStandardMaterial({ color: new Color(kit.hair).lerp(new Color("#3b2a1d"), 0.15), alphaMap: grain, vertexColors: true, transparent: true, depthWrite: false, roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }),
     };
     const wears = new Set<string>(["Body", "Eyes", "Shirt", "Shorts", "Socks", "Boots"]);
     if (kit.hairStyle === "medium") wears.add("HairMedium");
