@@ -311,3 +311,10 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **Flags in the crowd:** about one fan in two hundred holds up a flag on a pole, waving: plain club colours with a stripe, no crests or words (`stadium/CrowdFlags.tsx`; `SHARE`, `COLOURS`).
 - **The LED ribbons along the tier fronts are lit:** club blues with slow bands and two sweeps of light chasing round the bowl, and the lamp grid up close. No words or sponsors (`ribbonMaterial` and `RIBBON` in `stadium/materials.ts`).
 - **The grass** carries the lawn photo's larger texture across the middle distance as well as close by, and has a little sheen, as grass catching the sky at a low angle does (`stadium/Pitch.tsx`).
+
+### Night glare, goal smoke, and finishing touches
+
+- **Floodlight glare:** a soft halo round every lamp in the ring under the roof, at every quality level, blazing at night and nearly gone by day (`stadium/FloodGlare.tsx`; `GLARE`).
+- **Smoke when a goal goes in:** blue and white plumes billow up from four places in the lower stands and drift off on the wind over about 13 seconds (`stadium/GoalSmoke.tsx`; `SOURCES`, `LAST`, `WIND`).
+- **The flags** take the same worked-out light as the seats they are held over, so they sit in the roof's shade instead of glowing, and are smaller.
+- **The grass grain** reaches further from the camera and is stronger in the middle distance.

@@ -14,6 +14,8 @@ import { loadSeatData } from "./seatData";
 import Crowd from "./Crowd";
 import CrowdFlags from "./CrowdFlags";
 import FloodBeams from "./FloodBeams";
+import FloodGlare from "./FloodGlare";
+import GoalSmoke from "./GoalSmoke";
 import GithubBoard from "./GithubBoard";
 import Seats from "./Seats";
 
@@ -263,6 +265,8 @@ export default function StadiumModel() {
       <CrowdFlags />
       <GithubBoard />
       <FloodBeams />
+      <FloodGlare />
+      <GoalSmoke />
     </group>
   );
 }

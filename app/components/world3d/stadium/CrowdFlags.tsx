@@ -6,6 +6,7 @@ import { BufferGeometry, Color, CylinderGeometry, DoubleSide, Float32BufferAttri
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { useWorld } from "../../../lib/store";
 import { atmo } from "../atmosphere/state";
+import { withBakedLight } from "./bakedLight";
 import { isTaken, seatHash as hash } from "./crowdPlan";
 import { loadSeatData } from "./seatData";
 
@@ -20,7 +21,7 @@ import { loadSeatData } from "./seatData";
 // ------------------------------------------------------------------
 
 const SHARE = 0.0045; // of the taken seats
-const FLAG = { width: 1.5, height: 0.95, pole: 2.6 };
+const FLAG = { width: 1.15, height: 0.72, pole: 2.3 };
 // [cloth, stripe]
 const COLOURS: [string, string][] = [
   ["#f4f4f0", "#17244d"],
@@ -50,7 +51,7 @@ export default function CrowdFlags() {
   const quality = useWorld((s) => s.quality);
 
   const { mesh, material, uniforms } = useMemo(() => {
-    const { positions } = data;
+    const { positions, details } = data;
     const chosen: number[] = [];
     for (let i = 0; i < data.manifest.seats; i++) if (isTaken(i) && hash(i, 21) < SHARE) chosen.push(i);
 
@@ -91,11 +92,15 @@ export default function CrowdFlags() {
           diffuseColor.rgb = vMain < 0.5 ? vec3( 0.06 ) : mix( diffuseColor.rgb, vStripe, band );`,
         );
     };
-    material.customProgramCacheKey = () => "crowd-flags";
+    material.customProgramCacheKey = () => "crowd-flags-v2";
+    // the same worked-out light as the seats they are held over: in the
+    // roof's shade by day, under the lamps at night
+    withBakedLight(material, "seat");
 
     const mesh = new InstancedMesh(flagGeometry(), material, chosen.length);
     mesh.name = "CrowdFlags";
     const extra = new Float32Array(chosen.length * 4);
+    const light = new Float32Array(chosen.length * 3);
     const matrix = new Matrix4();
     const colour = new Color();
     chosen.forEach((seat, k) => {
@@ -110,8 +115,10 @@ export default function CrowdFlags() {
       mesh.setColorAt(k, colour.set(cloth));
       colour.set(stripe);
       extra.set([colour.r, colour.g, colour.b, hash(seat, 24)], k * 4);
+      light.set([details[seat * 8 + 2] / 255, details[seat * 8 + 3] / 255, details[seat * 8 + 6] / 255], k * 3);
     });
     mesh.geometry.setAttribute("aFlag", new InstancedBufferAttribute(extra, 4));
+    mesh.geometry.setAttribute("aBake", new InstancedBufferAttribute(light, 3));
     mesh.instanceMatrix.needsUpdate = true;
     mesh.frustumCulled = false;
     return { mesh, material, uniforms };
