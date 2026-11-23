@@ -78,10 +78,10 @@
   --color-royal: var(--royal);
   --color-pitch: var(--pitch);
   --color-danger: var(--danger);
-  --font-sans: var(--font-barlow-text);
+  --font-sans: var(--font-text);
   /* numbers and clocks use the condensed width, with every digit the same width */
-  --font-mono: var(--font-barlow);
-  --font-display: var(--font-barlow);
+  --font-mono: var(--font-head);
+  --font-display: var(--font-head);
 }
 
 html {
@@ -91,7 +91,7 @@ html {
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-barlow-text), system-ui, sans-serif;
+  font-family: var(--font-text), system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
   transition:
     background-color 0.6s ease,
@@ -151,7 +151,7 @@ body {
 
 /* Small gold line above a heading: "Goals scored" */
 .kicker {
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.03em;
@@ -169,7 +169,7 @@ body {
   border: 1px solid var(--line-strong);
   background: var(--panel-solid);
   color: var(--ink);
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1.125rem;
   letter-spacing: 0.02em;
@@ -332,7 +332,7 @@ body {
 }
 /* one line: the section's name, like a sign over a door */
 .tag-title {
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1.0625rem;
   letter-spacing: 0.02em;
@@ -347,7 +347,7 @@ body {
   align-items: center;
   min-height: 2.75rem;
   padding: 0 0.9rem;
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 700;
   font-size: 1.3rem;
   letter-spacing: 0.06em;
@@ -372,7 +372,7 @@ body {
   display: flex;
   align-items: center;
   padding: 0 0.7rem;
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1.125rem;
   letter-spacing: 0.02em;
@@ -424,7 +424,7 @@ body {
   transform-origin: left bottom;
 }
 .home-where {
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1.125rem;
   letter-spacing: 0.03em;
@@ -432,7 +432,7 @@ body {
 }
 .home-name {
   margin-top: 0.15rem;
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 800;
   font-size: clamp(2.5rem, 4.4vw, 3.75rem);
   line-height: 0.92;
@@ -494,7 +494,7 @@ body {
   }
 }
 .home-hint {
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1.0625rem;
   letter-spacing: 0.02em;
@@ -516,7 +516,7 @@ body {
   padding: 0.4rem 0.7rem;
   cursor: pointer;
   list-style: none;
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 0.9375rem;
   letter-spacing: 0.02em;
@@ -548,7 +548,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(7, 11, 20, 0.9);
   color: #f4f6f8;
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1.0625rem;
   letter-spacing: 0.02em;
@@ -597,8 +597,11 @@ body {
 }
 .panel-head h1 {
   transform: skewX(-7deg);
-  transform-origin: left bottom;
+  transform-origin: center bottom;
   text-shadow: 0 2px 18px rgba(0, 10, 40, 0.45);
+}
+.panel-head .sign {
+  justify-content: center;
 }
 .panel-head .sign-place {
   color: var(--gold);
@@ -651,7 +654,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1.0625rem;
   letter-spacing: 0.02em;
@@ -706,7 +709,8 @@ body {
   border-top: 1px solid var(--line);
 }
 .part-title {
-  font-family: var(--font-barlow), sans-serif;
+  text-align: center;
+  font-family: var(--font-head), sans-serif;
   font-weight: 700;
   font-size: 1.5rem;
   line-height: 1.1;
@@ -730,7 +734,7 @@ body {
   background: color-mix(in srgb, var(--bg-raised) 50%, transparent);
 }
 .card-title {
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 700;
   font-size: 1.625rem;
   line-height: 1.05;
@@ -745,7 +749,7 @@ body {
 }
 /* the name of a row or a group: "School", "Languages" */
 .label {
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 0.9375rem;
   line-height: 1.25;
@@ -778,7 +782,7 @@ body {
   padding: 0.2rem 0;
   cursor: pointer;
   list-style: none;
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.02em;
@@ -807,13 +811,14 @@ body {
   gap: 0.5rem;
 }
 .stat {
+  text-align: center;
   padding: 0.7rem 0.85rem 0.75rem;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: color-mix(in srgb, var(--bg-raised) 50%, transparent);
 }
 .stat-value {
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 700;
   font-size: 1.875rem;
   line-height: 1;
@@ -833,7 +838,7 @@ body {
   background: color-mix(in srgb, var(--bg-raised) 50%, transparent);
 }
 .quote blockquote {
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 700;
   font-size: 1.625rem;
   line-height: 1.14;
@@ -869,8 +874,12 @@ body {
   border-bottom: 0;
   padding-bottom: 0;
 }
+.facts > .facts-wide {
+  justify-items: center;
+  text-align: center;
+}
 .facts > .facts-wide dd {
-  text-align: left;
+  text-align: center;
 }
 @container (min-width: 38rem) {
   .facts {
@@ -915,7 +924,7 @@ body {
   min-height: 2.5rem;
   padding: 0.35rem 0.75rem;
   border-radius: 7px;
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1.0625rem;
   line-height: 1.15;
@@ -1059,7 +1068,7 @@ html[data-intro="start"] .start-actions {
   pointer-events: auto;
 }
 .start-where {
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1.125rem;
   letter-spacing: 0.16em;
@@ -1068,7 +1077,7 @@ html[data-intro="start"] .start-actions {
 }
 .start-name {
   margin-top: 0.3rem;
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 800;
   font-size: clamp(3.25rem, 9.5vw, 7.75rem);
   line-height: 0.9;
@@ -1108,7 +1117,7 @@ html[data-intro="start"] .start-actions {
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.85);
 }
 .start-skip {
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1.0625rem;
   letter-spacing: 0.03em;
@@ -1256,14 +1265,14 @@ html[data-show]:not([data-show=""]) .after-intro {
   border-color: var(--gold);
 }
 .match-index-minute {
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 0.9375rem;
   line-height: 1.1;
   color: var(--gold);
 }
 .match-index-title {
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1.1875rem;
   line-height: 1.1;
@@ -1295,7 +1304,7 @@ html[data-show]:not([data-show=""]) .after-intro {
   border: 1px solid var(--gold);
   border-radius: 50%;
   background: var(--bg);
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-head), sans-serif;
   font-weight: 600;
   font-size: 1rem;
   color: var(--gold);

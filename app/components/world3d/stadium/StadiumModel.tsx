@@ -141,10 +141,10 @@ function showSegments(show: Show): StripSegment[] {
   }
   if (show.kind === "fireworks") {
     return [
-      { text: "¡HALA MADRID!", color: GOLD },
+      { text: "WHAT A NIGHT", color: GOLD },
       { text: show.label, color: WHITE },
-      { text: "¡HALA MADRID!", color: GOLD },
-      { text: "Y NADA MÁS", color: WHITE },
+      { text: "WHAT A NIGHT", color: GOLD },
+      { text: "THANK YOU FOR VISITING", color: WHITE },
     ];
   }
   if (show.kind === "fifteen") {
@@ -152,7 +152,7 @@ function showSegments(show: Show): StripSegment[] {
       { text: "15", color: GOLD },
       { text: "KINGS OF EUROPE", color: WHITE },
       { text: "15", color: GOLD },
-      { text: "LA DECIMOQUINTA", color: WHITE },
+      { text: "FIFTEEN EUROPEAN CUPS", color: WHITE },
     ];
   }
   return [

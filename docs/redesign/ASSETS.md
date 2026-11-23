@@ -73,7 +73,7 @@ How they are handled:
 
 | Font | Source | Licence |
 |---|---|---|
-| Barlow and Barlow Condensed, by Jeremy Tribby | Google Fonts, loaded through `next/font` (`app/fonts.ts`) | SIL Open Font License 1.1 |
+| Saira and Saira Condensed, by Omnibus-Type | Google Fonts, loaded through `next/font` (`app/fonts.ts`) | SIL Open Font License 1.1 |
 | CMU Serif (Computer Modern Unicode), by Andrey V. Panov after Donald Knuth | The `computer-modern` package on npm; three files kept in [`scripts/fonts/`](../../scripts/fonts) | SIL Open Font License 1.1 (`scripts/fonts/OFL.txt`) |
 
 CMU Serif is used only to set the résumé PDF (`scripts/build-resume-pdf.mjs`), so that it matches the LaTeX original. It is not loaded by the site's pages.

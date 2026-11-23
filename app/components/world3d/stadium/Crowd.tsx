@@ -37,6 +37,10 @@ const HEIGHT = 1.8;
 const LIFT = 0.0; // the bottom of the picture above the seat's step
 const FORWARD = 0.3; // in front of the seat back
 const CHEER_SECONDS = 4.5;
+// the share of the fans drawn at the "low" quality level, spread evenly
+// round the ground (the picture drops to "low" by itself when it runs
+// slow, so the crowd must never vanish there)
+const LOW_SHARE = 0.4;
 
 // [colour, how common]: mostly the home white, then the club's blues
 const SHIRTS: [string, number][] = [
@@ -92,6 +96,9 @@ export default function Crowd() {
     const total = data.manifest.seats;
     const seated: number[] = [];
     for (let i = 0; i < total; i++) if (isTaken(i)) seated.push(i);
+    // in a shuffled order, so drawing only the first part of the list
+    // thins the whole crowd evenly instead of emptying one end
+    seated.sort((a, b) => hash(a, 14) - hash(b, 14));
 
     const shape = new PlaneGeometry(WIDTH, HEIGHT);
     shape.translate(0, LIFT + HEIGHT / 2, FORWARD);
@@ -212,7 +219,10 @@ export default function Crowd() {
     if (jump > 0) stir();
   });
 
-  // Hidden, not removed, at "low": taking it out of the scene and putting
-  // it back left the crowd undrawn
-  return <primitive object={mesh} visible={quality !== "low"} />;
+  // Thinner, not hidden, at "low"
+  useEffect(() => {
+    mesh.count = quality === "low" ? Math.floor(mesh.instanceMatrix.count * LOW_SHARE) : mesh.instanceMatrix.count;
+  }, [mesh, quality]);
+
+  return <primitive object={mesh} />;
 }

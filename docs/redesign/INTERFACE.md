@@ -19,7 +19,7 @@ A football broadcast puts its words on small, solid captions at the edges of the
 | Programme white | `#fafbfc` on `#eef0f3` | Panels in the light (roof open) theme. It replaced a warm cream. |
 | Ink | `#0e1424` | Text in the light theme |
 
-**Type.** One family in two widths: **Barlow Condensed** for names, headings, buttons, clocks and numbers, **Barlow** for reading text. Barlow was drawn from road signs and number plates, which is the same world as stadium wayfinding and shirt lettering. It replaced three families (a condensed face, Geist and a monospace). Capitals are kept for display headings, the way a name is set on a shirt; small labels and buttons are in sentence case.
+**Type.** One family in two widths: **Saira Condensed** for names, headings, buttons, clocks and numbers, **Saira** for reading text. Saira is a geometric sports face with squared-off curves, the lettering of match graphics and shirt numbers. It replaced Barlow on 2026-11-23, which had read as generic. Capitals are kept for display headings, the way a name is set on a shirt; small labels and buttons are in sentence case.
 
 **Shape.** Rectangles with small corners (6 to 16 px), like plates and signs. No pills, no blur.
 

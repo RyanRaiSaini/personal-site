@@ -2,14 +2,18 @@
 
 import { profile, resumeText } from "../../../data/portfolio";
 import { headshot } from "../../../data/photos";
-import { Box, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign, usePhoto } from "./common";
+import { Box, Glow, GOLD, NAVY, ROYAL, Shell, Sign, usePhoto } from "./common";
 
 // The ticket office (Résumé). Two lit windows in the concourse wall
-// and, between them, the cover of today's matchday programme: my
-// résumé. Beside it, a framed player profile with my photo and a club
-// banner; a rail of scarves on the left wall, the colours of the club
-// shop on the right wall; club-blue walls with a navy band, a lit
-// ceiling, and gold markings on the floor leading to each window.
+// and, between them, my résumé itself, framed: a picture of its first
+// page (public/resume/resume-page.webp, made by `npm run resume:image`).
+// Beside it, a framed player profile with my photo and a board of
+// numbers from the résumé; the colours of the club shop on the right
+// wall; club-blue walls with a navy band, a lit ceiling, and gold
+// markings on the floor leading to each window.
+
+// the résumé picture's shape, width by height (scripts/resume-image.mjs)
+const PAGE_SHAPE = 1200 / 1687;
 
 function Window({ x }: { x: number }) {
   return (
@@ -26,12 +30,8 @@ function Window({ x }: { x: number }) {
       <Box size={[2.5, 0.08, 0.5]} position={[0, 1.08, 0.18]} color="#d7dbe2" metalness={0.8} roughness={0.25} />
       <Box size={[2.4, 1.05, 0.12]} position={[0, 0.53, 0.02]} color={NAVY} roughness={0.6} />
       <Box size={[0.5, 0.05, 0.02]} position={[0, 1.2, 0.04]} color="#08090c" />
-      {/* a silhouette of the clerk */}
-      <Box size={[0.42, 0.5, 0.02]} position={[0.2, 1.52, -0.04]} color="#3a2d1c" roughness={1} />
-      <mesh position={[0.2, 1.92, -0.04]} scale={[1, 1, 0.2]}>
-        <sphereGeometry args={[0.13, 16, 12]} />
-        <meshStandardMaterial color="#3a2d1c" roughness={1} />
-      </mesh>
+      {/* a lit sign in the window: open */}
+      <Sign lines={[{ text: resumeText.windowSign.toUpperCase(), size: 1, color: "#7dffb0", weight: 800, spacing: 0.3 }]} width={0.62} height={0.2} position={[-0.55, 2.38, -0.03]} background="#06140c" border="#2a7a4a" glow={1.6} />
     </group>
   );
 }
@@ -106,26 +106,50 @@ function Profile({ x }: { x: number }) {
   );
 }
 
-// A tall club banner: my crest, and where I study and live
-function Banner({ x }: { x: number }) {
+// A board of numbers from the résumé, lit like a stadium screen
+function Stats({ x }: { x: number }) {
+  const stats = resumeText.stats;
   return (
     <group position={[x, 1.62, -4.38]}>
-      <Box size={[0.04, 0.04, 1.2]} position={[0, 1.05, 0.02]} rotation={[0, Math.PI / 2, 0]} color={GOLD} metalness={0.9} roughness={0.3} />
+      <Box size={[1.1, 2.1, 0.06]} position={[0, 0, -0.02]} color="#0c0d11" metalness={0.5} roughness={0.4} />
       <Sign
         lines={[
-          { text: "RS", size: 0.3, color: GOLD, weight: 800 },
-          { text: " ", size: 0.06 },
-          ...resumeText.banner.map((line) => ({ text: line.toUpperCase(), size: 0.1, color: "#ffffff", weight: 700, spacing: 0.12 })),
+          { text: stats.title.toUpperCase(), size: 0.085, color: GOLD, weight: 800, spacing: 0.2 },
           { text: " ", size: 0.04 },
-          { text: "\u2605  \u2605  \u2605", size: 0.07, color: GOLD, weight: 700 },
+          ...stats.items.flatMap((item, i) => [
+            ...(i ? [{ text: " ", size: 0.035 }] : []),
+            { text: item.value, size: 0.12, color: "#ffffff", weight: 800 },
+            { text: item.label.toUpperCase(), size: 0.045, color: "#9db8ff", weight: 600, spacing: 0.12 },
+          ]),
         ]}
         width={1.0}
         height={2.0}
         position={[0, 0, 0.02]}
-        background={ROYAL}
+        background="#07102a"
         border={GOLD}
         glow={1.05}
       />
+    </group>
+  );
+}
+
+// My résumé, framed behind glass: the first page, as printed
+function ResumeOnWall() {
+  const page = usePhoto("/resume/resume-page.webp");
+  const tall = 2.34;
+  const wide = tall * PAGE_SHAPE;
+  return (
+    <group position={[0, 1.5, -4.38]}>
+      {/* a black frame with a white mount, as a print is framed */}
+      <Box size={[wide + 0.22, tall + 0.12, 0.07]} position={[0, 0, 0]} color="#0c0d11" metalness={0.5} roughness={0.4} />
+      <Box size={[wide + 0.12, tall + 0.04, 0.072]} position={[0, 0, 0.001]} color={GOLD} metalness={0.8} roughness={0.35} />
+      <Box size={[wide + 0.08, tall, 0.074]} position={[0, 0, 0.002]} color="#f4f2ec" roughness={0.9} />
+      <mesh position={[0, 0, 0.041]}>
+        <planeGeometry args={[wide, tall - 0.04]} />
+        {/* keyed, so the paper is a new material once the picture arrives: one
+            that is only given a map later keeps the shader it was built without */}
+        {page ? <meshBasicMaterial key="page" map={page} toneMapped={false} color={[0.9, 0.9, 0.88]} /> : <meshStandardMaterial key="blank" color="#f4f2ec" roughness={0.9} />}
+      </mesh>
     </group>
   );
 }
@@ -200,7 +224,7 @@ export default function TicketOffice() {
       {/* the wall band and the lit sign over the windows */}
       <Box size={[13, 0.9, 0.06]} position={[0, 3.25, -4.44]} color={NAVY} roughness={0.6} />
       <Glow size={[13, 0.03, 0.02]} position={[0, 2.8, -4.4]} color={[1.6, 1.3, 0.6]} />
-      <Sign lines={[{ text: "TICKETS  ·  TAQUILLAS", size: 1, color: "#ffffff", spacing: 0.3 }]} width={5.6} height={0.42} position={[0, 3.27, -4.39]} background={null} glow={1.7} />
+      <Sign lines={[{ text: resumeText.sign.toUpperCase(), size: 1, color: "#ffffff", spacing: 0.3 }]} width={4.6} height={0.42} position={[0, 3.27, -4.39]} background={null} glow={1.7} />
 
       {/* a royal-blue band round the walls, topped with gold */}
       <Box size={[13, 1.0, 0.02]} position={[0, 0.5, -4.47]} color={NAVY} roughness={0.7} />
@@ -223,7 +247,7 @@ export default function TicketOffice() {
 
       <Window x={-3.9} />
       <Window x={3.9} />
-      <Banner x={-1.82} />
+      <Stats x={-1.82} />
       <Profile x={1.82} />
       <Scarves position={[6.42, 0, -0.2]} rotation={[0, -Math.PI / 2, 0]} />
       {/* gold markings on the floor, one to each window */}
@@ -234,29 +258,9 @@ export default function TicketOffice() {
       <Pendant x={3.9} z={-3.1} />
       <FixtureBoard />
 
-      {/* the programme cover, in a frame between the windows; its top stays
-          below the line of light, clear of the sign */}
-      <group position={[0, 1.5, -4.38]}>
-        <Box size={[1.9, 2.5, 0.08]} position={[0, 0, 0]} color="#0c0d11" metalness={0.5} roughness={0.4} />
-        <Sign
-          lines={[
-            { text: "OFFICIAL MATCHDAY PROGRAMME", size: 0.07, color: GOLD, weight: 600, spacing: 0.3 },
-            { text: " ", size: 0.04 },
-            { text: profile.firstName.toUpperCase(), size: 0.2, color: CREAM, weight: 800 },
-            { text: "SAINI", size: 0.26, color: CREAM, weight: 800 },
-            { text: " ", size: 0.05 },
-            { text: "THE RÉSUMÉ ISSUE", size: 0.1, color: "#ffffff", weight: 700, spacing: 0.2 },
-            { text: "MATHEMATICS · AI · SOFTWARE", size: 0.06, color: "#9db8ff", weight: 600, spacing: 0.2 },
-            { text: "FREE  ·  TAKE ONE", size: 0.06, color: GOLD, weight: 600, spacing: 0.3 },
-          ]}
-          width={1.74}
-          height={2.32}
-          position={[0, 0, 0.05]}
-          background={ROYAL}
-          border={GOLD}
-          glow={1.05}
-        />
-      </group>
+      {/* my résumé, framed between the windows; its top stays below the
+          line of light, clear of the sign */}
+      <ResumeOnWall />
 
       {/* a rack of programmes */}
       <group position={[-5.6, 0, -2.4]} rotation={[0, 0.7, 0]}>

@@ -86,23 +86,23 @@ function paint(ctx: CanvasRenderingContext2D, w: number, h: number, family: stri
   figure(best, text.best, middle);
   figure(active, text.active, middle + 340);
 
-  // right: the last few weeks, one column a week, Sunday at the top
+  // right: the last few weeks as a calendar, a row a week, Sunday first
   const weeks = data.levels.slice(-githubText.recentWeeks);
-  const cell = 30;
-  const gap = 8;
-  const gridWidth = weeks.length * (cell + gap) - gap;
-  const gridHeight = 7 * (cell + gap) - gap;
+  const cell = 44;
+  const gap = 9;
+  const gridWidth = 7 * (cell + gap) - gap;
+  const gridHeight = weeks.length * (cell + gap) - gap;
   const gx = w - pad - gridWidth;
   const gy = 70 + (h - 70 - gridHeight) / 2 + 6;
   ctx.fillStyle = SOFT;
   ctx.font = `700 44px ${family}`;
   ctx.textAlign = "right";
   ctx.fillText(text.recent.toUpperCase(), w - pad, 92);
-  weeks.forEach((week, x) =>
-    week.forEach((level, y) => {
+  weeks.forEach((week, y) =>
+    week.forEach((level, x) => {
       if (level < 0) return;
       ctx.fillStyle = LEVELS[Math.min(4, level)];
-      roundRect(ctx, gx + x * (cell + gap), gy + y * (cell + gap), cell, cell, 5);
+      roundRect(ctx, gx + x * (cell + gap), gy + y * (cell + gap), cell, cell, 7);
       ctx.fill();
     }),
   );

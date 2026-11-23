@@ -126,7 +126,7 @@ Each section has one file that lays out its content. They are used by both the 3
 | The loading bar | `.loading…` | `app/globals.css` |
 | The "GOOOOOL!" banner animation | `.show-banner` | `app/globals.css` |
 | The red card on the 404 page | `.red-card` | `app/globals.css` |
-| The fonts (Barlow for text, Barlow Condensed for headings and buttons) | | `app/fonts.ts` |
+| The fonts (Saira for text, Saira Condensed for headings and buttons) | | `app/fonts.ts` |
 | The browser tab icon (my initials) | | `app/icon.svg` |
 | The picture shown when the link is shared | | `app/opengraph-image.tsx` |
 

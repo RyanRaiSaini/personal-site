@@ -339,11 +339,11 @@ export default function TrophyRoom() {
         </group>
       ))}
 
-      {/* the room's name, with the Spanish under it, as at the ticket office */}
+      {/* the room's name */}
       <Sign
         lines={[
           { text: "HALL OF HONOURS", size: 0.62, color: GOLD, weight: 800, spacing: 0.32 },
-          { text: "SALA DE TROFEOS", size: 0.3, color: CREAM, weight: 600, spacing: 0.6 },
+          { text: "SCHOLARSHIPS  ·  AWARDS  ·  SERVICE", size: 0.3, color: CREAM, weight: 600, spacing: 0.4 },
         ]}
         width={4.4}
         height={0.44}

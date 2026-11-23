@@ -505,22 +505,24 @@ export const now = {
 // ------------------------------------------------------------------
 
 export const githubText = {
-  lead: "Each square represents one day.",
-  body: "Darker squares indicate more contributions. The scoreboard on the main stand shows the same figures.",
+  lead: "The last four weeks, a square a day.",
+  body: "The number in a square is that day's contributions; the brighter the green, the busier the day. The scoreboard on the main stand shows the same.",
   saved: "GitHub is temporarily unavailable. A saved copy is shown.",
   // the figures above the chart
   total: "contributions in the last year",
   active: "days with a commit",
   best: "most in one day",
   // how many recent weeks the chart and the scoreboard show
-  recentWeeks: 16,
+  recentWeeks: 4,
+  // the calendar's column heads, Sunday first, as GitHub counts weeks
+  dayHeads: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
   // the scoreboard hung under the main stand's second tier
   board: {
     title: "GitHub",
     total: "Contributions this year",
     best: "Best day",
     active: "Active days",
-    recent: "Last 16 weeks",
+    recent: "Last 4 weeks",
     loading: "Loading contributions",
   },
 };
@@ -529,15 +531,32 @@ export const resumeText = {
   download: "Download PDF",
   open: "Open in a new tab",
   note: "A complete copy, including my telephone number, is available on request.",
-  // the matchday board hanging in the ticket office
-  // the ticket office's player profile and banner
+  // the ticket office: the lit sign over the windows, the windows' signs,
+  // the player profile, and the board of numbers from the résumé
+  sign: "Ticket office",
+  windowSign: "Open",
   profileTitle: "Player profile",
-  banner: ["University of Waterloo", "Mathematics", "Brampton, Ontario"],
+  stats: {
+    title: "Season stats",
+    items: [
+      { value: "6,000+", label: "companies screened" },
+      { value: "50+", label: "startups onboarded" },
+      { value: "25,000+", label: "lines in 36 hours" },
+      { value: "$50,000+", label: "raised for wishes" },
+    ],
+  },
+  // the matchday board hanging from the ceiling
   board: {
     heading: "Today's fixture",
     fixture: "The Résumé Issue",
     gate: "Gate A  ·  Programmes on sale now",
   },
+};
+
+// The panel's footer: the way back to the whole stadium, which is also
+// where the last section leads
+export const panelText = {
+  stadium: "Stadium",
 };
 
 export const contactText = {

@@ -274,3 +274,13 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 
 - The kit, skin, hair and boots use three.js's physical material: the kit has a soft sheen where the cloth turns from the light, the skin a warm glow round its edges (standing in for light scattered under it), the hair a sheen, and the boots a lacquered shine (`FABRIC` and the materials in `players/Player.tsx`).
 - Number 8 no longer jumps between spots. A long way off, he is put a few metres short of his mark and runs in, slowing as he arrives, while the camera comes in; a short way, he jogs or turns on the spot. Changing from one way of standing to another is a fade, and after his own replay he jogs back from where he celebrated, out of the celebration's last pose rather than snapped out of it (`RUN_IN`, `BRAKE`, `RESTANCE` in `players/Cast.tsx`).
+
+## 2026-11-23, Ryan's notes, the same night
+
+- **The font** is now Saira (headings in Saira Condensed): a geometric sports face, closer to match graphics than Barlow was (`app/fonts.ts`). The panel headers, section titles, highlighted numbers and the coursework line are centred, like a presentation slide.
+- **Fixed: the crowd disappeared during a goal.** When the picture runs slow for a few seconds the site steps down a quality level by itself, and "low" hid the crowd for the rest of the visit. A goal's camera work is the busiest moment, so that is when it happened. At "low" the crowd is now thinned to 40%, spread evenly (`LOW_SHARE` in `stadium/Crowd.tsx`), never hidden.
+- **The last section leads out:** "next" from Contact goes to the whole stadium, not round to About (`panelText` in the data file).
+- **No more Spanish** on the signs, ring screens or Easter eggs.
+- **GitHub** shows the last 4 weeks, as a calendar with each day's count in its square, in the panel and on the scoreboard.
+- **The ticket office** has the résumé itself in the frame between the windows (a picture of its first page, `npm run resume:image`), a board of four numbers from the résumé where the banner was, "Ticket office" over the windows, and "Open" signs in the windows instead of the two shapes that stood for clerks.
+- Found on the way: a material that is given its picture only after it first draws keeps the shader it was built without, so the résumé frame showed blank. It is keyed now, so a new material is made when the picture arrives.

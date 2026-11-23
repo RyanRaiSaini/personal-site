@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
+import { panelText } from "../../data/portfolio";
 import { useWorld } from "../../lib/store";
 import { places, section as getSection, type SectionId } from "../../sections/registry";
 import PlaceIcon from "./PlaceIcon";
@@ -20,7 +21,8 @@ export default function SectionPanel({ id, children }: { id: SectionId; children
 
   const index = places.findIndex((p) => p.id === id);
   const previous = places[(index - 1 + places.length) % places.length];
-  const next = places[(index + 1) % places.length];
+  // the last section leads back out to the whole stadium, not round to the first
+  const next = index === places.length - 1 ? { href: "/", title: panelText.stadium } : places[index + 1];
 
   // Tell the camera how far to slide the view
   useEffect(() => {
@@ -68,7 +70,7 @@ export default function SectionPanel({ id, children }: { id: SectionId; children
         className="panel panel-in pointer-events-auto flex max-h-[64dvh] w-full flex-col rounded-t-2xl lg:mb-4 lg:mr-4 lg:mt-[4.75rem] lg:max-h-none lg:w-[min(34rem,44vw)] lg:rounded-2xl"
       >
         {/* kept short, so the reading space below is as tall as it can be */}
-        <header className="panel-head flex items-start justify-between gap-4 px-5 pb-3.5 pt-4 sm:px-7">
+        <header className="panel-head relative px-14 pb-3.5 pt-4 text-center">
           <div className="min-w-0">
             <p className="sign">
               <PlaceIcon id={id} className="h-[1.125rem] w-[1.125rem] flex-none text-gold" />
@@ -80,7 +82,7 @@ export default function SectionPanel({ id, children }: { id: SectionId; children
             </h1>
             {info.intro && <p className="mt-1.5 text-[0.9375rem] leading-snug text-ink-soft">{info.intro}</p>}
           </div>
-          <Link href="/" className="icon-btn flex-none" aria-label="Back to the stadium" title="Back to the stadium (Esc)">
+          <Link href="/" className="icon-btn absolute right-4 top-4 flex-none" aria-label="Back to the stadium" title="Back to the stadium (Esc)">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
               <path d="m6 6 12 12M18 6 6 18" />
             </svg>
@@ -95,7 +97,7 @@ export default function SectionPanel({ id, children }: { id: SectionId; children
             <span className="truncate font-display text-base font-semibold uppercase tracking-wide">{previous.title}</span>
           </Link>
           <Link href="/" className="hidden rounded-full px-3 py-2 text-xs uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-gold sm:block">
-            Stadium
+            {panelText.stadium}
           </Link>
           <Link href={next.href} className="group flex min-w-0 items-center gap-2 rounded-full px-3 py-2 text-sm text-ink-soft transition-colors hover:text-gold" aria-label={`Next: ${next.title}`}>
             <span className="truncate font-display text-base font-semibold uppercase tracking-wide">{next.title}</span>

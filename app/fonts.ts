@@ -1,20 +1,20 @@
-import { Barlow, Barlow_Condensed } from "next/font/google";
+import { Saira, Saira_Condensed } from "next/font/google";
 
-// The whole site is set in one family, Barlow, in two widths. It was
-// drawn from road and number-plate lettering, which is the same world
-// as stadium signs and shirt names.
+// The whole site is set in one family, Saira, in two widths: a
+// geometric sports face with squared-off curves, the lettering of match
+// graphics and shirt numbers. Free, under the SIL Open Font License.
 
 // Body text: the regular width
-export const sans = Barlow({
-  variable: "--font-barlow-text",
+export const sans = Saira({
+  variable: "--font-text",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
 });
 
 // Headings, buttons, shirt names, clocks and scoreboard text: the
 // condensed width
-export const display = Barlow_Condensed({
-  variable: "--font-barlow",
+export const display = Saira_Condensed({
+  variable: "--font-head",
   subsets: ["latin"],
   weight: ["500", "600", "700", "800"],
 });

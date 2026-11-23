@@ -45,11 +45,25 @@ export default function GithubContent() {
             ]}
           />
           <div className="card">
-            <div role="img" aria-label={`GitHub contribution chart for ${data.user}, the last ${weeks.length} weeks. ${data.total} contributions in the last year, on ${activeDays} days.`} className="grid grid-flow-col grid-rows-7 gap-[4px]" style={{ gridTemplateColumns: `repeat(${weeks.length}, minmax(0, 1fr))` }}>
+            {/* a calendar of the last few weeks: a row a week, a column a day,
+                each day's count written in its square */}
+            <div role="img" aria-label={`GitHub contributions for ${data.user}, the last ${weeks.length} weeks. ${data.total} contributions in the last year, on ${activeDays} days.`} className="grid grid-cols-7 gap-[6px] text-center">
+              {githubText.dayHeads.map((head) => (
+                <span key={head} className="pb-1 text-xs font-semibold uppercase tracking-wide text-ink-faint">
+                  {head}
+                </span>
+              ))}
               {weeks.map((week, i) =>
-                week.map((level, d) => (
-                  <span key={`${i}-${d}`} title={describe(data.dates[from + i]?.[d] ?? "", data.counts[from + i]?.[d] ?? -1) || undefined} className="aspect-square w-full rounded-[3px]" style={{ background: level < 0 ? "transparent" : palette[Math.min(4, level)] }} data-day={DAY_NAMES[d]} />
-                )),
+                week.map((level, d) => {
+                  const count = data.counts[from + i]?.[d] ?? -1;
+                  const date = data.dates[from + i]?.[d] ?? "";
+                  return (
+                    <span key={`${i}-${d}`} title={describe(date, count) || undefined} className="flex aspect-square w-full flex-col items-center justify-center rounded-[5px]" style={{ background: level < 0 ? "transparent" : palette[Math.min(4, level)] }} data-day={DAY_NAMES[d]}>
+                      {level >= 0 && <span className="text-[0.62rem] leading-none text-ink-faint">{date.slice(8).replace(/^0/, "")}</span>}
+                      {count > 0 && <span className="mt-0.5 font-display text-lg font-bold leading-none text-ink">{count}</span>}
+                    </span>
+                  );
+                }),
               )}
             </div>
             <div className="mt-3 flex items-center justify-between gap-1.5 text-xs text-ink-faint">

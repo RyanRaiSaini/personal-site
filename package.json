@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "resume": "node scripts/build-resume-pdf.mjs",
+    "resume:image": "node scripts/resume-image.mjs",
     "photos": "node scripts/optimize-photos.mjs",
     "shots": "node scripts/shots.mjs",
     "stadium:pack": "node scripts/pack-stadium.mjs",

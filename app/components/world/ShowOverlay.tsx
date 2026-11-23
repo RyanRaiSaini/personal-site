@@ -22,8 +22,8 @@ function bannerFor(show: Show): { title: string; line: string; delay: number; sm
     if (show.scorer === "saini") return { title: "Goal", line: show.label, delay, small: true };
     return { title: "Gooooool!", line: show.label, delay };
   }
-  if (show.kind === "fireworks") return { title: "¡Hala Madrid!", line: "Y nada más", delay: 0.4 };
-  if (show.kind === "fifteen") return { title: "15", line: "La Decimoquinta. Kings of Europe.", delay: 0.8 };
+  if (show.kind === "fireworks") return { title: "What a night!", line: "Thank you for visiting", delay: 0.4 };
+  if (show.kind === "fifteen") return { title: "15", line: "Fifteen European Cups. Kings of Europe.", delay: 0.8 };
   return { title: "66", line: "Still the best pass in the building.", delay: 1.1, small: true };
 }
 
@@ -84,7 +84,7 @@ export default function ShowOverlay() {
       world.findEgg("hala");
       const in3d = world.mode === "tour" && world.worldReady && world.introDone && sceneOf(world.section) === "bowl";
       if (in3d && !world.reducedMotion) {
-        if (!world.show) world.startShow({ kind: "fireworks", label: "HALA MADRID" });
+        if (!world.show) world.startShow({ kind: "fireworks", label: "FULL TIME" });
       } else {
         setConfetti(true);
         window.setTimeout(() => setConfetti(false), 5200);
