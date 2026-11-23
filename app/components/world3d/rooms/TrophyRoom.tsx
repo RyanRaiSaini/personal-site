@@ -339,7 +339,18 @@ export default function TrophyRoom() {
         </group>
       ))}
 
-      <Sign lines={[{ text: "SILVERWARE", size: 1, color: GOLD, spacing: 0.5 }]} width={3.4} height={0.3} position={[0, 3.3, -4.38]} background={null} glow={1.6} />
+      {/* the room's name, with the Spanish under it, as at the ticket office */}
+      <Sign
+        lines={[
+          { text: "HALL OF HONOURS", size: 0.62, color: GOLD, weight: 800, spacing: 0.32 },
+          { text: "SALA DE TROFEOS", size: 0.3, color: CREAM, weight: 600, spacing: 0.6 },
+        ]}
+        width={4.4}
+        height={0.44}
+        position={[0, 3.37, -4.38]}
+        background={null}
+        glow={1.7}
+      />
 
       {/* a runner up the middle of the room to the cabinet */}
       <Box size={[1.5, 0.012, 9.2]} position={[0, 0.006, 1.0]} color="#13204a" roughness={0.95} />

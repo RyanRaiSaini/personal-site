@@ -9,7 +9,7 @@ import { playing, standing, type Layer } from "./moves";
 import Player, { type PlayerHandle } from "./Player";
 
 // Number 8 inside each room: looking over the shirts, admiring the
-// silverware, sitting at the press desk, queueing for a programme, and
+// trophies, sitting at the press desk, queueing for a programme, and
 // stopping to talk in the mixed zone.
 
 type Mark = { at: [number, number, number]; facing: number; doing: (time: number) => Layer[] };

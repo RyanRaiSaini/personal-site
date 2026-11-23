@@ -115,7 +115,7 @@ export const sections: Section[] = [
     href: "/awards",
     title: "Awards",
     place: "The trophy room",
-    kicker: "Silverware",
+    kicker: "Hall of honours",
     summary: "Scholarships, awards and Make-A-Wish.",
     intro: "Scholarships, awards and my work with Make-A-Wish Canada.",
     scene: "room",
