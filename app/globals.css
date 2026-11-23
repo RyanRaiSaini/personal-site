@@ -1378,6 +1378,16 @@ html[data-show]:not([data-show=""]) .after-intro {
 [data-theme="light"] .world-vignette {
   background: radial-gradient(ellipse at 50% 46%, transparent 60%, rgba(2, 4, 10, 0.26) 100%);
 }
+/* a camera's fine grain over the picture, so flat colour never looks
+   like flat colour (a still noise pattern: nothing to redraw) */
+.world-vignette::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 1.6 -0.3'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+}
 
 /* The 3D view keeps the page's own text sharp: no selecting the picture */
 .world-canvas canvas {

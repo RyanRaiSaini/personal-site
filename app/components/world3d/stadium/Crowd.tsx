@@ -6,6 +6,7 @@ import { Color, DoubleSide, InstancedBufferAttribute, InstancedMesh, Matrix4, Me
 import { useWorld } from "../../../lib/store";
 import { stir } from "../activity";
 import { atmo } from "../atmosphere/state";
+import { rig } from "../camera/CameraRig";
 import { withBakedLight } from "./bakedLight";
 import { isTaken, seatHash as hash } from "./crowdPlan";
 import { loadSeatData } from "./seatData";
@@ -105,14 +106,16 @@ export default function Crowd() {
 
     const material = new MeshStandardMaterial({ map: pictures.colour, roughness: 0.85, side: DoubleSide, alphaTest: 0.4, alphaToCoverage: true });
     material.name = "Crowd";
-    const uniforms = { uJump: { value: 0 }, uTime: { value: 0 } };
+    const uniforms = { uJump: { value: 0 }, uTime: { value: 0 }, uFocus: { value: 60 }, uSoft: { value: 0 } };
     material.onBeforeCompile = (shader) => {
       shader.uniforms.uJump = uniforms.uJump;
       shader.uniforms.uTime = uniforms.uTime;
+      shader.uniforms.uFocus = uniforms.uFocus;
+      shader.uniforms.uSoft = uniforms.uSoft;
       shader.uniforms.uMask = { value: pictures.mask };
       shader.uniforms.uBox = { value: pictures.boxes.map(([left, right, top]) => new Vector3(left, right, top)) };
       shader.vertexShader = shader.vertexShader
-        .replace("#include <common>", `#include <common>\nattribute vec3 aShirt;\nattribute vec3 aFan;\nuniform float uJump;\nuniform float uTime;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvarying vec3 vSkin;\nvarying vec3 vLegs;\nvarying vec3 vHair;`)
+        .replace("#include <common>", `#include <common>\nattribute vec3 aShirt;\nattribute vec3 aFan;\nuniform float uJump;\nuniform float uTime;\nuniform float uFocus;\nuniform float uSoft;\nvarying float vBlur;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvarying vec3 vSkin;\nvarying vec3 vLegs;\nvarying vec3 vHair;`)
         .replace(
           "#include <begin_vertex>",
           `#include <begin_vertex>
@@ -131,6 +134,13 @@ export default function Crowd() {
           transformed.y += 0.012 * sin( uTime * 0.8 * pace + own * 1.7 );`,
         )
         .replace(
+          "#include <project_vertex>",
+          `#include <project_vertex>
+          // out of focus: the further from what the camera is looking at,
+          // the softer (a long lens on a close subject blurs the stands)
+          vBlur = uSoft * clamp( abs( -mvPosition.z - uFocus ) / max( uFocus, 1.0 ) * 0.9, 0.0, 1.5 );`,
+        )
+        .replace(
           "#include <uv_vertex>",
           `#include <uv_vertex>
           vec3 box = uBox[ int( aFan.x + 0.5 ) ];
@@ -146,10 +156,10 @@ export default function Crowd() {
           float h = fract( aFan.z * 29.3 ) * ( 1.0 - 0.6 * aFan.y );
           vHair = h < 0.42 ? vec3( 0.022, 0.018, 0.015 ) : h < 0.66 ? vec3( 0.07, 0.042, 0.025 ) : h < 0.8 ? vec3( 0.17, 0.1, 0.05 ) : h < 0.9 ? vec3( 0.42, 0.3, 0.15 ) : vec3( 0.36, 0.35, 0.34 );`,
         );
-      shader.fragmentShader = shader.fragmentShader.replace("#include <common>", "#include <common>\nuniform sampler2D uMask;\nvarying vec3 vShirt;\nvarying vec3 vSkin;\nvarying vec3 vLegs;\nvarying vec3 vHair;").replace(
+      shader.fragmentShader = shader.fragmentShader.replace("#include <common>", "#include <common>\nvarying float vBlur;\nuniform sampler2D uMask;\nvarying vec3 vShirt;\nvarying vec3 vSkin;\nvarying vec3 vLegs;\nvarying vec3 vHair;").replace(
         "#include <map_fragment>",
-        `vec4 fan = texture2D( map, vMapUv );
-        vec3 parts = texture2D( uMask, vMapUv ).rgb;
+        `vec4 fan = texture2D( map, vMapUv, vBlur );
+        vec3 parts = texture2D( uMask, vMapUv, vBlur ).rgb;
         // blue: full for the trousers, half for the hair
         float legs = smoothstep( 0.88, 0.97, parts.b );
         float hair = smoothstep( 0.55, 0.68, parts.b ) * ( 1.0 - legs );
@@ -163,7 +173,7 @@ export default function Crowd() {
         diffuseColor.a *= fan.a;`,
       );
     };
-    material.customProgramCacheKey = () => "crowd-v6";
+    material.customProgramCacheKey = () => "crowd-v7";
     withBakedLight(material, "seat");
 
     const n = seated.length;
@@ -224,6 +234,11 @@ export default function Crowd() {
     const jump = since >= 0 && since < CHEER_SECONDS ? Math.min(1, since * 4) * Math.min(1, (CHEER_SECONDS - since) * 1.5) : 0;
     uniforms.uJump.value = jump;
     uniforms.uTime.value = atmo.time;
+    // the camera's subject: how far it is, and how strongly the rest blurs
+    // (not at all in wide shots, fully in a close-up)
+    const focus = rig.position.distanceTo(rig.target);
+    uniforms.uFocus.value = focus;
+    uniforms.uSoft.value = Math.min(1, Math.max(0, (28 - focus) / 18));
     if (jump > 0) stir();
   });
 

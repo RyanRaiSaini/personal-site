@@ -302,3 +302,9 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **The tunnel** has rubber tiles underfoot and wear in the wall paint (Poly Haven photos laid over its painted light).
 - **Photographers behind each goal line:** eight a side on low stools, in hi-vis bibs, long lenses on the pitch, as at every televised match (`stadium/Photographers.tsx`).
 - **Stewards along both touchlines,** on chairs on a step at the foot of the stand, facing the crowd in hi-vis vests (seen from behind; `stadium/Stewards.tsx`).
+
+### A camera's lens (after Ryan's reference pictures and FC 27's screenshots)
+
+- **Shallow focus:** at "high", a depth-of-field pass (in the glow pass that already exists, at half size) keeps the camera's subject sharp while the stands melt away and lights turn to soft discs. Wide shots stay sharp throughout, as on television; the closer the subject, the stronger the blur (`atmosphere/Effects.tsx`). At "low" and "medium", where there is no such pass, the crowd itself softens with distance from the focus, at no extra cost (`vBlur` in `stadium/Crowd.tsx`).
+- **Film grain** over the picture, a still noise pattern in the page's stylesheet, so no flat colour ever looks flat (`.world-vignette::after` in `app/globals.css`).
+- **Stewards** sit only on the far touchline now, raised higher: from pitch level on the main stand's side all that showed of them was a head over the boards.

@@ -10,18 +10,17 @@ import { AD_BOARD, PITCH } from "./dims";
 // front wall, facing the crowd, in hi-vis vests, as at every match. Seen
 // from the pitch, so from behind (the crowd's people drawn from the back).
 //
-// To move them, change MAIN and FAR (metres along each touchline). The
-// main stand's side leaves room for the tunnel, the flash interview and
-// both dugouts.
+// To move them, change FAR (metres along the far touchline). None sit on
+// the main stand's side: the section cameras look across the boards
+// there from pitch level, and all that showed of them was a head.
 // ------------------------------------------------------------------
 
-const MAIN = [-44, -30, 26, 32, 44];
 const FAR = [-44, -31, -18, -6, 6, 18, 31, 44];
 // between the back of the boards and the front wall
 const OUT = PITCH.halfWidth + AD_BOARD.offsetZ + 1.3;
 const VEST = "#e8f51c";
 // they sit on a step, so they show over the boards from the pitch
-const STEP = 0.5;
+const STEP = 0.85;
 
 function Steward({ x, z, turn, i }: { x: number; z: number; turn: number; i: number }) {
   return (
@@ -38,10 +37,6 @@ function Steward({ x, z, turn, i }: { x: number; z: number; turn: number; i: num
 export default function Stewards() {
   return (
     <group>
-      {/* the main stand's side (-Z): facing the stand, their backs to the pitch */}
-      {MAIN.map((x, i) => (
-        <Steward key={`m${x}`} x={x} z={-OUT} turn={0} i={i} />
-      ))}
       {/* the far side (+Z) */}
       {FAR.map((x, i) => (
         <Steward key={`f${x}`} x={x} z={OUT} turn={Math.PI} i={i + 2} />
