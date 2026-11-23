@@ -230,6 +230,8 @@ Every player is a copy of one model (`public/players/player.glb`), moved by moti
 | The goalkeeper: who he is, and which way he dives | `KITS.keeper`; `keeper` in `GOALS` (`"wrong"` or `"late"`). His dive was recorded one way only, so for the other he is shown as in a mirror (`keeperMirrored`), with his number printed to suit. | `players/kits.ts`, `players/shows.ts`, `players/Cast.tsx` |
 | Where number 8 stands in each outdoor section, and how he stands | `REST` | `app/components/world3d/players/Cast.tsx` |
 | Where number 8 is in each room, and what he is doing | `MARKS` | `app/components/world3d/players/RoomSaini.tsx` |
+| How number 8 gets to his spot: the run-in, how hard he slows, how long a change of stance takes | `RUN_IN`, `FAR`, `BRAKE`, `RESTANCE` | `app/components/world3d/players/Cast.tsx` |
+| The players' cloth, skin and hair finish | `FABRIC` and the materials in `useEffect` | `app/components/world3d/players/Player.tsx` |
 | The camera during a goal: the main camera's place and lens, the hand-held sway, the cuts | `MAIN_CAMERA`, `handHeld`, and "The camera, for the two guest stars" | `app/components/world3d/players/Cast.tsx` |
 | The body's build (shoulders, chest, waist, arms, neck, calves, thighs) | `SHAPE`, and `THIGH` (each row: a height, the thigh's radius there, and how far forward it sits), then rebuild (section 11) | `blender/players/params.py` |
 | The shorts: how long, how narrow at the hem, how close to the thigh | `SHORTS_HEM`, `SHORTS_SLIM`, `SHORTS_CLEAR`, then rebuild and run the check | `blender/players/params.py` |

@@ -2,7 +2,7 @@
 
 import { useGLTF } from "@react-three/drei";
 import { Component, forwardRef, Suspense, use, useEffect, useImperativeHandle, useMemo, useRef, type ReactNode } from "react";
-import { AnimationClip, AnimationMixer, Color, DoubleSide, LoopRepeat, MeshBasicMaterial, MeshStandardMaterial, SRGBColorSpace, type AnimationAction, type Group, type Material, type Object3D, type SkinnedMesh, type Texture } from "three";
+import { AnimationClip, AnimationMixer, Color, DoubleSide, LoopRepeat, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, SRGBColorSpace, type AnimationAction, type Group, type Material, type Object3D, type SkinnedMesh, type Texture } from "three";
 import { clone as cloneFigure } from "three/examples/jsm/utils/SkeletonUtils.js";
 import { canvasTexture, seeded } from "../textures/canvas";
 import { useDisplayFont } from "../textures/text";
@@ -59,6 +59,9 @@ const shared = new WeakMap<object, Shared>();
 function boneOf(track: string) {
   return track.slice(0, track.lastIndexOf("."));
 }
+
+// How the kit's cloth catches the light at a slant (three.js's sheen)
+const FABRIC = { sheen: 0.3, sheenRoughness: 0.45, sheenColor: new Color("#d8d8d8") };
 
 function share(model: { animations: AnimationClip[]; materials: Record<string, Material> }, notes: PlayerNotes): Shared {
   const before = shared.get(model);
@@ -260,15 +263,20 @@ const Figure = forwardRef<PlayerHandle, { kit: Kit; shadow: boolean; mirrored: b
     grain.repeat.set(36, 36);
     const maps = library.maps;
     const materials: Record<string, MeshStandardMaterial> = {
-      Body: new MeshStandardMaterial({ map: maps.skin, color: skinTint(kit, notes), roughness: 0.62 }),
+      // Skin: light that goes in a little way comes out warm round the
+      // edges (a warm sheen stands in for it), and a soft shine
+      Body: new MeshPhysicalMaterial({ map: maps.skin, color: skinTint(kit, notes), roughness: 0.55, sheen: 0.35, sheenRoughness: 0.55, sheenColor: new Color("#b8644a"), specularIntensity: 0.6 }),
       // a touch darker than the picture, so the whites do not stare
       Eyes: new MeshStandardMaterial({ map: maps.skin, roughness: 0.3, color: "#d9d4cc" }),
-      Shirt: new MeshStandardMaterial({ map: shirt ?? maps.shirt, normalMap: maps.folds, roughness: 0.8 }),
-      Shorts: new MeshStandardMaterial({ color: cloth, roughness: 0.82, side: DoubleSide }),
-      Socks: new MeshStandardMaterial({ color: kit.colour ?? "#ffffff", vertexColors: true, roughness: 0.86, side: DoubleSide }),
-      Boots: new MeshStandardMaterial({ map: maps.boots, roughness: 0.42 }),
-      HairMedium: new MeshStandardMaterial({ map: maps.hair, color: kit.hair, alphaTest: 0.42, side: DoubleSide, roughness: 0.55 }),
-      HairCurls: new MeshStandardMaterial({ color: kit.hair, normalMap: maps.curls, roughness: 0.86 }),
+      // Kit: knitted polyester, matt head-on with a soft sheen where the
+      // cloth turns away from the light, as a shirt under floodlights has
+      Shirt: new MeshPhysicalMaterial({ map: shirt ?? maps.shirt, normalMap: maps.folds, roughness: 0.78, ...FABRIC }),
+      Shorts: new MeshPhysicalMaterial({ color: cloth, roughness: 0.78, side: DoubleSide, ...FABRIC }),
+      Socks: new MeshPhysicalMaterial({ color: kit.colour ?? "#ffffff", vertexColors: true, roughness: 0.86, side: DoubleSide, ...FABRIC }),
+      // the boots' synthetic upper has a lacquered shine
+      Boots: new MeshPhysicalMaterial({ map: maps.boots, roughness: 0.42, clearcoat: 0.6, clearcoatRoughness: 0.25 }),
+      HairMedium: new MeshPhysicalMaterial({ map: maps.hair, color: kit.hair, alphaTest: 0.42, side: DoubleSide, roughness: 0.5, sheen: 0.5, sheenRoughness: 0.35, sheenColor: new Color(kit.hair).lerp(new Color("#ffffff"), 0.35) }),
+      HairCurls: new MeshPhysicalMaterial({ color: kit.hair, normalMap: maps.curls, roughness: 0.8, sheen: 0.4, sheenRoughness: 0.5, sheenColor: new Color(kit.hair).lerp(new Color("#ffffff"), 0.3) }),
       // a very dark brown, broken into fine hairs so skin shows through
       Beard: new MeshStandardMaterial({ color: new Color(kit.hair).lerp(new Color("#3b2a1d"), 0.15), alphaMap: grain, vertexColors: true, transparent: true, depthWrite: false, roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }),
     };

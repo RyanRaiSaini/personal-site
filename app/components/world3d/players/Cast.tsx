@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { DoubleSide, type Group, type Mesh, type MeshBasicMaterial } from "three";
 import { useWorld } from "../../../lib/store";
 import type { SectionId } from "../../../sections/registry";
+import { stir } from "../activity";
 import { atmo } from "../atmosphere/state";
 import { rig } from "../camera/CameraRig";
 import { clickable } from "../rooms/common";
@@ -41,6 +42,16 @@ const REST: Partial<Record<SectionId, { at: [number, number]; facing: number; st
   projects: { at: [PITCH.halfLength - 13.4, 3.6], facing: Math.PI * 0.42, stances: ["hips"] },
   experience: { at: [-15.2, -38.3], facing: 0.55, stances: ["folded"] },
 };
+
+// How number 8 gets to his spot when the section changes. A long way
+// off, he is put RUN_IN metres short, on the line from where he was,
+// and runs in to his mark as the camera arrives; a short way, he jogs
+// or turns on the spot. He slows down as he arrives (BRAKE, m/s²).
+const RUN_IN = 6;
+const FAR = 8;
+const BRAKE = 3.2;
+// seconds to change from one way of standing to another
+const RESTANCE = 0.6;
 
 // Where the ball under his foot is, measured from him: to his right and in front
 // (the same place the "foot" pose was built for: blender/players/stances.py)
@@ -201,6 +212,8 @@ export default function Cast() {
   const directing = useRef(false);
   // which of the director's shots is on screen (-1: none), so a change of shot is a cut
   const shot = useRef(-1);
+  // where number 8 really is, as he makes his way between spots
+  const walk = useRef({ x: 0, z: 0, facing: 0, speed: 0, travelled: 0, ready: false, section: "", stances: [] as Stance[], from: [] as Stance[], fade: 1, after: null as Layer[] | null, afterFade: 1 });
   const leather = useMemo(() => ballTexture(), []);
   useEffect(() => () => leather.dispose(), [leather]);
 
@@ -247,7 +260,8 @@ export default function Cast() {
     start(scorer);
   };
 
-  useFrame((frame) => {
+  useFrame((frame, delta) => {
+    const dt = Math.min(delta, 0.1);
     const world = useWorld.getState();
     const current = world.show;
     const goal = current?.kind === "goal" ? current : null;
@@ -257,9 +271,71 @@ export default function Cast() {
     if (me && !(goal && goal.scorer === "saini")) {
       const rest = REST[world.section] ?? REST.home;
       if (rest) {
-        me.group.position.set(rest.at[0], 0, rest.at[1]);
-        me.group.rotation.y = rest.facing;
-        me.play(standing(atmo.time, rest.stances));
+        const w = walk.current;
+        const [restX, restZ] = rest.at;
+        if (!w.ready || world.reducedMotion) {
+          w.x = restX;
+          w.z = restZ;
+          w.facing = rest.facing;
+          w.speed = 0;
+          w.stances = rest.stances;
+          w.fade = 1;
+          w.ready = true;
+        }
+        if (world.section !== w.section) {
+          // a new section: a long way off, start him a short run from his mark
+          const far = Math.hypot(restX - w.x, restZ - w.z);
+          if (far > FAR) {
+            const ux = (restX - w.x) / far;
+            const uz = (restZ - w.z) / far;
+            w.x = restX - ux * RUN_IN;
+            w.z = restZ - uz * RUN_IN;
+            w.facing = turnToward(ux, uz);
+            w.speed = 3;
+          }
+          w.section = world.section;
+        }
+        if (rest.stances.join() !== w.stances.join()) {
+          w.from = w.stances;
+          w.stances = rest.stances;
+          w.fade = 0;
+        }
+        w.fade = Math.min(1, w.fade + dt / RESTANCE);
+
+        // toward the mark, quick to start and slowing as he arrives
+        const size = notes ? sizeOf(KITS.saini, notes) : 1;
+        const runSpeed = (notes?.clips.run?.speed ?? 4.27) * size;
+        const jogSpeed = (notes?.clips.jog?.speed ?? 2.45) * size;
+        const dx = restX - w.x;
+        const dz = restZ - w.z;
+        const left = Math.hypot(dx, dz);
+        const wanted = left > 0.02 ? Math.min(runSpeed, Math.sqrt(2 * BRAKE * left)) : 0;
+        w.speed += (wanted - w.speed) * (1 - Math.exp(-5 * dt));
+        const step = Math.min(left, w.speed * dt);
+        if (left > 1e-4) {
+          w.x += (dx / left) * step;
+          w.z += (dz / left) * step;
+        }
+        w.travelled += step;
+        // facing where he is going, then the way his spot faces
+        const aim = left > 0.35 ? turnToward(dx, dz) : rest.facing;
+        const turning = Math.abs(Math.atan2(Math.sin(aim - w.facing), Math.cos(aim - w.facing)));
+        w.facing = mixAngle(w.facing, aim, 1 - Math.exp(-7 * dt));
+
+        const still = blend(standing(atmo.time, w.from), standing(atmo.time, w.stances), ease(w.fade));
+        const stride = blend(playing("jog", w.travelled / jogSpeed), playing("run", w.travelled / runSpeed), ease((w.speed - jogSpeed * 0.8) / (runSpeed * 0.9 - jogSpeed * 0.8)));
+        me.group.position.set(w.x, 0, w.z);
+        me.group.rotation.y = w.facing;
+        let moving = blend(still, stride, ease(w.speed / 0.9));
+        // just after his replay: out of its last pose, not snapped
+        if (w.after) {
+          w.afterFade = Math.min(1, w.afterFade + dt / 0.5);
+          moving = blend(w.after, moving, ease(w.afterFade));
+          if (w.afterFade >= 1) w.after = null;
+        }
+        me.play(moving);
+        // still on his way, turning or changing how he stands: keep drawing
+        if (w.speed > 0.01 || left > 0.02 || turning > 0.005 || w.fade < 1 || w.after) stir();
         // The centre ball sits under his raised foot, or on the centre spot
         if (centreBall.current) {
           if (rest.stances.includes("foot")) {
@@ -364,6 +440,8 @@ export default function Cast() {
 
     if (player) {
       player.group.position.set(x, 0, z);
+      // number 8 jogs back to his mark from here when the replay ends
+      if (goal.scorer === "saini") Object.assign(walk.current, { x, z, facing, speed: 0, after: layers, afterFade: 0 });
       player.group.rotation.y = facing;
       player.play(layers);
     }

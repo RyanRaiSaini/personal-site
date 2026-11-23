@@ -269,3 +269,8 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **Fixed:** flights between the pitch and somewhere high went through the stands (after a guest goal, the camera flew back to the overview through the seats). Such flights now climb above the lower end first and travel at height.
 - The guest goals are directed like a match broadcast: the strike on the main camera high in the main stand, panning with the taker and then the ball on a long lens; a cut to a hand-held camera at the scorer's shoulder as he wheels away; then the slow turn round him.
 - Speed readings tonight were lower across the board because OneDrive was syncing hard in the background. With the crowd shown and hidden in turn, its cost was unchanged at about 8 pictures a second.
+
+### The players: cloth, skin, and getting about
+
+- The kit, skin, hair and boots use three.js's physical material: the kit has a soft sheen where the cloth turns from the light, the skin a warm glow round its edges (standing in for light scattered under it), the hair a sheen, and the boots a lacquered shine (`FABRIC` and the materials in `players/Player.tsx`).
+- Number 8 no longer jumps between spots. A long way off, he is put a few metres short of his mark and runs in, slowing as he arrives, while the camera comes in; a short way, he jogs or turns on the spot. Changing from one way of standing to another is a fade, and after his own replay he jogs back from where he celebrated, out of the celebration's last pose rather than snapped out of it (`RUN_IN`, `BRAKE`, `RESTANCE` in `players/Cast.tsx`).
