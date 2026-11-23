@@ -376,4 +376,9 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **More life in the ticket office:** a fan browsing the club shop scarves, a steward in a high-visibility vest by the barriers, and a programme seller by the rack (`OTHERS` in `rooms/Queue.tsx`).
 - Checked with the camera moving across the stands: flicker to or from blue 0.01% (8 cm) and 0.04% (20 cm), the same as before.
 - Two phone pictures added to the fixed set, `phone-resume` and `phone-contact` (`scripts/shots.mjs`); the tour, résumé, contact and flat views all fit at phone width.
-- Seen only in very close views the site never reaches: some fans' hair shows as a flat grey cap (it is on the live site too, older than this change).
+
+### No more grey caps of hair in the crowd (2026-11-24, Ryan asked)
+
+- Close up, many fans' dark hair showed as a flat grey cap. Painting the hair red showed every head of hair was found correctly; the grey was the sky's reflection, a faint sheen on each flat picture that is brighter than dark hair. The hair no longer takes it (`stadium/Crowd.tsx`, after `aomap_fragment`).
+- One man's hair had a gap showing his scalp, a pale spot on his fringe. When the pictures are packed, any small patch of skin with hair all round it is now marked as hair (`closeHairGaps` in `scripts/pack-crowd.mjs`).
+- Flicker on the stands unchanged: 0.01% to or from blue at 8 cm, 0.04% at 20 cm.

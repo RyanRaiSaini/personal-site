@@ -213,9 +213,17 @@ varying float vFar;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvaryi
         // the outline from the sharp picture: a softened outline cut off at
         // the alpha test would make fans vanish and reappear over their seats
         diffuseColor.a *= mix( texture2D( map, vMapUv ).a, 1.0, solid );`,
+      ).replace(
+        "#include <aomap_fragment>",
+        // no sheen of reflected sky on the hair: on a flat picture it is a
+        // grey haze, brighter than dark hair, and turned every dark head of
+        // hair into a grey cap
+        `#include <aomap_fragment>
+        reflectedLight.indirectSpecular *= 1.0 - hair;
+        reflectedLight.directSpecular *= 1.0 - hair;`,
       );
     };
-    material.customProgramCacheKey = () => "crowd-v11";
+    material.customProgramCacheKey = () => "crowd-v12";
     withBakedLight(material, "seat");
 
     const n = seated.length;

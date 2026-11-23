@@ -21,6 +21,51 @@ const DIR = "public/stadium/crowd";
 // much to draw as the person.
 const MARGIN = 3;
 
+// One of the men's hair has a gap that shows his scalp: a small patch of
+// skin with hair all round it. In the mask such a patch is marked as hair,
+// so the site colours it with the rest of his hair.
+const isSkin = (d, i) => d[i + 1] > 128 && d[i] < 100 && d[i + 2] < 100;
+const isHair = (d, i) => d[i] < 60 && d[i + 1] < 60 && d[i + 2] > 140 && d[i + 2] < 225;
+// round the patch's edge the pixels are part skin, part hair: they count as hair
+const isHairEdge = (d, i) => d[i] < 60 && d[i + 2] > 100 && d[i + 2] < 225;
+async function closeHairGaps(file) {
+  const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const { width, height } = info;
+  const seen = new Uint8Array(width * height);
+  let hairValue = null;
+  for (let i = 0; i < data.length && !hairValue; i += 4) if (isHair(data, i)) hairValue = [data[i], data[i + 1], data[i + 2]];
+  let closed = 0;
+  for (let start = 0; start < width * height; start++) {
+    if (seen[start] || !isSkin(data, start * 4)) continue;
+    // the patch of skin this pixel belongs to, and what lies round it
+    const patch = [start];
+    seen[start] = 1;
+    let hairRound = 0;
+    let otherRound = 0;
+    for (let k = 0; k < patch.length; k++) {
+      const p = patch[k];
+      const x = p % width;
+      const y = (p - x) / width;
+      for (const [nx, ny] of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) {
+        if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+        const q = ny * width + nx;
+        if (isSkin(data, q * 4)) {
+          if (!seen[q]) {
+            seen[q] = 1;
+            patch.push(q);
+          }
+        } else if (isHairEdge(data, q * 4)) hairRound++;
+        else otherRound++;
+      }
+    }
+    if (patch.length < 400 && hairRound > 4 * otherRound && hairValue) {
+      for (const p of patch) data.set(hairValue, p * 4);
+      closed++;
+    }
+  }
+  return { image: sharp(data, { raw: { width, height, channels: 4 } }), closed };
+}
+
 for (const sheetName of ["crowd", "crowd-back", "queue"]) {
   if (!existsSync(`${DIR}/${sheetName}-colour.raw.png`)) continue;
   for (const [part, options] of [
@@ -29,7 +74,11 @@ for (const sheetName of ["crowd", "crowd-back", "queue"]) {
   ]) {
     const from = `${DIR}/${sheetName}-${part}.raw.png`;
     const to = `${DIR}/${sheetName}-${part}.webp`;
-    await sharp(from).webp(options).toFile(to);
+    if (part === "mask") {
+      const { image, closed } = await closeHairGaps(from);
+      await image.webp(options).toFile(to);
+      console.log(`${sheetName}: ${closed} gaps in the hair closed`);
+    } else await sharp(from).webp(options).toFile(to);
     console.log(`${to}  ${(statSync(from).size / 1024).toFixed(0)} KB -> ${(statSync(to).size / 1024).toFixed(0)} KB`);
   }
 
