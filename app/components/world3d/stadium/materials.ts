@@ -80,7 +80,10 @@ function picture(surface: Surface, map: "diff" | "nor" | "arm"): Texture | null 
 
 // The seats' plastic. Each seat's own colour is set where the seats
 // are placed (Seats.tsx), so this stays white.
-export const SEAT_COLOR = "#22398a";
+// A dark charcoal-navy: where a seat shows between fans it reads as
+// shadow. Bright royal blue seats showed as hard blue blocks and lines
+// all over the stands, which Ryan did not want (2026-11-24).
+export const SEAT_COLOR = "#262c3b";
 
 export type StadiumMaterials = Record<string, Material>;
 

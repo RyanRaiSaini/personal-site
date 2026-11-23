@@ -44,9 +44,7 @@ function shareGeometry(source: BufferGeometry, light: InstancedBufferAttribute):
 function build(data: SeatData, detailedSeat: BufferGeometry, plainSeat: BufferGeometry, material: MeshStandardMaterial) {
   const group = new Group();
   group.name = "Seats";
-  // empty seats a little deeper than the plastic's own royal blue: bright
-  // blue specks between fans flickered as the camera moved (2026-11-24)
-  const base = new Color(SEAT_COLOR).lerp(new Color("#141a2e"), 0.32);
+  const base = new Color(SEAT_COLOR);
   const chunks: Chunk[] = [];
   const { positions, details } = data;
 

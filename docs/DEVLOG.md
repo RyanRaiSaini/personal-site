@@ -347,3 +347,7 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **The tier-front ribbons are dark again.** Lit, they ran round the whole stadium as bright blue lines, which Ryan did not want; the ribbon shader is gone (`stadium/materials.ts`). The pitch boards stay lit, as he chose.
 - **Canada's and the United States' flags in the crowd,** alongside two plain club flags: about 38% Canada, 24% USA, the rest club. Every flag streams the same way, downwind, drooping in the lulls and standing out in the gusts (`KINDS`, `WIND` in `stadium/CrowdFlags.tsx`). Near the camera the cloth ripples; far off it only sways, so nothing shimmers.
 - Checked with the camera moving across all the stands: flicker to or from blue 0.00% (8 cm) and 0.05% (20 cm).
+
+### No more blue blocks in the stands (2026-11-24, Ryan's third report)
+
+- The blue blocks and lines in the stands were the seats themselves: bright royal-blue plastic that showed as hard blue rectangles wherever a seat was not hidden by a fan (an empty seat, the front row, the seat backs between fans), and from afar as blue lines along every tier's front rows. Found by painting each material red in turn. The seats are now a dark charcoal-navy, so where one shows it reads as shadow between people (`SEAT_COLOR` in `stadium/materials.ts`).
