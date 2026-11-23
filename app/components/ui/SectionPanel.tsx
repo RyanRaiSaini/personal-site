@@ -68,7 +68,7 @@ export default function SectionPanel({ id, children }: { id: SectionId; children
         className="panel panel-in pointer-events-auto flex max-h-[64dvh] w-full flex-col rounded-t-2xl lg:mb-4 lg:mr-4 lg:mt-[4.75rem] lg:max-h-none lg:w-[min(34rem,44vw)] lg:rounded-2xl"
       >
         {/* kept short, so the reading space below is as tall as it can be */}
-        <header className="flex items-start justify-between gap-4 border-b border-line px-5 pb-3 pt-4 sm:px-7">
+        <header className="panel-head flex items-start justify-between gap-4 px-5 pb-3.5 pt-4 sm:px-7">
           <div className="min-w-0">
             <p className="sign">
               <PlaceIcon id={id} className="h-[1.125rem] w-[1.125rem] flex-none text-gold" />

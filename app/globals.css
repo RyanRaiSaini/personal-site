@@ -27,6 +27,12 @@
   --pitch: #2f9e57;
   --danger: #ff5a5f;
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+  /* GitHub's shades, none to a lot (lib/github.ts has the same) */
+  --level-0: #1a2130;
+  --level-1: #0e4429;
+  --level-2: #006d32;
+  --level-3: #26a641;
+  --level-4: #39d353;
 }
 
 [data-theme="light"] {
@@ -48,6 +54,11 @@
   --pitch: #1f7a40;
   --danger: #c8242b;
   --shadow: 0 24px 80px rgba(16, 19, 28, 0.22);
+  --level-0: #e6e9ee;
+  --level-1: #9be9a8;
+  --level-2: #40c463;
+  --level-3: #30a14e;
+  --level-4: #216e39;
 }
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -397,21 +408,27 @@ body {
    The home screen (app/page.tsx): a caption in the corner of the
    picture, the way a broadcast names a player
 ------------------------------------------------------------------- */
+/* the home screen's name card, in the section panels' broadcast colours */
 .home-plate {
   width: min(100%, 30rem);
   padding: 0.95rem 1.2rem 1.05rem;
-  background: rgba(7, 11, 20, 0.9);
-  border-left: 4px solid #e6c56c;
-  border-radius: 0 12px 12px 0;
-  color: #f4f6f8;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+  background:
+    linear-gradient(115deg, transparent 0 64%, rgba(255, 255, 255, 0.03) 64% 72%, transparent 72%),
+    linear-gradient(160deg, rgba(23, 56, 160, 0.96) 0%, rgba(11, 29, 82, 0.95) 45%, rgba(7, 17, 44, 0.95) 100%);
+  border-left: 4px solid #f5c84c;
+  color: #ffffff;
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
+}
+.home-plate .home-name {
+  transform: skewX(-7deg);
+  transform-origin: left bottom;
 }
 .home-where {
   font-family: var(--font-barlow), sans-serif;
   font-weight: 600;
   font-size: 1.125rem;
   letter-spacing: 0.03em;
-  color: #e6c56c;
+  color: #f5c84c;
 }
 .home-name {
   margin-top: 0.15rem;
@@ -433,9 +450,11 @@ body {
   min-height: 2.5rem;
   padding: 0.4rem 0.9rem;
   font-size: 1.0625rem;
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.3);
-  color: #f4f6f8;
+  background: rgba(150, 178, 255, 0.16);
+  border-color: transparent;
+  border-radius: 0;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  color: #ffffff;
 }
 .home-plate .btn:hover {
   border-color: #e6c56c;
@@ -447,9 +466,9 @@ body {
   }
 }
 .home-plate .btn-primary {
-  background: #e6c56c;
-  border-color: #e6c56c;
-  color: #12100a;
+  background: #f5c84c;
+  border-color: #f5c84c;
+  color: #0b1430;
 }
 .home-links a {
   color: rgba(244, 246, 248, 0.78);
@@ -538,11 +557,93 @@ body {
 /* ------------------------------------------------------------------
    A section's panel (app/components/ui/SectionPanel.tsx)
 ------------------------------------------------------------------- */
+/* The panel is styled like a match broadcast's graphics: deep royal
+   glass, white type, a brighter gold, and angled corners in place of
+   rounded ones. It keeps these colours in either theme (as the plates
+   of the top bar do), by setting its own colour tokens: everything
+   inside picks them up. */
 .panel {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-top: 3px solid var(--gold);
-  box-shadow: var(--shadow);
+  --panel: #0a1840;
+  --panel-solid: #0d1d50;
+  --bg-raised: #17307a;
+  --ink: #ffffff;
+  --ink-soft: #c6d0ee;
+  --ink-faint: #93a1cc;
+  --line: rgba(150, 178, 255, 0.16);
+  --line-strong: rgba(150, 178, 255, 0.34);
+  --gold: #f5c84c;
+  --gold-ink: #0b1430;
+  --royal: #9ab8ff;
+  --pitch: #22b357;
+  --level-0: rgba(150, 178, 255, 0.12);
+  --level-1: #0e4429;
+  --level-2: #006d32;
+  --level-3: #26a641;
+  --level-4: #39d353;
+  color: var(--ink);
+  background:
+    linear-gradient(115deg, transparent 0 62%, rgba(255, 255, 255, 0.025) 62% 70%, transparent 70%),
+    linear-gradient(165deg, #12307f 0%, #0b1d52 32%, #07112c 100%);
+  border: 0;
+  border-radius: 0 !important;
+  clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px);
+}
+/* the header: a broadcast bar, the title slanted, a gold sash beneath
+   (app/components/ui/SectionPanel.tsx) */
+.panel-head {
+  position: relative;
+  background: linear-gradient(100deg, #2457e6 0%, #1a43c2 45%, rgba(20, 52, 160, 0) 100%);
+  border-bottom: 3px solid var(--gold);
+}
+.panel-head h1 {
+  transform: skewX(-7deg);
+  transform-origin: left bottom;
+  text-shadow: 0 2px 18px rgba(0, 10, 40, 0.45);
+}
+.panel-head .sign-place {
+  color: var(--gold);
+}
+.panel-head .sign-what {
+  color: #dbe4ff;
+  border-left-color: rgba(255, 255, 255, 0.35);
+}
+.panel-head p {
+  color: #dbe4ff;
+}
+/* inside: tinted blocks with one clipped corner, no outlines */
+.panel .card,
+.panel .stat,
+.panel .quote {
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(160deg, rgba(120, 150, 255, 0.12), rgba(120, 150, 255, 0.05));
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+}
+.panel .quote {
+  border-left: 3px solid var(--gold);
+}
+.panel .stat-value {
+  font-size: 2.125rem;
+}
+.panel .tabs-list {
+  border: 0;
+  border-radius: 0;
+  background: rgba(4, 10, 32, 0.45);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+}
+.panel .tab {
+  border-radius: 0;
+}
+.panel .tab[aria-selected="true"] {
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+.panel .btn {
+  border-radius: 0;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+.panel .btn:not(.btn-primary) {
+  background: rgba(120, 150, 255, 0.14);
+  border-color: transparent;
 }
 /* Where in the stadium this section is, set like a sign: the place,
    a rule, then what happens there */

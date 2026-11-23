@@ -1,7 +1,6 @@
 "use client";
 
 import { githubText, profile } from "../../data/portfolio";
-import { LEVEL_HEX, LEVEL_HEX_LIGHT } from "../../lib/github";
 import { useWorld } from "../../lib/store";
 import { Arrow, ExternalLink, Stats } from "./parts";
 
@@ -20,8 +19,9 @@ function describe(date: string, count: number): string {
 
 export default function GithubContent() {
   const data = useWorld((s) => s.contributions);
-  const roofClosed = useWorld((s) => s.roofClosed);
-  const palette = roofClosed ? LEVEL_HEX : LEVEL_HEX_LIGHT;
+  // GitHub's five shades, from the stylesheet: the dark ones in the
+  // stadium's panel and at night, the light ones by day in the flat view
+  const palette = [0, 1, 2, 3, 4].map((n) => `var(--level-${n})`);
 
   const activeDays = data ? data.levels.flat().filter((level) => level > 0).length : 0;
   const busiest = data ? Math.max(0, ...data.counts.flat()) : 0;
