@@ -1,6 +1,8 @@
 "use client";
 
 import { useGLTF } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
+import { atmo } from "../atmosphere/state";
 import { Component, forwardRef, Suspense, use, useEffect, useImperativeHandle, useMemo, useRef, type ReactNode } from "react";
 import { AnimationClip, AnimationMixer, Color, DoubleSide, LoopRepeat, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, SRGBColorSpace, type AnimationAction, type Group, type Material, type Object3D, type SkinnedMesh, type Texture } from "three";
 import { clone as cloneFigure } from "three/examples/jsm/utils/SkeletonUtils.js";
@@ -206,13 +208,15 @@ function shadowTexture() {
         ctx.save();
         ctx.translate(w / 2, h / 2);
         ctx.rotate((i * Math.PI) / 2 + Math.PI / 4);
-        const g = ctx.createRadialGradient(22, 0, 2, 22, 0, 34);
-        g.addColorStop(0, "rgba(0,0,0,0.5)");
+        // long and thin, darkest at his feet, as from a lamp high up
+        const g = ctx.createRadialGradient(10, 0, 1, 26, 0, 38);
+        g.addColorStop(0, "rgba(0,0,0,0.55)");
+        g.addColorStop(0.5, "rgba(0,0,0,0.28)");
         g.addColorStop(1, "rgba(0,0,0,0)");
         ctx.fillStyle = g;
-        ctx.scale(1, 0.42);
+        ctx.scale(1, 0.26);
         ctx.beginPath();
-        ctx.arc(22, 0, 34, 0, Math.PI * 2);
+        ctx.arc(26, 0, 38, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
       }
@@ -238,6 +242,18 @@ const Figure = forwardRef<PlayerHandle, { kit: Kit; shadow: boolean; mirrored: b
   const notes = use(loadPlayerNotes());
   const family = useDisplayFont();
   const root = useRef<Group>(null);
+  const shade = useRef<Group>(null);
+  // The floodlights' four shadows: strong at night, by day only a faint
+  // shade at his feet (the sun throws his real shadow then)
+  useFrame(() => {
+    const group = shade.current;
+    if (!group || !root.current) return;
+    let turn = 0;
+    for (let node: Object3D | null = root.current; node; node = node.parent) turn += node.rotation.y;
+    group.rotation.y = -turn;
+    const night = Math.min(1, atmo.floodlights) * (1 - Math.min(1, atmo.outdoor * 1.4));
+    blob.opacity = 0.12 + 0.78 * night;
+  });
   const library = useMemo(() => share(model as unknown as { animations: AnimationClip[]; materials: Record<string, Material> }, notes), [model, notes]);
 
   const figure = useMemo(() => cloneFigure(model.scene) as Object3D, [model]);
@@ -351,9 +367,13 @@ const Figure = forwardRef<PlayerHandle, { kit: Kit; shadow: boolean; mirrored: b
   return (
     <group ref={root}>
       {shadow && (
-        <mesh material={blob} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]} renderOrder={2}>
-          <planeGeometry args={[2.6, 2.6]} />
-        </mesh>
+        // kept square to the ground (toward its four corners, where the
+        // floodlights are) whichever way he faces
+        <group ref={shade}>
+          <mesh material={blob} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]} renderOrder={2}>
+            <planeGeometry args={[3.2, 3.2]} />
+          </mesh>
+        </group>
       )}
       <primitive object={figure} scale={size} />
     </group>

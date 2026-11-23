@@ -336,3 +336,8 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - The ground is fuller (95% of seats taken, `OCCUPANCY` in `stadium/crowdPlan.ts`), and empty seats are a deeper blue (`stadium/Seats.tsx`).
 - Result, with the camera moved 8 cm: sharp changes in the stands down from 6.1% to 1.9%, and changes to or from blue from 0.69% to 0.05%. With 20 cm, blue changes from 2.9% to 0.13%.
 - **Number 8 in the ticket office** no longer stands in the queue barrier: he is on the open floor in front of the framed résumé (`players/RoomSaini.tsx`).
+
+### Night shadows and colour in the ends
+
+- **Four floodlight shadows under every player at night,** long and thin, pointing to the ground's four corners whichever way he faces; by day only a faint shade at his feet, as the sun throws his real shadow (`shadowTexture` and the `shade` group in `players/Player.tsx`).
+- **The ends behind the goals are blocks of club colour:** nearly everyone there in white or royal blue, the sides more mixed (`END_SHIRTS`, `END_FROM` in `stadium/Crowd.tsx`). The distant crowd is evened out less, so the shirts' colour shows; checked with the camera moving, flicker to or from blue stays at 0.05% of the stands.

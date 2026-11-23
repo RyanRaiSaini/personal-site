@@ -53,6 +53,17 @@ const SHIRTS: [string, number][] = [
   ["#8d939e", 0.07],
   ["#6b1e2a", 0.05],
 ];
+// Behind the goals, where the most devoted fans stand, nearly everyone
+// is in the club's white or royal blue: blocks of colour, as at a real
+// home end
+const END_SHIRTS: [string, number][] = [
+  ["#f2f2ee", 0.58],
+  ["#2f4fb3", 0.26],
+  ["#17244d", 0.12],
+  ["#d6a93f", 0.04],
+];
+// how far along the pitch (metres from the halfway line) the ends begin
+const END_FROM = 56;
 
 // The crowd's two pictures (blender/build_crowd.py, packed by
 // scripts/pack-crowd.mjs): eight people side by side, two men in four
@@ -190,10 +201,10 @@ varying float vFar;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvaryi
         // his own hair colour, keeping the picture's light and shade
         float shade = dot( fan.rgb, vec3( 0.3, 0.59, 0.11 ) );
         body = mix( body, vHair * ( 0.6 + 2.2 * shade ), hair );
-        body = mix( body, vec3( 0.2, 0.22, 0.3 ), 0.35 * vFar );
+        body = mix( body, vec3( 0.2, 0.22, 0.3 ), 0.18 * vFar );
         // and each distant fan a little lighter or darker than the next, so
         // the solid patches still read as people
-        body *= 1.0 - 0.35 * solid * fract( vSkin.r * 91.7 + vShirt.g * 53.3 + vLegs.b * 17.1 );
+        body *= 1.0 - 0.25 * solid * fract( vSkin.r * 91.7 + vShirt.g * 53.3 + vLegs.b * 17.1 );
         diffuseColor.rgb *= body;
         // the outline from the sharp picture: a softened outline cut off at
         // the alpha test would make fans vanish and reappear over their seats
@@ -212,6 +223,7 @@ varying float vFar;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvaryi
     const matrix = new Matrix4();
     const colour = new Color();
     const weights = SHIRTS.reduce((sum, [, w]) => sum + w, 0);
+    const endWeights = END_SHIRTS.reduce((sum, [, w]) => sum + w, 0);
     seated.forEach((seat, k) => {
       const x = positions[seat * 4];
       const y = positions[seat * 4 + 1];
@@ -224,10 +236,11 @@ varying float vFar;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvaryi
       const across = hash(seat, 13) < 0.5 ? -size : size;
       matrix.set(c * across, 0, s * size, x, 0, size, 0, y, -s * across, 0, c * size, z, 0, 0, 0, 1);
       mesh.setMatrixAt(k, matrix);
-      let pick = hash(seat, 3) * weights;
+      const palette = Math.abs(x) > END_FROM ? END_SHIRTS : SHIRTS;
+      let pick = hash(seat, 3) * (palette === SHIRTS ? weights : endWeights);
       let index = 0;
-      while (index < SHIRTS.length - 1 && pick > SHIRTS[index][1]) pick -= SHIRTS[index++][1];
-      colour.set(SHIRTS[index][0]).multiplyScalar(0.85 + 0.15 * hash(seat, 4));
+      while (index < palette.length - 1 && pick > palette[index][1]) pick -= palette[index++][1];
+      colour.set(palette[index][0]).multiplyScalar(0.85 + 0.15 * hash(seat, 4));
       shirts.set([colour.r, colour.g, colour.b], k * 3);
       // which of the two men, and how he sits: most with hands on knees,
       // some with an arm up, a few with both
