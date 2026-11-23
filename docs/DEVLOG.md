@@ -361,3 +361,10 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 
 - **The plain club flags are gone.** In their place, the big footballing nations: Spain, Portugal, Argentina, Uruguay, Brazil, France, England, Germany, Italy and the Netherlands, alongside Canada (still the most common) and the USA (`KINDS` in `stadium/CrowdFlags.tsx`). Emblems are simplified (a small shield for Spain and Portugal, a plain sun for Argentina and Uruguay), as they read from the stands. National flags only: a club's flag would carry its crest.
 - A few more flags overall (`SHARE` 0.45% to 0.6% of the taken seats). Distant flags still only sway, so nothing shimmers.
+
+### Women in the ticket queues (2026-11-24, Ryan asked)
+
+- **Two women, Mixamo's Kate (shirt and trousers) and Megan (T-shirt and jeans),** downloaded with Ryan's Adobe account into `stadium-work/mixamo/raw/` (not in the repo) and rendered standing alongside the two men (`WOMEN` in `blender/build_crowd.py`, a little shorter than the men). The queue sheet now has sixteen cells.
+- Each queue now alternates men and women: four women among the nine (`FANS` in `rooms/Queue.tsx`).
+- People's trousers can now be coloured too, so the jeans are blue (`trousers` in `rooms/clerk.ts`).
+- Megan's download names her bones `mixamorig2:`; the builder renames them to match the clips.

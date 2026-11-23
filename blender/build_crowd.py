@@ -41,6 +41,12 @@ PEOPLE = {
     "remy": {"file": "remy/Remy.fbx", "shirt": ["Tops"], "skin": ["Body"], "trousers": ["Bottoms"], "hair": ["Hair"], "drop": ["Eyelashes"]},
     "bryce": {"file": "bryce/Bryce.fbx", "shirt": ["Ch42_Shirt"], "skin": ["Ch42_Body1"], "trousers": ["Ch42_Shorts"], "hair": ["Ch42_Hair1"], "drop": ["Ch42__Eyelashes"]},
 }
+# the queues have women in them too (Mixamo's Kate and Megan), a
+# little shorter than the men
+WOMEN = {
+    "kate": {"file": "kate/Kate.fbx", "shirt": ["Ch21_Shirt"], "skin": ["Ch21_Body"], "trousers": ["Ch21_Pants"], "hair": ["Ch21_Hair"], "drop": ["Ch21_Eyelasshes"], "height": 1.68},
+    "megan": {"file": "megan/Megan.fbx", "shirt": ["Ch22_Shirt"], "skin": ["Ch22_Body"], "trousers": ["Ch22_Pants"], "hair": ["Ch22_Hair"], "drop": ["Ch22_Eyelashes"], "height": 1.66},
+}
 SITTING = "extra/sitting idle.fbx"
 VICTORY = "extra/victory.fbx"
 
@@ -132,6 +138,11 @@ def load_person(source, spec):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.import_scene.fbx(filepath=os.path.join(source, spec["file"]))
     arm = next(o for o in bpy.data.objects if o.type == "ARMATURE")
+    # some downloads number their bones ("mixamorig2:Hips"); the clips use
+    # "mixamorig:Hips". Renaming a bone renames its vertex group too.
+    for bone in arm.data.bones:
+        if bone.name.startswith("mixamorig") and ":" in bone.name:
+            bone.name = "mixamorig:" + bone.name.split(":", 1)[1]
     for name in spec["drop"]:
         if name in bpy.data.objects:
             bpy.data.objects.remove(bpy.data.objects[name])
@@ -158,7 +169,7 @@ def load_person(source, spec):
                 mat.surface_render_method = "DITHERED"
     bpy.context.view_layer.update()
     zs = [(o.matrix_world @ v.co).z for o in meshes for v in o.data.vertices]
-    arm.scale = arm.scale * (HEIGHT / (max(zs) - min(zs)))
+    arm.scale = arm.scale * (spec.get("height", HEIGHT) / (max(zs) - min(zs)))
     bpy.context.view_layer.update()
     return arm, meshes
 
@@ -295,7 +306,7 @@ def build(args):
     global CELL_W, CELL_H
     if args.stand:
         CELL_W, CELL_H = STAND_CELL
-    for person, spec in PEOPLE.items():
+    for person, spec in ({**PEOPLE, **WOMEN} if args.stand else PEOPLE).items():
         arm, meshes = load_person(source, spec)
         if args.stand:
             standing = clip(os.path.join(source, STANDING), arm)

@@ -8,16 +8,19 @@ import { CanvasTexture, Color, SRGBColorSpace, type Texture } from "three";
 //
 // Three sheets: "crowd" sees them seated from the front, "crowd-back"
 // from behind; "queue" has them standing (build_crowd.py --stand), each
-// seen from four sides (VIEW). Each has eight cells: the two men, four
-// each.
+// seen from four sides (VIEW), and two women as well (WOMAN). Each person
+// has four cells side by side: the crowd sheets two men, the queue sheet
+// the two men and two women.
 // ------------------------------------------------------------------
 
 export const PERSON = { width: 1.097, height: 1.8 }; // metres, as rendered
-const CELLS = 8;
+const CELLS: Record<Sheet, number> = { crowd: 8, "crowd-back": 8, queue: 16 };
 // [man, pose] -> cell: poses are sit, arms up, arm up, arms high
 export const POSE = { sit: 0, armUp: 2 } as const;
 // on the "queue" sheet the four cells are the sides he is seen from
 export const VIEW = { back: 0, backQuarter: 1, frontQuarter: 2, front: 3 } as const;
+// on the "queue" sheet, people 2 and 3 are women (Kate and Megan)
+export const WOMAN = { shirtAndTrousers: 2, teeAndJeans: 3 } as const;
 
 type Sheet = "crowd" | "crowd-back" | "queue";
 const sheets = new Map<Sheet, Promise<[HTMLImageElement, HTMLImageElement]>>();
@@ -40,16 +43,17 @@ function load(sheet: Sheet) {
 
 export type PersonLook = {
   sheet?: Sheet;
-  man: 0 | 1;
+  man: 0 | 1 | 2 | 3; // which person: 0 and 1 the men; on "queue", 2 and 3 the women (WOMAN)
   pose?: number; // POSE.sit or POSE.armUp; on the "queue" sheet, a VIEW
   shirt: string;
   skin?: number; // 0 fair to 1 dark
   hair?: string;
+  trousers?: string; // left grey (as rendered) unless given
 };
 
-export async function personPicture({ sheet = "crowd", man, pose = POSE.sit, shirt, skin = 0.25, hair }: PersonLook): Promise<Texture> {
+export async function personPicture({ sheet = "crowd", man, pose = POSE.sit, shirt, skin = 0.25, hair, trousers }: PersonLook): Promise<Texture> {
   const [picture, parts] = await load(sheet);
-  const cellW = picture.width / CELLS;
+  const cellW = picture.width / CELLS[sheet];
   const cellH = picture.height;
   const cell = man * 4 + pose;
 
@@ -69,6 +73,8 @@ export async function personPicture({ sheet = "crowd", man, pose = POSE.sit, shi
   // the pictured men are fair: darken toward the chosen tone, as the crowd does
   const skinRGB = [1 - skin * 0.66, 1 - skin * 0.76, 1 - skin * 0.81];
   const hairColour = hair ? new Color(hair).convertSRGBToLinear() : null;
+  const legs = trousers ? new Color(trousers).convertSRGBToLinear() : null;
+  const legsRGB = legs ? [legs.r, legs.g, legs.b].map((v) => Math.min(1.6, v * 1.45)) : null;
   const toLinear = (v: number) => Math.pow(v / 255, 2.2);
   const toByte = (v: number) => Math.round(255 * Math.pow(Math.min(1, v), 1 / 2.2));
   for (let i = 0; i < px.length; i += 4) {
@@ -81,6 +87,7 @@ export async function personPicture({ sheet = "crowd", man, pose = POSE.sit, shi
     for (let c = 0; c < 3; c++) {
       let lin = toLinear(px[i + c]) * (1 + (shirtRGB[c] - 1) * r) * (1 + (skinRGB[c] - 1) * g);
       if (isHair && hairColour) lin = [hairColour.r, hairColour.g, hairColour.b][c] * (0.6 + 2.2 * shade);
+      else if (legsRGB && b > 0.85) lin *= legsRGB[c];
       px[i + c] = toByte(lin);
     }
   }
