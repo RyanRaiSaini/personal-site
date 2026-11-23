@@ -156,7 +156,8 @@ function grassMaterial() {
     texture.repeat.set(length / BLADES, width / BLADES);
     texture.anisotropy = 8;
   }
-  const material = new MeshStandardMaterial({ color: "#ffffff", roughness: 1, metalness: 0, normalMap: relief, roughnessMap: finish });
+  // a little sheen: grass blades catch the sky at a low angle
+  const material = new MeshStandardMaterial({ color: "#ffffff", roughness: 0.82, metalness: 0, normalMap: relief, roughnessMap: finish });
   material.normalScale.setScalar(0.75);
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uGrain = { value: grain };
@@ -173,10 +174,15 @@ function grassMaterial() {
         // (0.245 is the photo's average brightness)
         float grainNear = 1.0 - smoothstep(0.02, 0.3, fwidth(vPitch.x) + fwidth(vPitch.y));
         float grainHere = clamp(dot(texture2D(uGrain, vNormalMapUv).rgb, vec3(0.3, 0.59, 0.11)) / 0.245, 0.5, 1.6);
-        diffuseColor.rgb *= mix(1.0, grainHere, 0.5 * grainNear);`,
+        diffuseColor.rgb *= mix(1.0, grainHere, 0.5 * grainNear);
+        // and the lawn's larger texture across the middle distance, four
+        // metres to a copy, so the pitch is never flat paint
+        float grainMid = smoothstep(0.01, 0.12, fwidth(vPitch.x) + fwidth(vPitch.y)) * (1.0 - smoothstep(0.8, 2.5, fwidth(vPitch.x) + fwidth(vPitch.y)));
+        float grainWide = clamp(dot(texture2D(uGrain, vNormalMapUv * 0.37).rgb, vec3(0.3, 0.59, 0.11)) / 0.245, 0.6, 1.4);
+        diffuseColor.rgb *= mix(1.0, grainWide, 0.3 * grainMid);`,
       );
   };
-  material.customProgramCacheKey = () => "pitch-grass-v4";
+  material.customProgramCacheKey = () => "pitch-grass-v5";
   material.userData.textures = [relief, finish, grain];
   // lit like the ground it is: the roof's shadow and the open sky above come from the ground picture
   return withBakedLight(material, "ground");

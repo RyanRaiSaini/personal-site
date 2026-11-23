@@ -310,3 +310,4 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **Stewards** sit only on the far touchline now, raised higher: from pitch level on the main stand's side all that showed of them was a head over the boards.
 - **Flags in the crowd:** about one fan in two hundred holds up a flag on a pole, waving: plain club colours with a stripe, no crests or words (`stadium/CrowdFlags.tsx`; `SHARE`, `COLOURS`).
 - **The LED ribbons along the tier fronts are lit:** club blues with slow bands and two sweeps of light chasing round the bowl, and the lamp grid up close. No words or sponsors (`ribbonMaterial` and `RIBBON` in `stadium/materials.ts`).
+- **The grass** carries the lawn photo's larger texture across the middle distance as well as close by, and has a little sheen, as grass catching the sky at a low angle does (`stadium/Pitch.tsx`).
