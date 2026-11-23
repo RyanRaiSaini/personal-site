@@ -210,6 +210,8 @@ By day the stadium is lit by one photographed sky and one fixed sun. The real cl
 | Trophy room (four cases, the cabinet, velvet ropes and runner) | Awards | `app/components/world3d/rooms/TrophyRoom.tsx` |
 | Press room (lighting rig, studio light, four TV cameras, PRESS chairs, the reporters in `REPORTERS`) | In the News | `app/components/world3d/rooms/PressRoom.tsx` |
 | Ticket office (lit windows, the club banner, the player profile with my photo, the scarf wall, the matchday board; the words are `resumeText.board`, `resumeText.banner` and `resumeText.profileTitle` in `portfolio.ts`) | Résumé | `app/components/world3d/rooms/TicketOffice.tsx` |
+| The photographers behind each goal line (where they sit, their bibs) | `SPOTS`, `BACK`, `BIBS` | `app/components/world3d/stadium/Photographers.tsx` |
+| The boards round the pitch (switched-on LED, plain club blue, no words) | `LED` | `app/components/world3d/stadium/AdBoards.tsx` |
 | The flash interview on the pitch by the tunnel (backdrop, microphones on stands, camera and light, the email and LinkedIn boards); where it stands is `FLASH` in `stadium/dims.ts` | Contact | `app/components/world3d/stadium/FlashZone.tsx` |
 | Shared building blocks (boxes, lit signs, the room shell, the TV camera on its tripod) | | `app/components/world3d/rooms/common.tsx` |
 | Real materials for the rooms (walnut, leather, marble, rubber, concrete, laminate, plaster, fabric, metal) and how a room uses one (`useSurface`, `floorSurface` on `Shell`, `material` on `Box`) | | `app/components/world3d/rooms/surfaces.ts` |

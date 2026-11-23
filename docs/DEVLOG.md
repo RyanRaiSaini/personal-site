@@ -299,3 +299,5 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **The glass on the front walls no longer reads as a grey band.** It was a pale tint lit by the sky, which washed out the first rows; it is now a faint dark tint with the sky's reflection, nearly invisible head-on, as stadium glass is (`Glass` in `stadium/materials.ts`).
 - **The boards round the pitch are switched-on LED screens** showing plain club blue, darker at the foot, with the grid of lamps visible up close. Still no words and no sponsors (`LED` in `stadium/AdBoards.tsx`).
 - **The crowd is never quite still:** each fan shifts slowly from side to side and settles, at his own pace (`stadium/Crowd.tsx`). It moves only while the picture is drawn, so the page still rests.
+- **The tunnel** has rubber tiles underfoot and wear in the wall paint (Poly Haven photos laid over its painted light).
+- **Photographers behind each goal line:** eight a side on low stools, in hi-vis bibs, long lenses on the pitch, as at every televised match (`stadium/Photographers.tsx`).

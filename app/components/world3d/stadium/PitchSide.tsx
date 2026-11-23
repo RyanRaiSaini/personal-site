@@ -2,7 +2,7 @@
 
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { AdditiveBlending, BoxGeometry, Color, CylinderGeometry, DoubleSide, Float32BufferAttribute, PlaneGeometry, type BufferGeometry, type Group, type MeshBasicMaterial } from "three";
+import { AdditiveBlending, BoxGeometry, Color, CylinderGeometry, DoubleSide, Float32BufferAttribute, PlaneGeometry, RepeatWrapping, SRGBColorSpace, TextureLoader, type BufferGeometry, type Group, type MeshBasicMaterial } from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { atmo } from "../atmosphere/state";
 import { disposeSurface, surfaceMaterial } from "../rooms/surfaces";
@@ -233,8 +233,21 @@ function Tunnel() {
   const made = useMemo(() => {
     const walls = wallTexture();
     walls.repeat.set(run / 2, 1);
+    // real surfaces over the painted light: the concrete's stains and
+    // wear on the walls, rubber tiles underfoot (Poly Haven, CC0)
+    const loader = new TextureLoader();
+    const wear = loader.load("/stadium/textures/brushed_concrete_diff.webp");
+    wear.wrapS = wear.wrapT = RepeatWrapping;
+    wear.repeat.set(run / 3, 1);
+    const tiles = loader.load("/stadium/textures/rubber_tiles_diff.webp");
+    tiles.colorSpace = SRGBColorSpace;
+    tiles.wrapS = tiles.wrapT = RepeatWrapping;
+    tiles.repeat.set((halfWidth * 2) / 1.2, run / 1.2);
+    tiles.anisotropy = 8;
     return {
       walls,
+      wear,
+      tiles,
       glow: glowTexture(),
       // each wall is turned to face inward, which puts the mouth at opposite ends of the two
       wall: { 1: shadedStrip(run, height, "x", 1), [-1]: shadedStrip(run, height, "x", -1) } as Record<number, BufferGeometry>,
@@ -246,6 +259,8 @@ function Tunnel() {
   useEffect(() => {
     return () => {
       made.walls.dispose();
+      made.wear.dispose();
+      made.tiles.dispose();
       made.glow.dispose();
       made.wall[1].dispose();
       made.wall[-1].dispose();
@@ -265,11 +280,13 @@ function Tunnel() {
           because no lamp reaches in here: dim at the back, lit by the
           day (or the floodlights) toward the mouth. */}
       <mesh geometry={made.floor} position={[0, 0.01, midZ]} rotation={[-Math.PI / 2, 0, 0]}>
-        <meshBasicMaterial color="#2a2d33" vertexColors />
+        {/* the tile photo is near black on its own: brightened to the old floor grey */}
+        <meshBasicMaterial color={[2.6, 2.7, 2.9]} map={made.tiles} vertexColors />
       </mesh>
       {[-1, 1].map((s) => (
         <mesh key={s} geometry={made.wall[s]} position={[s * halfWidth, height / 2, midZ]} rotation={[0, (-s * Math.PI) / 2, 0]}>
-          <meshBasicMaterial map={made.walls} vertexColors />
+          {/* the concrete photo's red channel as shading: stains and wear in the paint */}
+          <meshBasicMaterial map={made.walls} aoMap={made.wear} aoMapIntensity={0.7} vertexColors />
         </mesh>
       ))}
       <mesh geometry={made.ceiling} position={[0, height, midZ]} rotation={[Math.PI / 2, 0, 0]}>

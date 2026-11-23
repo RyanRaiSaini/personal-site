@@ -1,6 +1,7 @@
 "use client";
 
 import FlashZone from "./stadium/FlashZone";
+import Photographers from "./stadium/Photographers";
 import { Suspense, useEffect } from "react";
 import { useWorld } from "../../lib/store";
 import Lights from "./atmosphere/Lights";
@@ -49,6 +50,7 @@ export default function Bowl({ children }: { children?: React.ReactNode }) {
         <Cast />
         <BenchShirt />
         <FlashZone />
+        <Photographers />
       </GroundLit>
       <Precipitation />
       {children}
