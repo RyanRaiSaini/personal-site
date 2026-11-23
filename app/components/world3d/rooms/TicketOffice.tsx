@@ -4,6 +4,7 @@ import { profile, resumeText } from "../../../data/portfolio";
 import { headshot } from "../../../data/photos";
 import Person from "./Person";
 import { Box, Glow, GOLD, NAVY, ROYAL, Shell, Sign, usePhoto } from "./common";
+import { useSurface } from "./surfaces";
 
 // The ticket office (Résumé). Two lit windows in the concourse wall
 // and, between them, my résumé itself, framed: a picture of its first
@@ -218,6 +219,8 @@ function Barrier({ x, z, length }: { x: number; z: number; length: number }) {
 }
 
 export default function TicketOffice() {
+  // the carpet: a real woven surface (surfaces.ts) in navy
+  const carpet = useSurface("fabric", { repeat: [6, 4], tint: "#1a2656", roughness: 1, bumps: 0.8 });
   return (
     <group>
       <hemisphereLight intensity={0.6} color="#eef2ff" groundColor="#1c1e24" />
@@ -246,7 +249,7 @@ export default function TicketOffice() {
       {/* carpet under the queues, edged in gold */}
       {[-3.9, 3.9].map((x) => (
         <group key={x}>
-          <Box size={[3.2, 0.012, 4.6]} position={[x, 0.006, -0.6]} color="#15214a" roughness={0.95} />
+          <Box size={[3.2, 0.012, 4.6]} position={[x, 0.006, -0.6]} material={carpet} />
           {[-1, 1].map((side) => (
             <Box key={side} size={[0.05, 0.014, 4.6]} position={[x + side * 1.6, 0.007, -0.6]} color="#8a6d2a" roughness={0.6} />
           ))}

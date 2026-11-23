@@ -306,7 +306,7 @@ export default function TrophyRoom() {
       ))}
       <pointLight position={[0, 2.6, 4.5]} intensity={12} distance={14} decay={1.4} color="#ffe0b0" />
 
-      <Shell width={12} depth={12} back={4.5} height={3.6} floor="#0a0b0f" wall="#15120e" ceiling="#070709" floorSurface={{ name: "marble", tile: 2.4, tint: "#3a3530", roughness: 0.35 }} />
+      <Shell width={12} depth={12} back={4.5} height={3.6} floor="#0a0b0f" wall="#7a5a40" ceiling="#070709" floorSurface={{ name: "marble", tile: 2.4, tint: "#3a3530", roughness: 0.35 }} wallSurface={{ name: "walnut", tile: 1.6, roughness: 0.6 }} />
 
       {/* slatted side walls with a warm line of light */}
       {[-1, 1].map((s) => (

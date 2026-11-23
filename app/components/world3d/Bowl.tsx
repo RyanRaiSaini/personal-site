@@ -3,6 +3,7 @@
 import FlashZone from "./stadium/FlashZone";
 import Photographers from "./stadium/Photographers";
 import Stewards from "./stadium/Stewards";
+import PitchCameras from "./stadium/PitchCameras";
 import { Suspense, useEffect } from "react";
 import { useWorld } from "../../lib/store";
 import Lights from "./atmosphere/Lights";
@@ -53,6 +54,7 @@ export default function Bowl({ children }: { children?: React.ReactNode }) {
         <FlashZone />
         <Photographers />
         <Stewards />
+        <PitchCameras />
       </GroundLit>
       <Precipitation />
       {children}

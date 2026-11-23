@@ -10,6 +10,7 @@ import { atmo } from "../atmosphere/state";
 import { canvasTexture } from "../textures/canvas";
 import { useDisplayFont } from "../textures/text";
 import { Box, clickable, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign, Tripod, TvCamera, usePhoto } from "./common";
+import { useSurface } from "./surfaces";
 import { POSE } from "./clerk";
 import Person from "./Person";
 
@@ -213,6 +214,8 @@ const REPORTERS: { seat: number; row: number; man: 0 | 1; shirt: string; skin: n
 ];
 
 export default function PressRoom() {
+  // the carpet: a real woven surface (surfaces.ts) in navy
+  const carpet = useSurface("fabric", { repeat: [6, 4], tint: "#1a2656", roughness: 1, bumps: 0.8 });
   const family = useDisplayFont();
   const backdrop = useMemo(() => {
     const t = backdropTexture(family);
@@ -250,7 +253,7 @@ export default function PressRoom() {
       <TvCamera position={[-2.6, 0, 3.7]} turn={-0.35} low={0.1} />
 
       {/* carpet under the reporters' chairs, edged in gold */}
-      <Box size={[6.2, 0.012, 3.4]} position={[0, 0.006, 1.9]} color="#15214a" roughness={0.95} />
+      <Box size={[6.2, 0.012, 3.4]} position={[0, 0.006, 1.9]} material={carpet} />
       {[-1, 1].map((side) => (
         <Box key={side} size={[6.2, 0.014, 0.05]} position={[0, 0.007, 1.9 + side * 1.7]} color="#8a6d2a" roughness={0.6} />
       ))}

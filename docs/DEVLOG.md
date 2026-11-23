@@ -325,3 +325,5 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - Now the ribbons are a steady glow with one broad, slow swell; only fans within about 30 m of the camera sway; and the softening never touches a fan's outline. Measured on the overview, sharp pixel changes in the stands between frames fell from 0.35% to 0.09% (what is left is the flags waving).
 - The haze in the bowl is also stronger, so the far stands sit back as in a broadcast, and at night it glows faintly instead of darkening.
 - **A modern match ball** (white, curved panel seams, bold printed strokes in navy, royal and gold, no maker's mark; `ballTexture` in `players/Cast.tsx`) and **corner flags whose cloth ripples** (`stadium/PitchSide.tsx`).
+- **The trophy room is panelled in walnut** (a room's shell can now take a real wall surface: `wallSurface` on `Shell` in `rooms/common.tsx`), and **the press room's and ticket office's carpets are a real weave** in navy.
+- **Television cameras along the far touchline,** on tripods behind the boards with their operators (`stadium/PitchCameras.tsx`; `ALONG`).

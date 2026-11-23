@@ -150,15 +150,20 @@ type ShellProps = {
   floorMap?: CanvasTexture | null;
   // a real floor (surfaces.ts): which, and how many metres one picture covers
   floorSurface?: { name: SurfaceName; tile: number; tint?: string; roughness?: number; grey?: boolean };
+  // a real wall surface instead of painted plaster (wood panelling, say): which, metres to a copy
+  wallSurface?: { name: SurfaceName; tile: number; roughness?: number };
 };
 
 // The empty room: floor, four walls and a ceiling, seen from inside
-export function Shell({ width, depth, back, height, floor, wall, ceiling, floorRoughness = 0.8, floorMetalness = 0, floorMap = null, floorSurface }: ShellProps) {
+export function Shell({ width, depth, back, height, floor, wall, ceiling, floorRoughness = 0.8, floorMetalness = 0, floorMap = null, floorSurface, wallSurface }: ShellProps) {
   const centreZ = -back + depth / 2;
   // the walls: real painted plaster, in the room's colour; each wall
   // repeats it about every two metres
-  const plasterLong = useSurface("plaster", { repeat: [width / 2, height / 2], tint: wall, roughness: 0.95, bumps: 0.6 });
-  const plasterSide = useSurface("plaster", { repeat: [depth / 2, height / 2], tint: wall, roughness: 0.95, bumps: 0.6 });
+  const wallName = wallSurface?.name ?? "plaster";
+  const wallTile = wallSurface?.tile ?? 2;
+  const wallRough = wallSurface?.roughness ?? 0.95;
+  const plasterLong = useSurface(wallName, { repeat: [width / wallTile, height / wallTile], tint: wall, roughness: wallRough, bumps: 0.6 });
+  const plasterSide = useSurface(wallName, { repeat: [depth / wallTile, height / wallTile], tint: wall, roughness: wallRough, bumps: 0.6 });
   const ceilingFinish = useSurface("plaster", { repeat: [width / 3, depth / 3], tint: ceiling, roughness: 1, bumps: 0.4 });
   const tile = floorSurface?.tile ?? 1;
   const realFloor = useSurface(floorSurface?.name ?? "concrete", { repeat: [width / tile, depth / tile], tint: floorSurface?.tint, roughness: floorSurface?.roughness, grey: floorSurface?.grey });
