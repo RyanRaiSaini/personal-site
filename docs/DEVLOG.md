@@ -261,3 +261,11 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - The picture is now finished as a television match picture is graded (`atmosphere/grade.ts`): the same ACES curve as before, then a little more contrast, richer colour, shadows a touch cool and highlights a touch warm. It costs nothing: it fills in three.js's "custom" tone mapping, the renderer's own last step, and at "high" it replaces the tone-mapping step of the glow pass.
 - The mowing stripes were scaled by how far the camera looked along the pitch, so from the stands (looking across it) they all but vanished. They now keep most of their strength from every side, and are stronger (`STRIPE` 0.15). The grass is a deeper, cleaner green.
 - The floodlight beams at night are fainter (`STRENGTH` 0.22): they had been washing out the stands.
+
+### Smoother camera, and goals shot like television
+
+- Every camera move now runs through a soft spring (`FOLLOW`, 0.16 s): the camera follows its plan as a camera on a crane does, so a flight cut short, a change of section mid-flight, or a show handing back control never jerks. Shows that want a hard cut still get one (`rig.snapOverride`).
+- Flights turn the view along the arc between the first and last directions instead of sliding the look-at point in a straight line, which had swung the view round when the two pointed different ways. The easing is gentler at both ends (no jolt in speed or acceleration).
+- **Fixed:** flights between the pitch and somewhere high went through the stands (after a guest goal, the camera flew back to the overview through the seats). Such flights now climb above the lower end first and travel at height.
+- The guest goals are directed like a match broadcast: the strike on the main camera high in the main stand, panning with the taker and then the ball on a long lens; a cut to a hand-held camera at the scorer's shoulder as he wheels away; then the slow turn round him.
+- Speed readings tonight were lower across the board because OneDrive was syncing hard in the background. With the crowd shown and hidden in turn, its cost was unchanged at about 8 pictures a second.

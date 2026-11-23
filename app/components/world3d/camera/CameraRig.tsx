@@ -18,6 +18,12 @@ import { ORBIT, orbitPose, poseOf, type Pose } from "../spots";
 //   4. Shows: hand over to the intro or an Easter egg while one is
 //      playing (they set `rig.override`).
 //
+// Whatever it is doing, the camera itself follows that plan on a soft
+// spring (FOLLOW), as a camera on a crane or a cable does: a change of
+// mind, a flight cut short or a show handing back never jerks it. A
+// show that wants a television cut sets `rig.snapOverride`, and the
+// spring is skipped for that one frame.
+//
 // The camera positions themselves are in ../spots.ts.
 // ------------------------------------------------------------------
 
@@ -42,14 +48,51 @@ export const rig = {
   target: new Vector3(),
 };
 
+// Seconds the camera takes to catch up with its plan, roughly
+const FOLLOW = 0.16;
+
+// Starts and stops with no jolt: speed and acceleration are both zero at the ends
 function easeInOut(t: number) {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  return t * t * t * (t * (t * 6 - 15) + 10);
+}
+
+// A spring that settles without overshoot, after Game Programming Gems 4
+// (the "smooth damp" most game engines use). Moves `value` toward `goal`
+// and keeps its speed in `speed`.
+function follow(value: Vector3, goal: Vector3, speed: Vector3, dt: number) {
+  const omega = 2 / FOLLOW;
+  const x = omega * dt;
+  const decay = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
+  for (const axis of ["x", "y", "z"] as const) {
+    const change = value[axis] - goal[axis];
+    const pull = (speed[axis] + omega * change) * dt;
+    speed[axis] = (speed[axis] - omega * pull) * decay;
+    value[axis] = goal[axis] + (change + pull) * decay;
+  }
+}
+
+// The direction a flight looks in, turned along the arc between its
+// first and last directions rather than cut across it, so a look-at
+// point that swings past the camera does not whip the view round
+function turnBetween(from: Vector3, to: Vector3, t: number, out: Vector3) {
+  const cos = Math.min(1, Math.max(-1, from.dot(to)));
+  const angle = Math.acos(cos);
+  if (angle < 1e-3) return out.lerpVectors(from, to, t).normalize();
+  const sin = Math.sin(angle);
+  return out
+    .copy(from)
+    .multiplyScalar(Math.sin((1 - t) * angle) / sin)
+    .addScaledVector(to, Math.sin(t * angle) / sin)
+    .normalize();
 }
 
 const scratch = new Vector3();
 const scratchTarget = new Vector3();
 const right = new Vector3();
 const up = new Vector3(0, 1, 0);
+const fromLook = new Vector3();
+const toLook = new Vector3();
+const look = new Vector3();
 
 export default function CameraRig() {
   const camera = useThree((s) => s.camera) as PerspectiveCamera;
@@ -60,11 +103,13 @@ export default function CameraRig() {
   const narrow = useWorld((s) => s.narrow);
 
   const current = useRef({ position: new Vector3(0, ORBIT.height, ORBIT.radiusZ), target: new Vector3(0, ORBIT.targetHeight, 0), fov: ORBIT.fov });
-  const flight = useRef({ active: false, t: 0, duration: 1.6, lift: 0, fromPosition: new Vector3(), fromTarget: new Vector3(), fromFov: 50, to: orbitPose(ORBIT.startAzimuth, false) });
+  const flight = useRef({ active: false, t: 0, duration: 1.6, lift: 0, fromPosition: new Vector3(), fromTarget: new Vector3(), fromFov: 50, to: orbitPose(ORBIT.startAzimuth, false), climb: false, via: new Vector3() });
   const started = useRef(false);
   const lastCuts = useRef(cuts);
   const wasOverridden = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
+  // where the camera really is: the plan above, followed on a spring
+  const shown = useRef({ position: new Vector3(), target: new Vector3(), fov: ORBIT.fov, speed: new Vector3(), targetSpeed: new Vector3(), fovSpeed: 0, ready: false, lastPlan: new Vector3() });
 
   // Where the camera should end up for the current section
   const destination = (): Pose => (section === "home" ? orbitPose(rig.azimuth, narrow) : poseOf(section, narrow));
@@ -77,6 +122,8 @@ export default function CameraRig() {
       c.target.set(...to.target);
       c.fov = to.fov;
       f.active = false;
+      // a jump is a jump: the spring starts again from here
+      shown.current.ready = false;
       return;
     }
     f.fromPosition.copy(c.position);
@@ -87,6 +134,13 @@ export default function CameraRig() {
     f.duration = Math.min(2.6, Math.max(1.1, distance / 42));
     // Rise a little in the middle of a long flight, like a cable camera
     f.lift = Math.min(12, distance * 0.1);
+    // Between the pitch and somewhere high (the overview), a straight
+    // line runs through the stands. So the camera climbs above the lower
+    // end first and travels at height, on a curve through `via`.
+    const low = c.position.y < to.position[1] ? c.position : scratch.set(...to.position);
+    const high = Math.max(c.position.y, to.position[1]);
+    f.climb = high - Math.min(c.position.y, to.position[1]) > 6 && distance > 20;
+    f.via.set(low.x, high + 4, low.z);
     f.t = 0;
     f.active = distance > 0.01;
   };
@@ -152,6 +206,8 @@ export default function CameraRig() {
     const state = useWorld.getState();
     const reduced = state.reducedMotion;
 
+    // a television cut: straight there, spring and all
+    const cut = rig.snapOverride && !!rig.override;
     if (rig.override) {
       // A show is steering
       const k = rig.snapOverride ? 1 : 1 - Math.exp(-rig.overrideStiffness * dt);
@@ -171,9 +227,24 @@ export default function CameraRig() {
       if (f.active) {
         f.t = Math.min(1, f.t + dt / f.duration);
         const e = easeInOut(f.t);
-        c.position.lerpVectors(f.fromPosition, scratch.set(...f.to.position), e);
-        c.position.y += Math.sin(Math.PI * e) * f.lift;
-        c.target.lerpVectors(f.fromTarget, scratchTarget.set(...f.to.target), e);
+        scratch.set(...f.to.position);
+        scratchTarget.set(...f.to.target);
+        // where it looks: turned from the first direction to the last,
+        // at a distance that changes evenly between the two
+        fromLook.subVectors(f.fromTarget, f.fromPosition);
+        toLook.subVectors(scratchTarget, scratch);
+        const reach = fromLook.length() + (toLook.length() - fromLook.length()) * e;
+        turnBetween(fromLook.normalize(), toLook.normalize(), e, look);
+        if (f.climb) {
+          // a curve that leaves the low end straight upward
+          const a = (1 - e) * (1 - e);
+          const b = 2 * (1 - e) * e;
+          c.position.copy(f.fromPosition).multiplyScalar(a).addScaledVector(f.via, b).addScaledVector(scratch, e * e);
+        } else {
+          c.position.lerpVectors(f.fromPosition, scratch, e);
+          c.position.y += Math.sin(Math.PI * e) * f.lift;
+        }
+        c.target.copy(c.position).addScaledVector(look, reach);
         c.fov = f.fromFov + (f.to.fov - f.fromFov) * e;
         if (f.t >= 1) f.active = false;
         // in flight: every frame counts
@@ -202,12 +273,40 @@ export default function CameraRig() {
       }
     }
 
-    camera.position.copy(c.position);
-    camera.lookAt(c.target);
+    // The camera follows the plan on its spring
+    const s = shown.current;
+    if (!s.ready || cut || reduced) {
+      s.position.copy(c.position);
+      s.target.copy(c.target);
+      s.fov = c.fov;
+      s.speed.set(0, 0, 0);
+      s.targetSpeed.set(0, 0, 0);
+      s.fovSpeed = 0;
+      s.ready = true;
+    } else {
+      follow(s.position, c.position, s.speed, dt);
+      follow(s.target, c.target, s.targetSpeed, dt);
+      // the field of view on the same spring, one number on its own
+      scratch.set(s.fov, 0, 0);
+      scratchTarget.set(c.fov, 0, 0);
+      right.set(s.fovSpeed, 0, 0);
+      follow(scratch, scratchTarget, right, dt);
+      s.fov = scratch.x;
+      s.fovSpeed = right.x;
+      // The plan has stopped and the camera is still catching up: keep
+      // drawing until it arrives. While the plan moves, whatever moves it
+      // decides that (the overview's slow drift is allowed to rest).
+      const planStill = s.lastPlan.distanceToSquared(c.position) < 1e-10;
+      if (planStill && (s.position.distanceToSquared(c.position) > 1e-6 || s.target.distanceToSquared(c.target) > 1e-6 || Math.abs(s.fov - c.fov) > 1e-3)) stir();
+    }
+
+    s.lastPlan.copy(c.position);
+    camera.position.copy(s.position);
+    camera.lookAt(s.target);
     // so anything placed on screen this frame (the name tags) uses the new view
     camera.updateMatrixWorld();
-    rig.position.copy(c.position);
-    rig.target.copy(c.target);
+    rig.position.copy(s.position);
+    rig.target.copy(s.target);
 
     // Slide the picture aside to make room for the open panel
     const wanted = state.viewOffset;
@@ -219,7 +318,7 @@ export default function CameraRig() {
     if (ox !== 0 || oy !== 0) camera.setViewOffset(size.width, size.height, ox, oy, size.width, size.height);
     else if (camera.view) camera.clearViewOffset();
 
-    if (Math.abs(camera.fov - c.fov) > 0.001) camera.fov = c.fov;
+    if (Math.abs(camera.fov - s.fov) > 0.001) camera.fov = s.fov;
     camera.updateProjectionMatrix();
   }, -5);
 

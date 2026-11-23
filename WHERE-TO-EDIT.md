@@ -145,6 +145,7 @@ Everything 3D is in `app/components/world3d/`. Sizes are in metres. The pitch is
 | Where a name tag floats | `SPOTS.<section>.anchor` | `app/components/world3d/spots.ts` |
 | The overview track (height, distance, zoom) | `ORBIT` | `app/components/world3d/spots.ts` |
 | Drift speed, drag speed, flight time, pointer lean | | `app/components/world3d/camera/CameraRig.tsx` |
+| How softly the camera follows its plan (the crane-like spring under every move) | `FOLLOW`, in seconds | `app/components/world3d/camera/CameraRig.tsx` |
 | The words on the start screen | `home.tour`, `home.startNote`, `home.skipStart` (the name and line under it are `profile.name` and `profile.headline`) | `app/data/portfolio.ts` |
 | How the start screen is laid out | the `.start` styles | `app/globals.css`, `app/components/world/StartScreen.tsx` |
 | Where the camera stands on the start screen | `WAITING` | `app/components/world3d/camera/Intro.tsx` |
@@ -229,7 +230,7 @@ Every player is a copy of one model (`public/players/player.glb`), moved by moti
 | The goalkeeper: who he is, and which way he dives | `KITS.keeper`; `keeper` in `GOALS` (`"wrong"` or `"late"`). His dive was recorded one way only, so for the other he is shown as in a mirror (`keeperMirrored`), with his number printed to suit. | `players/kits.ts`, `players/shows.ts`, `players/Cast.tsx` |
 | Where number 8 stands in each outdoor section, and how he stands | `REST` | `app/components/world3d/players/Cast.tsx` |
 | Where number 8 is in each room, and what he is doing | `MARKS` | `app/components/world3d/players/RoomSaini.tsx` |
-| The camera during a goal | "The camera, for the two guest stars" | `app/components/world3d/players/Cast.tsx` |
+| The camera during a goal: the main camera's place and lens, the hand-held sway, the cuts | `MAIN_CAMERA`, `handHeld`, and "The camera, for the two guest stars" | `app/components/world3d/players/Cast.tsx` |
 | The body's build (shoulders, chest, waist, arms, neck, calves, thighs) | `SHAPE`, and `THIGH` (each row: a height, the thigh's radius there, and how far forward it sits), then rebuild (section 11) | `blender/players/params.py` |
 | The shorts: how long, how narrow at the hem, how close to the thigh | `SHORTS_HEM`, `SHORTS_SLIM`, `SHORTS_CLEAR`, then rebuild and run the check | `blender/players/params.py` |
 | How even and how smooth the skin is (a blotchy skin goes rusty under a brown tint) | `SKIN_EVEN`, `SKIN_SMOOTH`, then rebuild | `blender/players/params.py` |

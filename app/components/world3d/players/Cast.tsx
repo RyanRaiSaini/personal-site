@@ -174,6 +174,20 @@ function HintRing({ x, z }: { x: number; z: number }) {
   );
 }
 
+// The main television camera: high in the main stand (the -Z side),
+// clear above the lower tier, on a long lens
+const MAIN_CAMERA = { y: 12.5, z: -50, fov: 15 };
+
+// A camera held by hand: a slow sway and a little shake, in metres,
+// as [across, up, aim]
+function handHeld(time: number): [number, number, number] {
+  return [
+    Math.sin(time * 1.3) * 0.06 + Math.sin(time * 3.7 + 1.1) * 0.02,
+    Math.sin(time * 1.9 + 0.4) * 0.035 + Math.sin(time * 5.3) * 0.012,
+    Math.sin(time * 1.1 + 2.0) * 0.08 + Math.sin(time * 4.1) * 0.025,
+  ];
+}
+
 export default function Cast() {
   const show = useWorld((s) => s.show);
   const introDone = useWorld((s) => s.introDone);
@@ -185,6 +199,8 @@ export default function Cast() {
   const southBall = useRef<Group>(null);
   const scored = useRef(false);
   const directing = useRef(false);
+  // which of the director's shots is on screen (-1: none), so a change of shot is a cut
+  const shot = useRef(-1);
   const leather = useMemo(() => ballTexture(), []);
   useEffect(() => () => leather.dispose(), [leather]);
 
@@ -265,6 +281,7 @@ export default function Cast() {
         directing.current = false;
         rig.override = null;
       }
+      shot.current = -1;
       // With Projects open the goalkeeper stands on his line in the north goal
       const waiting = keeper.current;
       if (waiting && !goal && world.section === "projects") {
@@ -393,30 +410,44 @@ export default function Cast() {
       world.cheer();
     }
 
-    // The camera, for the two guest stars
+    // The camera, for the two guest stars, directed as a match is on
+    // television: the strike on the main camera high in the stand,
+    // following the ball; a cut to a camera at his shoulder as he wheels
+    // away; then a slow turn round him while he celebrates.
     if (script.directed) {
       directing.current = true;
       rig.overrideStiffness = 3.2;
       const toGoal = Math.sign(goalX - script.ball[0]);
-      if (t < tContact + BALL_FLIGHT + 0.55) {
-        // behind the taker, looking at the goal
+      const now = t < tContact + BALL_FLIGHT + 0.7 ? 0 : t < tHold ? 1 : 2;
+      // a new shot is a cut; the turn at the end follows on from the shoulder camera
+      if (now !== shot.current && now < 2) rig.snapOverride = true;
+      shot.current = now;
+      if (now === 0) {
+        // the main camera: high on the halfway side of the main stand,
+        // long lens, panning with the taker and then the ball
+        const follow = t < tContact || !ball ? [x, z] : [ball.position.x, ball.position.z];
+        const mid = (script.ball[0] + goalX) / 2;
+        rig.overrideStiffness = 2.6;
         rig.override = {
-          position: [script.ball[0] - toGoal * 9.5, 2.3, script.ball[1] + 3.6],
-          target: [goalX, 1.5, script.target[2] * 0.4],
-          fov: 40,
+          position: [mid * 0.55 - toGoal * 6, MAIN_CAMERA.y, MAIN_CAMERA.z],
+          target: [follow[0] + toGoal * 1.5, 1.1, follow[1] * 0.85],
+          fov: MAIN_CAMERA.fov,
         };
-      } else if (t < tHold) {
-        // running alongside
+      } else if (now === 1) {
+        // at his shoulder, hand-held: running with him, never quite steady
+        const sway = handHeld(atmo.time);
+        rig.overrideStiffness = 4;
         rig.override = {
-          position: [x + toGoal * -5.5, 1.9, z + (script.party[1] > script.ball[1] ? -4.5 : 4.5) * 0.9],
-          target: [x, 1.25, z],
+          position: [x + toGoal * -5.5 + sway[0], 1.85 + sway[1], z + (script.party[1] > script.ball[1] ? -4.5 : 4.5) * 0.9],
+          target: [x + sway[2], 1.25 + sway[1] * 0.5, z],
           fov: 42,
         };
       } else {
         // a slow turn round him, ending behind so the name can be read
         const angle = script.partyFacing - 0.3 + (t - tHold) * (2.9 / script.hold);
+        const sway = handHeld(atmo.time);
         rig.override = {
-          position: [x + Math.sin(angle) * 4.3, 1.5, z + Math.cos(angle) * 4.3],
+          position: [x + Math.sin(angle) * 4.3 + sway[0] * 0.5, 1.5 + sway[1] * 0.5, z + Math.cos(angle) * 4.3],
           target: [x, 1.28, z],
           fov: 38,
         };

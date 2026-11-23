@@ -36,6 +36,7 @@ function DevTools() {
       const { rig } = await import("./camera/CameraRig");
       rig.override = x === undefined || y === undefined || z === undefined ? null : { position: [x, y, z], target: [tx, ty, tz], fov };
       rig.overrideStiffness = 60;
+      rig.snapOverride = true;
     };
     w.__camera = camera;
     w.__scene = scene;
