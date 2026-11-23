@@ -2,6 +2,10 @@
 
 import { profile, resumeText } from "../../../data/portfolio";
 import { headshot } from "../../../data/photos";
+import { useEffect, useState } from "react";
+import { DoubleSide, type Texture } from "three";
+import { HEIGHT, WIDTH } from "../stadium/Crowd";
+import { clerkPicture } from "./clerk";
 import { Box, Glow, GOLD, NAVY, ROYAL, Shell, Sign, usePhoto } from "./common";
 
 // The ticket office (Résumé). Two lit windows in the concourse wall
@@ -15,9 +19,38 @@ import { Box, Glow, GOLD, NAVY, ROYAL, Shell, Sign, usePhoto } from "./common";
 // the résumé picture's shape, width by height (scripts/resume-image.mjs)
 const PAGE_SHAPE = 1200 / 1687;
 
-function Window({ x }: { x: number }) {
+// The person serving at a window: one of the crowd's people, seated on a
+// stool behind the counter, in the club's staff polo (rooms/clerk.ts)
+function Clerk({ which, mirrored }: { which: 0 | 1; mirrored: boolean }) {
+  const [picture, setPicture] = useState<Texture | null>(null);
+  useEffect(() => {
+    let alive = true;
+    let made: Texture | null = null;
+    clerkPicture(which, NAVY, which ? 0.55 : 0.2)
+      .then((texture) => {
+        made = texture;
+        if (alive) setPicture(texture);
+        else texture.dispose();
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+      made?.dispose();
+    };
+  }, [which]);
+  if (!picture) return null;
+  return (
+    <mesh position={[mirrored ? 0.25 : -0.25, 0.68 + HEIGHT / 2, -0.035]} scale={[mirrored ? -1 : 1, 1, 1]}>
+      <planeGeometry args={[WIDTH, HEIGHT]} />
+      <meshStandardMaterial map={picture} alphaTest={0.45} roughness={0.85} side={DoubleSide} />
+    </mesh>
+  );
+}
+
+function Window({ x, clerk }: { x: number; clerk: 0 | 1 }) {
   return (
     <group position={[x, 0, -4.4]}>
+      <Clerk which={clerk} mirrored={clerk === 1} />
       {/* the booth: a warm room behind glass (kept in front of the wall, or the wall hides it) */}
       <Box size={[2.2, 1.5, 0.02]} position={[0, 1.85, -0.06]} color="#f1cf96" emissive="#f4b864" emissiveIntensity={0.9} roughness={0.9} />
       <Box size={[2.2, 0.3, 0.02]} position={[0, 2.45, -0.05]} color="#2a2f3a" roughness={0.7} />
@@ -31,7 +64,7 @@ function Window({ x }: { x: number }) {
       <Box size={[2.4, 1.05, 0.12]} position={[0, 0.53, 0.02]} color={NAVY} roughness={0.6} />
       <Box size={[0.5, 0.05, 0.02]} position={[0, 1.2, 0.04]} color="#08090c" />
       {/* a lit sign in the window: open */}
-      <Sign lines={[{ text: resumeText.windowSign.toUpperCase(), size: 1, color: "#7dffb0", weight: 800, spacing: 0.3 }]} width={0.62} height={0.2} position={[-0.55, 2.38, -0.03]} background="#06140c" border="#2a7a4a" glow={1.6} />
+      <Sign lines={[{ text: resumeText.windowSign.toUpperCase(), size: 1, color: "#7dffb0", weight: 800, spacing: 0.3 }]} width={0.62} height={0.2} position={[0.62, 2.4, -0.03]} background="#06140c" border="#2a7a4a" glow={1.6} />
     </group>
   );
 }
@@ -245,8 +278,8 @@ export default function TicketOffice() {
         </group>
       ))}
 
-      <Window x={-3.9} />
-      <Window x={3.9} />
+      <Window x={-3.9} clerk={0} />
+      <Window x={3.9} clerk={1} />
       <Stats x={-1.82} />
       <Profile x={1.82} />
       <Scarves position={[6.42, 0, -0.2]} rotation={[0, -Math.PI / 2, 0]} />

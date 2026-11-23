@@ -284,3 +284,6 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **GitHub** shows the last 4 weeks, as a calendar with each day's count in its square, in the panel and on the scoreboard.
 - **The ticket office** has the résumé itself in the frame between the windows (a picture of its first page, `npm run resume:image`), a board of four numbers from the résumé where the banner was, "Ticket office" over the windows, and "Open" signs in the windows instead of the two shapes that stood for clerks.
 - Found on the way: a material that is given its picture only after it first draws keeps the shader it was built without, so the résumé frame showed blank. It is keyed now, so a new material is made when the picture arrives.
+- **Someone at each ticket window:** a clerk in a navy staff polo sits behind each counter, one of the crowd's rendered people recoloured (`rooms/clerk.ts`).
+- **The trophy plaques are readable:** each award has a short plaque name in the data file (`plaque`), set large on a plaque that fills the pedestal's front, with its value or giver beneath.
+- **Make-A-Wish and the NBA** now opens with STARboard (a large portrait card and a link to the board), then the three numbers, three photos from All-Star weekend, the quote, and the story in full at the bottom.

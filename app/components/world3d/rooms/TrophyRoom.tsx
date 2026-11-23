@@ -144,16 +144,21 @@ function Case({ x, z, turn, index }: { x: number; z: number; turn: number; index
         <boxGeometry args={[0.86, 0.92, 0.86]} />
         <meshStandardMaterial {...GLASS} />
       </mesh>
+      {/* the plaque: the award's short name, large enough to read from the
+          rope, and its value or who gave it */}
       <Sign
         lines={[
-          { text: award.title.toUpperCase(), size: 0.36, color: CREAM, weight: 700 },
-          { text: [award.from, award.amount].filter(Boolean).join("  ·  ").toUpperCase() || award.note.toUpperCase(), size: 0.26, color: GOLD, weight: 600, spacing: 0.08 },
+          { text: award.plaque[0].toUpperCase(), size: 0.22, color: CREAM, weight: 800, spacing: 0.04 },
+          { text: award.plaque[1].toUpperCase(), size: 0.22, color: CREAM, weight: 800, spacing: 0.04 },
+          { text: " ", size: 0.06 },
+          { text: (award.amount ?? award.from ?? "").toUpperCase(), size: 0.2, color: GOLD, weight: 700, spacing: 0.06 },
         ]}
-        width={0.84}
-        height={0.4}
-        position={[0, 0.6, 0.456]}
+        width={0.8}
+        height={0.7}
+        position={[0, 0.52, 0.456]}
         background="#0e1015"
         border={GOLD}
+        glow={1.15}
       />
     </group>
   );

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { awards, makeAWish } from "../../data/portfolio";
-import { starboardPortrait } from "../../data/photos";
+import { album, starboardPortrait } from "../../data/photos";
 import PlaceIcon from "../ui/PlaceIcon";
 import Tabs from "../ui/Tabs";
 import { ExternalLink, Quote, Stats } from "./parts";
@@ -29,30 +29,43 @@ export default function AwardsContent() {
     </ul>
   );
 
+  // STARboard first, then the numbers and the photos, then the story in full
   const story = (
     <div className="grid gap-5">
+      <div className="card grid gap-4 text-center sm:grid-cols-[9rem_1fr] sm:items-center sm:text-left">
+        <Image src={starboardPortrait.src} alt={starboardPortrait.alt} width={starboardPortrait.width} height={starboardPortrait.height} placeholder="blur" blurDataURL={starboardPortrait.blur} className="mx-auto aspect-square w-36 rounded-lg object-cover" />
+        <div className="min-w-0">
+          <p className="font-display text-2xl font-bold uppercase leading-tight tracking-wide text-gold">{makeAWish.board.name}</p>
+          <p className="mt-1 text-[0.9375rem] leading-normal text-ink-soft">{makeAWish.board.note}</p>
+          <p className="mt-2">
+            <ExternalLink href={makeAWish.starboardUrl} className="btn !min-h-9 !px-3 !text-sm">
+              {makeAWish.board.link}
+            </ExternalLink>
+          </p>
+          <p className="meta mt-1.5 !text-xs">Photo: {starboardPortrait.credit}</p>
+        </div>
+      </div>
+
+      <Stats items={makeAWish.stats} />
+
+      {/* three photos from All-Star weekend; the rest are in the press room */}
+      <ul role="list" className="grid grid-cols-3 gap-2">
+        {album.slice(0, 3).map((photo) => (
+          <li key={photo.src}>
+            <Image src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} placeholder="blur" blurDataURL={photo.blur} sizes="11rem" className="aspect-[4/5] w-full rounded-md object-cover" />
+          </li>
+        ))}
+      </ul>
+
+      <Quote text={makeAWish.quote.text} source={makeAWish.quote.source} />
+
       <div className="prose">
         {makeAWish.paragraphs.map((paragraph) => (
           <p key={paragraph.slice(0, 24)}>{paragraph}</p>
         ))}
       </div>
 
-      <Quote text={makeAWish.quote.text} source={makeAWish.quote.source} />
-
-      <Stats items={makeAWish.stats} />
-
-      <div className="card flex items-center gap-4">
-        <Image src={starboardPortrait.src} alt={starboardPortrait.alt} width={starboardPortrait.width} height={starboardPortrait.height} placeholder="blur" blurDataURL={starboardPortrait.blur} className="h-16 w-16 flex-none rounded-lg object-cover" />
-        <div className="min-w-0 text-[0.9375rem] leading-normal">
-          <p className="font-medium">{makeAWish.board.name}</p>
-          <p className="text-ink-soft">
-            {makeAWish.board.note} <ExternalLink href={makeAWish.starboardUrl}>{makeAWish.board.link}</ExternalLink>
-          </p>
-          <p className="meta mt-0.5 !text-xs">Photo: {starboardPortrait.credit}</p>
-        </div>
-      </div>
-
-      <div>
+      <div className="text-center">
         <Link href="/news" className="btn">
           {makeAWish.photosButton}
         </Link>

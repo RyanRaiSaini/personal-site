@@ -41,6 +41,8 @@ export type Experience = {
 export type Award = {
   id: string;
   title: string;
+  // the name on its plaque in the trophy room: two short lines at most
+  plaque: [string, string];
   from?: string;
   amount?: string;
   year?: string;
@@ -308,6 +310,7 @@ export const awards: Award[] = [
   {
     id: "john-plater",
     title: "John Plater Scholarship",
+    plaque: ["John Plater", "Scholarship"],
     from: "Hemophilia Ontario",
     amount: "$8,000",
     note: "Awarded to students in Ontario's bleeding disorders community.",
@@ -315,6 +318,7 @@ export const awards: Award[] = [
   {
     id: "presidents-scholarship",
     title: "President's Scholarship of Distinction",
+    plaque: ["President's", "Scholarship"],
     from: "University of Waterloo",
     amount: "$4,000",
     note: "Entrance scholarship for top incoming students.",
@@ -322,11 +326,13 @@ export const awards: Award[] = [
   {
     id: "leader-of-tomorrow",
     title: "Leader of Tomorrow Canada Hemophilia Award",
+    plaque: ["Leader of", "Tomorrow"],
     note: "For leadership in the hemophilia community.",
   },
   {
     id: "starboard",
     title: "STARboard selection",
+    plaque: ["STARboard", "Selection"],
     from: "Make-A-Wish Canada",
     note: "Chosen for the national youth advisory board of wish recipients.",
   },

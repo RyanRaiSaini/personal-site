@@ -32,8 +32,8 @@ import { loadSeatData } from "./seatData";
 
 // one fan's picture, in metres: as rendered (blender/build_crowd.py,
 // WORLD_W and WORLD_H), his feet on his row's step, in front of the seat back
-const WIDTH = 1.097;
-const HEIGHT = 1.8;
+export const WIDTH = 1.097;
+export const HEIGHT = 1.8;
 const LIFT = 0.0; // the bottom of the picture above the seat's step
 const FORWARD = 0.3; // in front of the seat back
 const CHEER_SECONDS = 4.5;
@@ -58,7 +58,7 @@ const SHIRTS: [string, number][] = [
 // poses each, and the masks of their shirt (red), skin (green),
 // trousers (full blue) and hair (half blue)
 const SHEET = { colour: "/stadium/crowd/crowd-colour.webp", mask: "/stadium/crowd/crowd-mask.webp", plan: "/stadium/crowd/crowd.json" };
-const CELLS = 8;
+export const CELLS = 8;
 const POSES_EACH = 4;
 
 // how much of his cell each person fills, [left, right, top] as shares of
@@ -67,7 +67,7 @@ const POSES_EACH = 4;
 type Box = [number, number, number];
 
 let sheets: Promise<{ colour: Texture; mask: Texture; boxes: Box[] }> | null = null;
-function loadSheets() {
+export function loadSheets() {
   sheets ??= (async () => {
     const loader = new TextureLoader();
     const [colour, mask, plan] = await Promise.all([
