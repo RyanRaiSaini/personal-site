@@ -98,6 +98,6 @@ export default function FloodBeams() {
     material.uniforms.uStrength.value = STRENGTH * atmo.floodlights * Math.max(0, 1 - atmo.outdoor * 1.6);
   });
 
-  if (quality === "low") return null;
-  return <mesh geometry={geometry} material={material} renderOrder={5} frustumCulled={false} />;
+  // hidden, not removed, at "low", so it comes back cleanly
+  return <mesh geometry={geometry} material={material} renderOrder={5} frustumCulled={false} visible={quality !== "low"} />;
 }

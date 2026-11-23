@@ -318,11 +318,12 @@ export default function Crowd() {
     if (changed) near.hide.needsUpdate = true;
   });
 
-  if (quality === "low") return null;
+  // Hidden, not removed, at "low": taking it out of the scene and putting
+  // it back left the crowd undrawn
   return (
     <>
-      <primitive object={mesh} />
-      <primitive object={near.group} />
+      <primitive object={mesh} visible={quality !== "low"} />
+      <primitive object={near.group} visible={quality !== "low"} />
     </>
   );
 }
