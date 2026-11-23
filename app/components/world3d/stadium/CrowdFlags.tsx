@@ -70,16 +70,21 @@ export default function CrowdFlags() {
           if ( uv.x >= 0.0 ) {
             // a wave running out from the pole, growing toward the free edge,
             // and the whole flag swung slowly from side to side
+            // The fast ripple only near the camera: from across the bowl a
+            // flag is a few pixels and a ripple there only shimmers. Far
+            // off, the flag just sways slowly, which reads as a wave.
+            vec3 heldAt = ( modelMatrix * instanceMatrix * vec4( 0.0, 0.0, 0.0, 1.0 ) ).xyz;
+            float near = 1.0 - smoothstep( 20.0, 45.0, distance( heldAt, cameraPosition ) );
             float along = uv.x;
             float t = uTime * ( 2.4 + aFlag.a * 1.2 ) + aFlag.a * 40.0;
-            transformed.z += along * ( 0.22 * sin( along * 5.5 - t ) + 0.08 * sin( along * 11.0 - t * 1.7 ) );
+            transformed.z += near * along * ( 0.22 * sin( along * 5.5 - t ) + 0.08 * sin( along * 11.0 - t * 1.7 ) );
             transformed.y -= along * along * 0.12 * ( 0.6 + 0.4 * sin( t * 0.5 ) );
-            float swing = 0.35 * sin( uTime * 0.7 + aFlag.a * 20.0 );
+            float swing = ( 0.15 + 0.2 * near ) * sin( uTime * 0.5 + aFlag.a * 20.0 );
             float lean = transformed.y / ${FLAG.pole.toFixed(2)};
             transformed.z += swing * transformed.x * 0.4 + swing * lean * 0.3;
           } else {
             vMain = 0.0;
-            transformed.z += 0.35 * sin( uTime * 0.7 + aFlag.a * 20.0 ) * ( transformed.y / ${FLAG.pole.toFixed(2)} ) * 0.3;
+            transformed.z += 0.25 * sin( uTime * 0.5 + aFlag.a * 20.0 ) * ( transformed.y / ${FLAG.pole.toFixed(2)} ) * 0.3;
           }`,
         );
       shader.fragmentShader = shader.fragmentShader
@@ -92,7 +97,7 @@ export default function CrowdFlags() {
           diffuseColor.rgb = vMain < 0.5 ? vec3( 0.06 ) : mix( diffuseColor.rgb, vStripe, band );`,
         );
     };
-    material.customProgramCacheKey = () => "crowd-flags-v2";
+    material.customProgramCacheKey = () => "crowd-flags-v3";
     // the same worked-out light as the seats they are held over: in the
     // roof's shade by day, under the lamps at night
     withBakedLight(material, "seat");

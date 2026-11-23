@@ -327,3 +327,4 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **A modern match ball** (white, curved panel seams, bold printed strokes in navy, royal and gold, no maker's mark; `ballTexture` in `players/Cast.tsx`) and **corner flags whose cloth ripples** (`stadium/PitchSide.tsx`).
 - **The trophy room is panelled in walnut** (a room's shell can now take a real wall surface: `wallSurface` on `Shell` in `rooms/common.tsx`), and **the press room's and ticket office's carpets are a real weave** in navy.
 - **Television cameras along the far touchline,** on tripods behind the boards with their operators (`stadium/PitchCameras.tsx`; `ALONG`).
+- **Distant flags** keep only a slow sway; their fast ripple is for flags near the camera (it shimmered from across the bowl). Sharp pixel flips in the stands are now about 0.03% by day and 0.06% at night.
