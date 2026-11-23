@@ -115,7 +115,8 @@ export default function Crowd() {
       shader.uniforms.uMask = { value: pictures.mask };
       shader.uniforms.uBox = { value: pictures.boxes.map(([left, right, top]) => new Vector3(left, right, top)) };
       shader.vertexShader = shader.vertexShader
-        .replace("#include <common>", `#include <common>\nattribute vec3 aShirt;\nattribute vec3 aFan;\nuniform float uJump;\nuniform float uTime;\nuniform float uFocus;\nuniform float uSoft;\nvarying float vBlur;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvarying vec3 vSkin;\nvarying vec3 vLegs;\nvarying vec3 vHair;`)
+        .replace("#include <common>", `#include <common>\nattribute vec3 aShirt;\nattribute vec3 aFan;\nuniform float uJump;\nuniform float uTime;\nuniform float uFocus;\nuniform float uSoft;\nvarying float vBlur;
+varying float vFar;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvarying vec3 vSkin;\nvarying vec3 vLegs;\nvarying vec3 vHair;`)
         .replace(
           "#include <begin_vertex>",
           `#include <begin_vertex>
@@ -132,6 +133,10 @@ export default function Crowd() {
           // and the blue seat behind, which flickers (it did, 2026-11-24)
           vec3 seatAt = ( modelMatrix * instanceMatrix * vec4( 0.0, 0.0, 0.0, 1.0 ) ).xyz;
           float near = 1.0 - smoothstep( 12.0, 30.0, distance( seatAt, cameraPosition ) );
+          // far off, each fan a little wider, so neighbours touch: the dark
+          // gaps between distant fans flashed as the camera moved
+          float wide = smoothstep( 30.0, 90.0, distance( seatAt, cameraPosition ) );
+          transformed.x *= 1.0 + 0.6 * wide;
           float own = aFan.z * 6.2832;
           float pace = 0.35 + fract( aFan.z * 7.3 ) * 0.5;
           float height = transformed.y / ${HEIGHT.toFixed(2)};
@@ -143,6 +148,10 @@ export default function Crowd() {
           `#include <project_vertex>
           // out of focus: the further from what the camera is looking at,
           // the softer (a long lens on a close subject blurs the stands)
+          // far off, the crowd evens out, as a lens and the haze soften a
+          // distant crowd: fans a pixel or two wide flashing between white
+          // shirts and blue seats as the camera moves is what it prevents
+          vFar = smoothstep( 28.0, 95.0, -mvPosition.z );
           vBlur = uSoft * clamp( abs( -mvPosition.z - uFocus ) / max( uFocus, 1.0 ) * 0.9, 0.0, 1.5 );`,
         )
         .replace(
@@ -161,9 +170,16 @@ export default function Crowd() {
           float h = fract( aFan.z * 29.3 ) * ( 1.0 - 0.6 * aFan.y );
           vHair = h < 0.42 ? vec3( 0.022, 0.018, 0.015 ) : h < 0.66 ? vec3( 0.07, 0.042, 0.025 ) : h < 0.8 ? vec3( 0.17, 0.1, 0.05 ) : h < 0.9 ? vec3( 0.42, 0.3, 0.15 ) : vec3( 0.36, 0.35, 0.34 );`,
         );
-      shader.fragmentShader = shader.fragmentShader.replace("#include <common>", "#include <common>\nvarying float vBlur;\nuniform sampler2D uMask;\nvarying vec3 vShirt;\nvarying vec3 vSkin;\nvarying vec3 vLegs;\nvarying vec3 vHair;").replace(
+      shader.fragmentShader = shader.fragmentShader.replace("#include <common>", "#include <common>\nvarying float vBlur;\nvarying float vFar;\nuniform sampler2D uMask;\nvarying vec3 vShirt;\nvarying vec3 vSkin;\nvarying vec3 vLegs;\nvarying vec3 vHair;").replace(
         "#include <map_fragment>",
-        `vec4 fan = texture2D( map, vMapUv, vBlur );
+        `vec4 fan = texture2D( map, vMapUv, vBlur + 2.0 * vFar );
+        // far off, a fan is drawn as a solid patch of his own averaged
+        // colours rather than a cut-out figure: a cut-out a pixel or two
+        // wide covers one pixel or two as the camera moves, and flickers.
+        // (Transparent parts of the picture are black, so the average is
+        // divided by how much of the patch he covers.)
+        float solid = smoothstep( 0.35, 0.75, vFar );
+        fan.rgb = mix( fan.rgb, fan.rgb / max( fan.a, 0.55 ), solid );
         vec3 parts = texture2D( uMask, vMapUv, vBlur ).rgb;
         // blue: full for the trousers, half for the hair
         float legs = smoothstep( 0.88, 0.97, parts.b );
@@ -174,13 +190,17 @@ export default function Crowd() {
         // his own hair colour, keeping the picture's light and shade
         float shade = dot( fan.rgb, vec3( 0.3, 0.59, 0.11 ) );
         body = mix( body, vHair * ( 0.6 + 2.2 * shade ), hair );
+        body = mix( body, vec3( 0.2, 0.22, 0.3 ), 0.35 * vFar );
+        // and each distant fan a little lighter or darker than the next, so
+        // the solid patches still read as people
+        body *= 1.0 - 0.35 * solid * fract( vSkin.r * 91.7 + vShirt.g * 53.3 + vLegs.b * 17.1 );
         diffuseColor.rgb *= body;
         // the outline from the sharp picture: a softened outline cut off at
         // the alpha test would make fans vanish and reappear over their seats
-        diffuseColor.a *= texture2D( map, vMapUv ).a;`,
+        diffuseColor.a *= mix( texture2D( map, vMapUv ).a, 1.0, solid );`,
       );
     };
-    material.customProgramCacheKey = () => "crowd-v8";
+    material.customProgramCacheKey = () => "crowd-v10";
     withBakedLight(material, "seat");
 
     const n = seated.length;

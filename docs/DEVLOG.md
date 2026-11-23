@@ -328,3 +328,11 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **The trophy room is panelled in walnut** (a room's shell can now take a real wall surface: `wallSurface` on `Shell` in `rooms/common.tsx`), and **the press room's and ticket office's carpets are a real weave** in navy.
 - **Television cameras along the far touchline,** on tripods behind the boards with their operators (`stadium/PitchCameras.tsx`; `ALONG`).
 - **Distant flags** keep only a slow sway; their fast ripple is for flags near the camera (it shimmered from across the bowl). Sharp pixel flips in the stands are now about 0.03% by day and 0.06% at night.
+
+### Fixed properly: the blue shimmer in the stands (2026-11-24, Ryan's second report)
+
+- The first fix was measured with the camera parked, but the home view drifts, and that is when the stands shimmered. Measured again with the camera nudged a few centimetres between frames: the crowd caused nearly all of it (with the crowd hidden, sharp pixel changes in the stands fell from 8.4% to 0.4%). Far off, a fan is a cut-out a pixel or two wide that covers one pixel or two as the camera moves, so fans flicked on and off against the dark rows and the bright blue empty seats.
+- Now, far from the camera, each fan is drawn as a solid patch of his own averaged colours (a little lighter or darker than the next) instead of a cut-out, eased toward the stands' overall tone as a lens and the haze would. Near fans keep their full figure; the change is gradual with distance (`solid`, `vFar` in `stadium/Crowd.tsx`).
+- The ground is fuller (95% of seats taken, `OCCUPANCY` in `stadium/crowdPlan.ts`), and empty seats are a deeper blue (`stadium/Seats.tsx`).
+- Result, with the camera moved 8 cm: sharp changes in the stands down from 6.1% to 1.9%, and changes to or from blue from 0.69% to 0.05%. With 20 cm, blue changes from 2.9% to 0.13%.
+- **Number 8 in the ticket office** no longer stands in the queue barrier: he is on the open floor in front of the framed résumé (`players/RoomSaini.tsx`).

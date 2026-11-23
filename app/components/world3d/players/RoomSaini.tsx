@@ -20,8 +20,9 @@ const MARKS: Record<Exclude<SceneId, "bowl">, Mark> = {
   trophy: { at: [2.5, 0, 1.0], facing: Math.PI * 0.86, doing: (time) => standing(time, ["folded"]) },
   // behind the desk, on the little stage
   press: { at: [0, 0.22, -3.55], facing: 0, doing: (time) => playing("sit", time) },
-  // in the left queue, looking across at the programme
-  tickets: { at: [-2.55, 0, -0.5], facing: Math.PI * 0.86, doing: (time) => standing(time) },
+  // on the open floor in front of the framed résumé, reading it: clear of
+  // the queue barriers (the nearest runs along x -2.6)
+  tickets: { at: [-1.0, 0, -1.7], facing: Math.PI * 0.94, doing: (time) => standing(time) },
 };
 
 export default function RoomSaini({ room }: { room: Exclude<SceneId, "bowl"> }) {

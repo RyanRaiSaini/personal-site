@@ -7,7 +7,7 @@
 // ------------------------------------------------------------------
 
 // The share of seats that are taken
-export const OCCUPANCY = 0.86;
+export const OCCUPANCY = 0.95;
 
 // A repeatable random number from 0 to 1 for seat `i`, stream `k`.
 // The streams must not be related to one another (whether a seat is
