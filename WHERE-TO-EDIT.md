@@ -193,6 +193,7 @@ By day the stadium is lit by one photographed sky and one fixed sun. The real cl
 | The shape of a fan in the round (body, head, hair, arms, legs) and the raised arm | `fanGeometry`, `fanMaterial` | `app/components/world3d/stadium/fanFigure.ts` |
 | The colour a taken seat is darkened to | `TAKEN` | `app/components/world3d/stadium/Seats.tsx` |
 | The floodlights' beams and the halo along the lamp bar at night (off at "low" quality) | `STRENGTH`, and `shafts` in the shader | `app/components/world3d/stadium/FloodBeams.tsx` |
+| The broadcast grade: contrast, colour, cool shadows and warm highlights, for the whole picture | `GRADE` | `app/components/world3d/atmosphere/grade.ts` |
 | The glow round bright lights ("high" quality only) | `intensity`, `luminanceThreshold` | `app/components/world3d/atmosphere/Effects.tsx` |
 | Rain and snow (how much, how fast) | `COUNT`, `fall` | `app/components/world3d/atmosphere/Precipitation.tsx` |
 | The city used for time and weather | `now.homeCity` | `app/data/portfolio.ts` |

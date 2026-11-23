@@ -27,7 +27,7 @@ import { outline } from "./path";
 
 const MARGIN_X = 6.5; // grass beyond the goal lines
 const MARGIN_Z = 5; // grass beyond the touchlines
-const STRIPE = 0.1; // how much lighter and darker the mown bands look, at most
+const STRIPE = 0.15; // how much lighter and darker the mown bands look, at most
 const BLADES = 1.5; // metres of pitch covered by one copy of the blade relief
 
 const pitchShader = /* glsl */ `
@@ -74,7 +74,7 @@ const pitchShader = /* glsl */ `
     float HL = ${PITCH.halfLength.toFixed(2)};
     float HW = ${PITCH.halfWidth.toFixed(2)};
 
-    vec3 base = vec3(0.060, 0.190, 0.038);
+    vec3 base = vec3(0.046, 0.200, 0.030);
     vec3 grass = base;
 
     // Mown bands across the pitch, twenty of them, and a fainter set
@@ -83,7 +83,9 @@ const pitchShader = /* glsl */ `
     vec2 view = normalize(toCamera + vec2(0.0001));
     float bandX = step(0.5, fract((p.x + HL) / 10.5)) * 2.0 - 1.0;
     float bandZ = step(0.5, fract((p.y + HW) / 11.34)) * 2.0 - 1.0;
-    grass *= 1.0 + ${STRIPE.toFixed(3)} * bandX * view.x;
+    // Strongest looking along the pitch; from the side the sheen still
+    // shows them, as a broadcast camera on the halfway line sees them
+    grass *= 1.0 + ${STRIPE.toFixed(3)} * bandX * (0.55 + 0.45 * abs(view.x));
     grass *= 1.0 + ${(STRIPE * 0.3).toFixed(3)} * bandZ * view.y;
 
     // No lawn is one colour: broad patches, smaller mottling, and a few
@@ -161,7 +163,7 @@ function grassMaterial() {
       .replace("#include <common>", `#include <common>\n${pitchShader}`)
       .replace("#include <color_fragment>", "#include <color_fragment>\ndiffuseColor.rgb = pitchColor(vPitch, vToCamera);");
   };
-  material.customProgramCacheKey = () => "pitch-grass-v2";
+  material.customProgramCacheKey = () => "pitch-grass-v3";
   material.userData.textures = [relief, finish];
   // lit like the ground it is: the roof's shadow and the open sky above come from the ground picture
   return withBakedLight(material, "ground");

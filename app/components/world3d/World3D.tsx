@@ -3,10 +3,13 @@
 import { Environment, Lightformer, useProgress } from "@react-three/drei";
 import { Canvas, useThree } from "@react-three/fiber";
 import { Suspense, useEffect } from "react";
+import { CustomToneMapping } from "three";
 import { useWorld } from "../../lib/store";
 import AtmosphereDriver from "./atmosphere/AtmosphereDriver";
 import { SKY_FILES, SKY_TURN } from "./atmosphere/daylight";
 import Effects from "./atmosphere/Effects";
+// fills in three.js's custom tone mapping with the broadcast grade
+import "./atmosphere/grade";
 import Bowl, { stadium } from "./Bowl";
 import CameraRig from "./camera/CameraRig";
 import Intro from "./camera/Intro";
@@ -129,7 +132,7 @@ export default function World3D() {
       // `shadows` alone asks for, and fell back to these with a warning
       shadows={quality !== "low" && "percentage"}
       dpr={lean ? LEAN_DPR : DPR[quality]}
-      gl={{ antialias: true, powerPreference: "high-performance" }}
+      gl={{ antialias: true, powerPreference: "high-performance", toneMapping: CustomToneMapping }}
       camera={{ position: [0, ORBIT.height, ORBIT.radiusZ], fov: ORBIT.fov, near: 0.3, far: 2000 }}
       role="img"
       aria-label="A 3D football stadium. Each part of the ground is a section of this site; the same sections are in the menu."

@@ -28,7 +28,7 @@ import { sweepBand } from "./path";
 // the beams land: on the pitch, well in from the touchlines
 const TOP = { d: -2.4, y: 42.2 };
 const BOTTOM = { d: -18, y: 0.3 };
-const STRENGTH = 0.34;
+const STRENGTH = 0.22;
 const COLOUR = new Color("#dfe7ff");
 
 const vertex = /* glsl */ `

@@ -255,3 +255,9 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - The fans in the round near the camera (`fanFigure.ts`) are gone: the rendered people look better up close than they did, and cost less.
 - Each fan's card is cut to the outline of the person on it (`boxes` in `crowd.json`). Only about a quarter of each cell is person, and the empty part costs as much to draw.
 - Cost, overview, 1280 x 720, development server, on mains: about 52 pictures a second with the crowd against 59 without it.
+
+### A broadcast picture
+
+- The picture is now finished as a television match picture is graded (`atmosphere/grade.ts`): the same ACES curve as before, then a little more contrast, richer colour, shadows a touch cool and highlights a touch warm. It costs nothing: it fills in three.js's "custom" tone mapping, the renderer's own last step, and at "high" it replaces the tone-mapping step of the glow pass.
+- The mowing stripes were scaled by how far the camera looked along the pitch, so from the stands (looking across it) they all but vanished. They now keep most of their strength from every side, and are stronger (`STRIPE` 0.15). The grass is a deeper, cleaner green.
+- The floodlight beams at night are fainter (`STRENGTH` 0.22): they had been washing out the stands.
