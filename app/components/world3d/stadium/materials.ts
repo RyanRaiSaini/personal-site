@@ -1,4 +1,4 @@
-import { DoubleSide, MeshBasicMaterial, MeshStandardMaterial, RepeatWrapping, SRGBColorSpace, TextureLoader, type Material, type Texture } from "three";
+import { Color, DoubleSide, MeshBasicMaterial, MeshStandardMaterial, RepeatWrapping, SRGBColorSpace, TextureLoader, type Material, type Texture } from "three";
 import { withBakedLight } from "./bakedLight";
 
 // ------------------------------------------------------------------
@@ -84,6 +84,41 @@ export const SEAT_COLOR = "#22398a";
 
 export type StadiumMaterials = Record<string, Material>;
 
+// The LED ribbons along the tier fronts: switched on, showing no words
+// and no sponsors (the site's rule), only the club's blues with a slow
+// sweep of light running round the bowl, as ribbon boards do between
+// adverts. `ribbonClock` is moved on each frame by StadiumModel.tsx.
+export const ribbonClock = { value: 0 };
+const RIBBON = { deep: "#0a1a52", bright: "#2a5ee8", sweep: 0.9 };
+
+function ribbonMaterial() {
+  const material = new MeshStandardMaterial({ color: "#04060a", roughness: 0.3 });
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uClock = ribbonClock;
+    shader.uniforms.uDeep = { value: new Color(RIBBON.deep) };
+    shader.uniforms.uBright = { value: new Color(RIBBON.bright) };
+    shader.vertexShader = shader.vertexShader
+      .replace("#include <common>", "#include <common>\nvarying vec3 vRibbon;")
+      .replace("#include <worldpos_vertex>", "#include <worldpos_vertex>\nvRibbon = ( modelMatrix * vec4( transformed, 1.0 ) ).xyz;");
+    shader.fragmentShader = shader.fragmentShader.replace("#include <common>", "#include <common>\nvarying vec3 vRibbon;\nuniform float uClock;\nuniform vec3 uDeep;\nuniform vec3 uBright;").replace(
+      "#include <emissivemap_fragment>",
+      `#include <emissivemap_fragment>
+      // round the bowl: 0 to 1 once round
+      float round = atan( vRibbon.z, vRibbon.x ) / 6.2832 + 0.5;
+      // two bright sweeps chasing round, over slow diagonal bands
+      float sweep = pow( 0.5 + 0.5 * sin( ( round * 2.0 - uClock * 0.05 ) * 6.2832 ), 6.0 );
+      float bands = 0.5 + 0.5 * sin( round * 260.0 + vRibbon.y * 3.0 - uClock * 1.2 );
+      // the lamps' grid up close
+      vec2 cell = fract( vec2( round * 9000.0, vRibbon.y * 90.0 ) ) - 0.5;
+      float lamp = mix( 0.6 + 0.4 * ( 1.0 - smoothstep( 0.25, 0.5, max( abs( cell.x ), abs( cell.y ) ) ) ), 0.8, smoothstep( 0.2, 0.6, fwidth( round * 9000.0 ) ) );
+      vec3 led = mix( uDeep, uBright, 0.25 + 0.25 * bands + 0.5 * sweep );
+      totalEmissiveRadiance = led * lamp * ${RIBBON.sweep.toFixed(2)};`,
+    );
+  };
+  material.customProgramCacheKey = () => "stadium-ribbon";
+  return material;
+}
+
 export function makeMaterials(): StadiumMaterials {
   const made: StadiumMaterials = {};
   for (const [name, look] of Object.entries(LOOKS)) {
@@ -101,6 +136,7 @@ export function makeMaterials(): StadiumMaterials {
     }
     made[name] = withBakedLight(material);
   }
+  made.Ribbon = ribbonMaterial();
   // Doorways into the dark: no light of their own, no reflections
   made.Void = new MeshBasicMaterial({ color: "#030304" });
   // Clear glass guards along the tier fronts and round the entrances:
