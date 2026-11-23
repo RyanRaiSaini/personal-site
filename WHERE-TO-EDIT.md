@@ -191,6 +191,7 @@ By day the stadium is lit by one photographed sky and one fixed sun. The real cl
 | The crowd: how full the ground is | `OCCUPANCY` | `app/components/world3d/stadium/crowdPlan.ts` |
 | The crowd: shirt colours, trousers, hair, how many raise an arm, how long they jump after a goal | `SHIRTS`, the shader's `vLegs` and `vHair`, the `cell` choice, `CHEER_SECONDS` | `app/components/world3d/stadium/Crowd.tsx` |
 | The crowd's people and poses (two Mixamo men, seated, four poses each) | `PEOPLE`, `POSES`; rebuild with `npm run crowd:build` then `npm run crowd:pack` | `blender/build_crowd.py`, `scripts/pack-crowd.mjs` |
+| The standing people in the ticket office's queues (the same two men, seen from four sides) | `STAND_VIEWS`; rebuild with `npm run crowd:build:queue` then `npm run crowd:pack` | `blender/build_crowd.py`, `scripts/pack-crowd.mjs` |
 | The shape of a fan in the round (body, head, hair, arms, legs) and the raised arm | `fanGeometry`, `fanMaterial` | `app/components/world3d/stadium/fanFigure.ts` |
 | The colour a taken seat is darkened to | `TAKEN` | `app/components/world3d/stadium/Seats.tsx` |
 | The floodlights' beams and the halo along the lamp bar at night (off at "low" quality) | `STRENGTH`, and `shafts` in the shader | `app/components/world3d/stadium/FloodBeams.tsx` |
@@ -221,6 +222,7 @@ By day the stadium is lit by one photographed sky and one fixed sun. The real cl
 | Shared building blocks (boxes, lit signs, the room shell, the TV camera on its tripod) | | `app/components/world3d/rooms/common.tsx` |
 | Real materials for the rooms (walnut, leather, marble, rubber, concrete, laminate, plaster, fabric, metal) and how a room uses one (`useSurface`, `floorSurface` on `Shell`, `material` on `Box`) | | `app/components/world3d/rooms/surfaces.ts` |
 | People in the rooms (the ticket clerks, the reporters): one of the crowd's rendered people, recoloured | `Person`, `personPicture` | `app/components/world3d/rooms/Person.tsx`, `rooms/clerk.ts` |
+| The fans queuing at the ticket windows: who stands where, their shirts, skin and hair | `FANS` | `app/components/world3d/rooms/Queue.tsx` |
 
 The shirts in the dressing room come from `squad` and `bench`. The trophies come from `awards` (the first four). The résumé picture in the ticket office comes from `npm run resume:image`; the boards at the flash interview read from `profile` and `contactText.zone`.
 

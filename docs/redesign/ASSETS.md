@@ -40,9 +40,9 @@ A second model, "santiago bernabeu" by Michael Persi (mikmikoni), CC BY 4.0, was
 
 | | |
 |---|---|
-| What | The fans in the stands: pictures of two people sitting down, in four poses each |
+| What | The fans in the stands: pictures of two people sitting down, in four poses each; and the same two standing, seen from four sides, for the ticket office's queues (`queue-*`) |
 | Characters | "Remy" and "Bryce", from Adobe's [Mixamo](https://www.mixamo.com) library |
-| Movement | Mixamo motion capture: Sitting Idle and Victory (the raised arms) |
+| Movement | Mixamo motion capture: Sitting Idle and Victory (the raised arms); Breathing Idle for the standing people |
 | Made by | Seated and rendered in Blender 5.3 by [`blender/build_crowd.py`](../../blender/build_crowd.py), packed by [`scripts/pack-crowd.mjs`](../../scripts/pack-crowd.mjs). A second picture marks the shirt, skin, trousers and hair, so the site gives every fan his own colours. |
 | Web version | [`public/stadium/crowd/`](../../public/stadium/crowd/), about 180 KB |
 | Licence | As for the players above |

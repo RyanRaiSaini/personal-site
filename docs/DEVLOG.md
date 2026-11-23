@@ -351,3 +351,8 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 ### No more blue blocks in the stands (2026-11-24, Ryan's third report)
 
 - The blue blocks and lines in the stands were the seats themselves: bright royal-blue plastic that showed as hard blue rectangles wherever a seat was not hidden by a fan (an empty seat, the front row, the seat backs between fans), and from afar as blue lines along every tier's front rows. Found by painting each material red in turn. The seats are now a dark charcoal-navy, so where one shows it reads as shadow between people (`SEAT_COLOR` in `stadium/materials.ts`).
+
+### Fans queuing at the ticket windows (2026-11-24, Ryan asked)
+
+- **Nine fans in the ticket office's queues,** standing in their own clothes, in single file down the middle of each lane, evenly spaced and facing the window (`FANS`, `STEP`, `LANES` in `rooms/Queue.tsx`). They are the crowd's two Mixamo men, rendered standing from four sides by `build_crowd.py --stand` (`npm run crowd:build:queue`, then `npm run crowd:pack`) into `public/stadium/crowd/queue-*`, recoloured like the clerks (`rooms/clerk.ts`), each with a soft shadow at his feet.
+- Two new pictures in the fixed set, `ticket-office` and `ticket-queue` (`scripts/shots.mjs`).

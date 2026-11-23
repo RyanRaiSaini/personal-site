@@ -60,6 +60,9 @@ const SHOTS = [
   { name: "awards-panel", path: "/awards", query: DAY },
   { name: "news-panel", path: "/news", query: DAY },
   { name: "resume-panel", path: "/resume", query: DAY },
+  // the ticket office (its room is built at 900, 0, -600) and its queues
+  { name: "ticket-office", path: "/resume", query: DAY, look: [900, 1.7, -593, 900, 1.7, -602, 46], scene: true },
+  { name: "ticket-queue", path: "/resume", query: DAY, look: [898.6, 1.6, -597.4, 896.1, 1.15, -602.3, 40], scene: true },
   { name: "contact-panel", path: "/contact", query: DAY },
   { name: "github-panel", path: "/github", query: DAY },
   { name: "live-panel", path: "/live", query: DAY },

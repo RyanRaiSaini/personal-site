@@ -3,6 +3,7 @@
 import { profile, resumeText } from "../../../data/portfolio";
 import { headshot } from "../../../data/photos";
 import Person from "./Person";
+import Queue from "./Queue";
 import { Box, Glow, GOLD, NAVY, ROYAL, Shell, Sign, usePhoto } from "./common";
 import { useSurface } from "./surfaces";
 
@@ -258,6 +259,8 @@ export default function TicketOffice() {
 
       <Window x={-3.9} clerk={0} />
       <Window x={3.9} clerk={1} />
+      {/* fans queuing at both windows (Queue.tsx) */}
+      <Queue />
       <Stats x={-1.82} />
       <Profile x={1.82} />
       <Scarves position={[6.42, 0, -0.2]} rotation={[0, -Math.PI / 2, 0]} />

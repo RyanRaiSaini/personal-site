@@ -20,6 +20,7 @@
     "players:pack": "node scripts/pack-players.mjs",
     "crowd:build": "blender --background --factory-startup --python blender/build_crowd.py -- --source ../stadium-work/mixamo/raw --site public/stadium/crowd",
     "crowd:build:back": "blender --background --factory-startup --python blender/build_crowd.py -- --source ../stadium-work/mixamo/raw --site public/stadium/crowd --back",
+    "crowd:build:queue": "blender --background --factory-startup --python blender/build_crowd.py -- --source ../stadium-work/mixamo/raw --site public/stadium/crowd --stand",
     "crowd:pack": "node scripts/pack-crowd.mjs",
     "peek": "node scripts/peek.mjs",
     "measure": "node scripts/measure.mjs"

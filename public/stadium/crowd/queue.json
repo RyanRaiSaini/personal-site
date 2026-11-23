@@ -1,0 +1,86 @@
+{
+  "cells": [
+    {
+      "person": "remy",
+      "pose": "back"
+    },
+    {
+      "person": "remy",
+      "pose": "back-quarter"
+    },
+    {
+      "person": "remy",
+      "pose": "front-quarter"
+    },
+    {
+      "person": "remy",
+      "pose": "front"
+    },
+    {
+      "person": "bryce",
+      "pose": "back"
+    },
+    {
+      "person": "bryce",
+      "pose": "back-quarter"
+    },
+    {
+      "person": "bryce",
+      "pose": "front-quarter"
+    },
+    {
+      "person": "bryce",
+      "pose": "front"
+    }
+  ],
+  "cell": [
+    320,
+    525
+  ],
+  "metres": [
+    1.097,
+    1.8
+  ],
+  "boxes": [
+    [
+      0.213,
+      0.788,
+      0.97
+    ],
+    [
+      0.219,
+      0.781,
+      0.983
+    ],
+    [
+      0.203,
+      0.797,
+      0.989
+    ],
+    [
+      0.213,
+      0.788,
+      0.977
+    ],
+    [
+      0.184,
+      0.816,
+      0.97
+    ],
+    [
+      0.178,
+      0.822,
+      0.985
+    ],
+    [
+      0.203,
+      0.797,
+      0.985
+    ],
+    [
+      0.194,
+      0.806,
+      0.977
+    ]
+  ]
+}

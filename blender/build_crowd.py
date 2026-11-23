@@ -54,6 +54,20 @@ POSES = [
 ]
 ARM_BONES = ("Shoulder", "Arm", "ForeArm", "Hand")
 
+# --stand: the same people standing, as in the ticket office's queues
+# (rooms/Queue.tsx): a frame of the "breathing idle" clip, each man seen
+# from several sides (degrees he is turned from facing the camera), into
+# its own sheet (queue-colour.webp), a little sharper than the crowd's
+# since the room's camera comes close
+STANDING = "extra/breathing idle.fbx"
+STAND_VIEWS = [
+    {"name": "back", "frame": 30, "turn": 180},
+    {"name": "back-quarter", "frame": 90, "turn": 145},
+    {"name": "front-quarter", "frame": 150, "turn": 35},
+    {"name": "front", "frame": 60, "turn": 0},
+]
+STAND_CELL = (320, 525)
+
 
 def log(message):
     print(f"[crowd] {message}", flush=True)
@@ -67,6 +81,8 @@ def parse_args():
     parser.add_argument("--probe")
     # the same people seen from behind (the press room's seats face away)
     parser.add_argument("--back", action="store_true")
+    # standing people, seen from several sides (the ticket office's queues)
+    parser.add_argument("--stand", action="store_true")
     return parser.parse_args(argv)
 
 
@@ -276,10 +292,16 @@ def build(args):
     work = os.path.join(tempfile.gettempdir(), "crowd-cells")
     os.makedirs(work, exist_ok=True)
     cells = []
+    global CELL_W, CELL_H
+    if args.stand:
+        CELL_W, CELL_H = STAND_CELL
     for person, spec in PEOPLE.items():
         arm, meshes = load_person(source, spec)
-        sitting = clip(os.path.join(source, SITTING), arm)
-        victory = clip(os.path.join(source, VICTORY), arm)
+        if args.stand:
+            standing = clip(os.path.join(source, STANDING), arm)
+        else:
+            sitting = clip(os.path.join(source, SITTING), arm)
+            victory = clip(os.path.join(source, VICTORY), arm)
         scene = stage(args.back)
         by_name = {o.name: o for o in meshes}
         own = {o.name: [s.material for s in o.material_slots] for o in meshes}
@@ -310,11 +332,23 @@ def build(args):
                     arm.location = (0.0, 0.0, 0.0)
             continue
 
-        for spec_pose in POSES:
+        for spec_pose in STAND_VIEWS if args.stand else POSES:
             arm.location = (0.0, 0.0, 0.0)
-            pose(arm, sitting, victory, spec_pose)
+            if args.stand:
+                # stood at a frame of the idle clip, held there, turned to the view
+                use(arm, standing)
+                scene.frame_set(spec_pose["frame"])
+                bpy.context.view_layer.update()
+                held = {bone.name: bone.matrix_basis.copy() for bone in arm.pose.bones}
+                arm.animation_data.action = None
+                for bone in arm.pose.bones:
+                    bone.matrix_basis = held[bone.name]
+                arm.rotation_euler.z = math.radians(spec_pose["turn"])
+                bpy.context.view_layer.update()
+            else:
+                pose(arm, sitting, victory, spec_pose)
             settle(arm, meshes)
-            base = os.path.join(work, f"{person}-{spec_pose['name']}{'-back' if args.back else ''}")
+            base = os.path.join(work, f"{person}-{spec_pose['name']}{'-back' if args.back else ''}{'-stand' if args.stand else ''}")
             for name, obj in by_name.items():
                 for i, slot in enumerate(obj.material_slots):
                     slot.material = greys.get(name, own[name][i])
@@ -334,7 +368,7 @@ def build(args):
         return
 
     # one sheet of colour, one of masks, the cells side by side
-    name = "crowd-back" if args.back else "crowd"
+    name = "queue" if args.stand else "crowd-back" if args.back else "crowd"
     sheet_w = CELL_W * len(cells)
     for which in ("colour", "mask"):
         sheet = bpy.data.images.new(f"{name}-{which}", sheet_w, CELL_H, alpha=True)

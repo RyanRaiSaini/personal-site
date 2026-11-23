@@ -6,16 +6,20 @@ import { CanvasTexture, Color, SRGBColorSpace, type Texture } from "three";
 // window, a reporter in the press room. The second picture of each sheet
 // marks the shirt, skin, trousers and hair, so those can be any colour.
 //
-// Two sheets: "crowd" sees them from the front, "crowd-back" from
-// behind. Each has eight cells: the two men, in four poses each.
+// Three sheets: "crowd" sees them seated from the front, "crowd-back"
+// from behind; "queue" has them standing (build_crowd.py --stand), each
+// seen from four sides (VIEW). Each has eight cells: the two men, four
+// each.
 // ------------------------------------------------------------------
 
 export const PERSON = { width: 1.097, height: 1.8 }; // metres, as rendered
 const CELLS = 8;
 // [man, pose] -> cell: poses are sit, arms up, arm up, arms high
 export const POSE = { sit: 0, armUp: 2 } as const;
+// on the "queue" sheet the four cells are the sides he is seen from
+export const VIEW = { back: 0, backQuarter: 1, frontQuarter: 2, front: 3 } as const;
 
-type Sheet = "crowd" | "crowd-back";
+type Sheet = "crowd" | "crowd-back" | "queue";
 const sheets = new Map<Sheet, Promise<[HTMLImageElement, HTMLImageElement]>>();
 function loadImage(src: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -37,7 +41,7 @@ function load(sheet: Sheet) {
 export type PersonLook = {
   sheet?: Sheet;
   man: 0 | 1;
-  pose?: number; // POSE.sit or POSE.armUp
+  pose?: number; // POSE.sit or POSE.armUp; on the "queue" sheet, a VIEW
   shirt: string;
   skin?: number; // 0 fair to 1 dark
   hair?: string;

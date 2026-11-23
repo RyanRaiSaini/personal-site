@@ -5,7 +5,8 @@
 //
 // blender/build_crowd.py writes, into public/stadium/crowd/, a colour
 // sheet and a mask sheet for the people seen from the front (crowd-*)
-// and, with --back, from behind (crowd-back-*). This writes the WebP
+// and, with --back, from behind (crowd-back-*); with --stand, standing
+// people for the ticket office's queues (queue-*). This writes the WebP
 // files the site loads. The masks are measurements, not colours, so
 // they are kept sharp.
 // ------------------------------------------------------------------
@@ -20,7 +21,7 @@ const DIR = "public/stadium/crowd";
 // much to draw as the person.
 const MARGIN = 3;
 
-for (const sheetName of ["crowd", "crowd-back"]) {
+for (const sheetName of ["crowd", "crowd-back", "queue"]) {
   if (!existsSync(`${DIR}/${sheetName}-colour.raw.png`)) continue;
   for (const [part, options] of [
     ["colour", { quality: 86, alphaQuality: 90, effort: 6 }],
