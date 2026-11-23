@@ -59,7 +59,7 @@ All from [Poly Haven](https://polyhaven.com), all [CC0](https://polyhaven.com/li
 | Brushed Concrete | <https://polyhaven.com/a/brushed_concrete> | Steps, walkways, risers | `textures/brushed_concrete_{diff,nor,arm}.webp` | 1024 × 1024 |
 | Painted Concrete 02 | <https://polyhaven.com/a/painted_concrete_02> | Walls, tier fronts, undersides, the wall round the pitch | `textures/painted_concrete_02_{diff,nor,arm}.webp` | 1024 × 1024 |
 | Corrugated Iron 02 | <https://polyhaven.com/a/corrugated_iron_02> | The roof deck (bumps and roughness only) | `textures/corrugated_iron_02_{nor,arm}.webp` | 1024 × 1024 |
-| Sparse Grass | <https://polyhaven.com/a/sparse_grass> | Blade detail on the pitch (bumps and roughness only) | `textures/sparse_grass_{nor,arm}.webp` | 1024 × 1024 |
+| Sparse Grass | <https://polyhaven.com/a/sparse_grass> | Blade detail on the pitch: bumps, roughness, and the photo's light and dark close to the camera (not its colour) | `textures/sparse_grass_{diff,nor,arm}.webp` | 512 × 512 (diff), 1024 × 1024 |
 | American Walnut Veneer | <https://polyhaven.com/a/american_walnut_veneer> | The dressing room's lockers | `textures/american_walnut_veneer_{diff,nor,arm}.webp` | 512 × 512 |
 | Leather White | <https://polyhaven.com/a/leather_white> | Padded locker backs and seats | `textures/leather_white_{diff,nor,arm}.webp` | 512 × 512 |
 | Marble 01 | <https://polyhaven.com/a/marble_01> | The trophy room's floor | `textures/marble_01_{diff,nor,arm}.webp` | 512 × 512 |

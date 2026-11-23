@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { AdditiveBlending, BoxGeometry, Color, CylinderGeometry, DoubleSide, Float32BufferAttribute, PlaneGeometry, type BufferGeometry, type Group, type MeshBasicMaterial } from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { atmo } from "../atmosphere/state";
+import { disposeSurface, surfaceMaterial } from "../rooms/surfaces";
 import { canvasTexture } from "../textures/canvas";
 import { BOWL, DUGOUT, PITCH, TUNNEL } from "./dims";
 
@@ -135,11 +136,19 @@ function Dugout({ x }: { x: number }) {
     };
   }, [geometry]);
 
+  // padded leather (a real surface, rooms/surfaces.ts), in each part's own colour
+  const padding = useMemo(() => {
+    const material = surfaceMaterial("leather", { roughness: 0.7, bumps: 0.6 });
+    material.vertexColors = true;
+    // the leather photo is a warm off-white; this brings the colours back up
+    material.color.setRGB(1.7, 1.7, 1.85);
+    return material;
+  }, []);
+  useEffect(() => () => disposeSurface(padding), [padding]);
+
   return (
     <group position={[x, 0, z]}>
-      <mesh geometry={geometry.solid} castShadow receiveShadow>
-        <meshStandardMaterial vertexColors roughness={0.62} />
-      </mesh>
+      <mesh geometry={geometry.solid} material={padding} castShadow receiveShadow />
       <mesh geometry={geometry.clear}>
         <meshStandardMaterial color="#a9b8ca" transparent opacity={0.2} roughness={0.06} metalness={0.1} side={DoubleSide} forceSinglePass depthWrite={false} />
       </mesh>

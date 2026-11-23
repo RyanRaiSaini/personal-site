@@ -32,7 +32,7 @@ const TEXTURES = [
   { id: "brushed_concrete", maps: ["diff", "nor", "arm"], size: "1k", use: "the steps and walkways" },
   { id: "painted_concrete_02", maps: ["diff", "nor", "arm"], size: "1k", use: "walls, tier fronts and undersides" },
   { id: "corrugated_iron_02", maps: ["nor", "arm"], size: "1k", use: "the roof's ceiling" },
-  { id: "sparse_grass", maps: ["nor", "arm"], size: "1k", web: 512, use: "fine relief on the pitch" },
+  { id: "sparse_grass", maps: ["diff", "nor", "arm"], size: "1k", web: 512, use: "fine relief and grain on the pitch" },
   // the rooms (added 2026-11-23)
   { id: "american_walnut_veneer", maps: ["diff", "nor", "arm"], size: "1k", web: 512, use: "the dressing room's lockers, wood trim" },
   { id: "leather_white", maps: ["diff", "nor", "arm"], size: "1k", web: 512, use: "padded benches and seat backs" },

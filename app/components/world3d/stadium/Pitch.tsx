@@ -146,9 +146,12 @@ function grassMaterial() {
   const loader = new TextureLoader();
   const relief = loader.load("/stadium/textures/sparse_grass_nor.webp");
   const finish = loader.load("/stadium/textures/sparse_grass_arm.webp");
+  // the photographed lawn's light and dark: real blades and grain near
+  // the camera (its colour is not used; pitchColor sets that)
+  const grain = loader.load("/stadium/textures/sparse_grass_diff.webp");
   const length = PITCH.length + MARGIN_X * 2;
   const width = PITCH.width + MARGIN_Z * 2;
-  for (const texture of [relief, finish]) {
+  for (const texture of [relief, finish, grain]) {
     texture.wrapS = texture.wrapT = RepeatWrapping;
     texture.repeat.set(length / BLADES, width / BLADES);
     texture.anisotropy = 8;
@@ -156,15 +159,25 @@ function grassMaterial() {
   const material = new MeshStandardMaterial({ color: "#ffffff", roughness: 1, metalness: 0, normalMap: relief, roughnessMap: finish });
   material.normalScale.setScalar(0.75);
   material.onBeforeCompile = (shader) => {
+    shader.uniforms.uGrain = { value: grain };
     shader.vertexShader = shader.vertexShader
       .replace("#include <common>", "#include <common>\nvarying vec2 vPitch;\nvarying vec2 vToCamera;")
       .replace("#include <begin_vertex>", "#include <begin_vertex>\nvPitch = position.xz;\nvToCamera = cameraPosition.xz - ( modelMatrix * vec4( position, 1.0 ) ).xz;");
     shader.fragmentShader = shader.fragmentShader
-      .replace("#include <common>", `#include <common>\n${pitchShader}`)
-      .replace("#include <color_fragment>", "#include <color_fragment>\ndiffuseColor.rgb = pitchColor(vPitch, vToCamera);");
+      .replace("#include <common>", `#include <common>\nuniform sampler2D uGrain;\n${pitchShader}`)
+      .replace(
+        "#include <color_fragment>",
+        `#include <color_fragment>
+        diffuseColor.rgb = pitchColor(vPitch, vToCamera);
+        // the photo's grain, strongest close by, gone in the distance
+        // (0.245 is the photo's average brightness)
+        float grainNear = 1.0 - smoothstep(0.02, 0.3, fwidth(vPitch.x) + fwidth(vPitch.y));
+        float grainHere = clamp(dot(texture2D(uGrain, vNormalMapUv).rgb, vec3(0.3, 0.59, 0.11)) / 0.245, 0.5, 1.6);
+        diffuseColor.rgb *= mix(1.0, grainHere, 0.5 * grainNear);`,
+      );
   };
-  material.customProgramCacheKey = () => "pitch-grass-v3";
-  material.userData.textures = [relief, finish];
+  material.customProgramCacheKey = () => "pitch-grass-v4";
+  material.userData.textures = [relief, finish, grain];
   // lit like the ground it is: the roof's shadow and the open sky above come from the ground picture
   return withBakedLight(material, "ground");
 }
