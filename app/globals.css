@@ -1121,7 +1121,7 @@ html[data-show]:not([data-show=""]) .after-intro {
 .match-pitch {
   background:
     linear-gradient(to bottom, transparent 40%, var(--bg) 100%),
-    radial-gradient(circle at 50% 58%, transparent 0 7.9rem, color-mix(in srgb, var(--ink) 16%, transparent) 7.9rem 8rem, transparent 8rem),
+    radial-gradient(circle at 50% 15.5rem, transparent 0 9.9rem, color-mix(in srgb, var(--ink) 16%, transparent) 9.9rem 10rem, transparent 10rem),
     linear-gradient(to right, transparent calc(50% - 0.5px), color-mix(in srgb, var(--ink) 14%, transparent) calc(50% - 0.5px) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
     repeating-linear-gradient(to right, color-mix(in srgb, var(--pitch) 26%, var(--bg)) 0 5rem, color-mix(in srgb, var(--pitch) 18%, var(--bg)) 5rem 10rem);
   pointer-events: none;
@@ -1129,6 +1129,13 @@ html[data-show]:not([data-show=""]) .after-intro {
 
 /* The team sheet at the top: every section as a small plate, with its
    minute above its name. As many across as fit. */
+/* the flat view's name: as large as the page allows, on the centre spot */
+.match-name {
+  font-size: clamp(3.4rem, 11.5vw, 8.75rem);
+  line-height: 0.86;
+  text-shadow: 0 0.06em 0.5em color-mix(in srgb, var(--bg) 70%, transparent);
+}
+
 .match-index {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(8.25rem, 1fr));

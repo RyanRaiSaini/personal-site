@@ -56,12 +56,13 @@ export default function MatchPage() {
       <div aria-hidden="true" className="match-pitch absolute inset-x-0 top-0 h-[38rem]" />
 
       <div className="relative mx-auto max-w-[54rem] px-5 pb-28 pt-28 sm:px-8 sm:pt-36">
-        <header className="pb-14 sm:pb-20">
+        {/* centred, the name on the centre spot like a kick-off */}
+        <header className="pb-14 text-center sm:pb-20">
           <p className="kicker">{profile.location}</p>
-          <h1 className="mt-2 font-display text-6xl font-extrabold uppercase leading-[0.9] tracking-tight sm:text-8xl">{profile.name}</h1>
-          <p className="mt-4 max-w-xl text-lg text-ink-soft">{profile.headline}</p>
-          <p className="mt-2 max-w-xl text-ink-soft">{profile.seeking}</p>
-          <div className="mt-6 flex flex-wrap gap-3">
+          <h1 className="match-name mt-3 font-display font-extrabold uppercase tracking-tight">{profile.name}</h1>
+          <p className="mx-auto mt-5 max-w-xl text-lg text-ink-soft">{profile.headline}</p>
+          <p className="mx-auto mt-2 max-w-xl text-ink-soft">{profile.seeking}</p>
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
             <a href="#projects" className="btn btn-primary">
               {home.projects}
             </a>
@@ -73,7 +74,7 @@ export default function MatchPage() {
               {newTab}
             </a>
           </div>
-          <ul aria-label="Links" className="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-[0.9375rem]">
+          <ul aria-label="Links" className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-1 text-[0.9375rem]">
             <li>
               <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="link">
                 GitHub{newTab}
@@ -93,7 +94,7 @@ export default function MatchPage() {
 
           {/* The team sheet: every section, in match order. The minute
               sits above the name, so no name is ever cut short. */}
-          <nav aria-label="Sections" className="mt-10">
+          <nav aria-label="Sections" className="mt-12 text-left">
             <ol role="list" className="match-index">
               {sections.map((s) => (
                 <li key={s.id}>
