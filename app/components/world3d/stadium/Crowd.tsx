@@ -1,14 +1,15 @@
 "use client";
 
-import { useFrame } from "@react-three/fiber";
-import { use, useEffect, useMemo } from "react";
-import { Color, DoubleSide, InstancedBufferAttribute, InstancedMesh, Matrix4, MeshStandardMaterial, PlaneGeometry } from "three";
+import { useFrame, useThree } from "@react-three/fiber";
+import { use, useEffect, useMemo, useRef } from "react";
+import { Color, DoubleSide, Frustum, Group, InstancedBufferAttribute, InstancedMesh, Matrix4, MeshStandardMaterial, PlaneGeometry, Sphere, Vector3 } from "three";
 import { useWorld } from "../../../lib/store";
 import { stir } from "../activity";
 import { atmo } from "../atmosphere/state";
 import { canvasTexture } from "../textures/canvas";
 import { withBakedLight } from "./bakedLight";
 import { isTaken, seatHash as hash } from "./crowdPlan";
+import { fanGeometry, fanMaterial, type CrowdUniforms } from "./fanFigure";
 import { loadSeatData } from "./seatData";
 
 // ------------------------------------------------------------------
@@ -23,6 +24,11 @@ import { loadSeatData } from "./seatData";
 // light as the seats (bakedLight.ts), so they sit in the roof's shade
 // by day and under the floodlights at night.
 //
+// Wherever the camera comes within NEAR metres of a block of seats that
+// is in view, the cut-outs there are swapped for fans in the round
+// (fanFigure.ts), so close views of the stands show people, not cards. Each block's figures
+// are made the first time it is needed, and drawn only while it is near.
+//
 // When a goal goes in (`cheer` in the store) the crowd jumps.
 //
 // To change how full the ground is, change OCCUPANCY in crowdPlan.ts;
@@ -36,6 +42,10 @@ const HEIGHT = 1.08;
 const LIFT = 0.34; // the bottom of the cut-out above the seat's step
 const FORWARD = 0.14; // in front of the seat back
 const CHEER_SECONDS = 4.5;
+// closer than this (metres from the edge of a block of seats), use the figures
+const NEAR = 30;
+// how often (in frames) to look again at which blocks are near and in view
+const CHECK_EVERY = 8;
 
 // [colour, how common]: mostly the home white, then the club's blues
 const SHIRTS: [string, number][] = [
@@ -139,8 +149,11 @@ function posesTexture() {
 export default function Crowd() {
   const data = use(loadSeatData());
   const quality = useWorld((s) => s.quality);
+  const camera = useThree((s) => s.camera);
+  const frame = useRef(0);
+  const view = useMemo(() => ({ frustum: new Frustum(), matrix: new Matrix4() }), []);
 
-  const { mesh, material, geometry, texture } = useMemo(() => {
+  const { mesh, material, geometry, texture, blocks, near, uniforms } = useMemo(() => {
     const { positions, details } = data;
     const total = data.manifest.seats;
     const seated: number[] = [];
@@ -152,16 +165,18 @@ export default function Crowd() {
     const texture = posesTexture();
     const material = new MeshStandardMaterial({ map: texture, roughness: 0.85, side: DoubleSide, alphaTest: 0.4, alphaToCoverage: true });
     material.name = "Crowd";
-    const uniforms = { uJump: { value: 0 }, uTime: { value: 0 } };
+    const uniforms: CrowdUniforms = { uJump: { value: 0 }, uTime: { value: 0 } };
     material.userData.uniforms = uniforms;
     material.onBeforeCompile = (shader) => {
       shader.uniforms.uJump = uniforms.uJump;
       shader.uniforms.uTime = uniforms.uTime;
       shader.vertexShader = shader.vertexShader
-        .replace("#include <common>", "#include <common>\nattribute vec3 aShirt;\nattribute vec3 aFan;\nuniform float uJump;\nuniform float uTime;\nvarying vec3 vShirt;\nvarying vec3 vSkin;")
+        .replace("#include <common>", "#include <common>\nattribute vec3 aShirt;\nattribute vec3 aFan;\nattribute float aHide;\nuniform float uJump;\nuniform float uTime;\nvarying vec3 vShirt;\nvarying vec3 vSkin;")
         .replace(
           "#include <begin_vertex>",
           `#include <begin_vertex>
+          // a fan drawn in the round instead (near the camera) folds away to nothing
+          transformed *= 1.0 - aHide;
           // up and down out of the seat, each fan in his own time
           transformed.y += uJump * 0.32 * max( 0.0, sin( uTime * 8.5 + aFan.z * 6.2832 ) );`,
         )
@@ -181,7 +196,7 @@ export default function Crowd() {
         diffuseColor.a *= fan.a;`,
       );
     };
-    material.customProgramCacheKey = () => "crowd-v1";
+    material.customProgramCacheKey = () => "crowd-v2";
     withBakedLight(material, "seat");
 
     const n = seated.length;
@@ -219,10 +234,29 @@ export default function Crowd() {
     geometry.setAttribute("aShirt", new InstancedBufferAttribute(shirts, 3));
     geometry.setAttribute("aFan", new InstancedBufferAttribute(fans, 3));
     geometry.setAttribute("aBake", new InstancedBufferAttribute(light, 3));
+    const hide = new InstancedBufferAttribute(new Float32Array(n), 1);
+    geometry.setAttribute("aHide", hide);
+
+    // Each block of seats, with the run of fans sitting in it (fans are
+    // in seat order, so each block's fans are side by side)
+    const firstFan = new Int32Array(total + 1);
+    for (let i = 0, k = 0; i <= total; i++) {
+      firstFan[i] = k;
+      if (i < total && isTaken(i)) k++;
+    }
+    const blocks = data.manifest.chunks.map((chunk) => ({
+      sphere: new Sphere(new Vector3(...chunk.centre), chunk.radius),
+      from: firstFan[chunk.start],
+      to: firstFan[chunk.start + chunk.count],
+      figures: null as InstancedMesh | null,
+      isNear: false,
+    }));
+    const near = { group: new Group(), geometry: fanGeometry(), material: fanMaterial(uniforms), matrices: mesh.instanceMatrix.array as Float32Array, shirts, fans, light, hide };
+    near.group.name = "CrowdNear";
     // the crowd fills the whole bowl, so it is never all out of view
     mesh.frustumCulled = false;
     mesh.matrixAutoUpdate = false;
-    return { mesh, material, geometry, texture };
+    return { mesh, material, geometry, texture, blocks, near, uniforms };
   }, [data]);
 
   useEffect(
@@ -231,20 +265,64 @@ export default function Crowd() {
       material.dispose();
       texture.dispose();
       mesh.dispose();
+      for (const block of blocks) block.figures?.geometry.dispose();
+      near.geometry.dispose();
+      near.material.dispose();
     },
-    [mesh, material, geometry, texture],
+    [mesh, material, geometry, texture, blocks, near],
   );
+
+  // The figures for one block of seats, made the first time it is near
+  function figuresFor(block: (typeof blocks)[number]): InstancedMesh {
+    if (block.figures) return block.figures;
+    const count = block.to - block.from;
+    // the shape is shared; who sits where belongs to this block alone
+    const own = near.geometry.clone();
+    own.setAttribute("aShirt", new InstancedBufferAttribute(near.shirts.slice(block.from * 3, block.to * 3), 3));
+    own.setAttribute("aFan", new InstancedBufferAttribute(near.fans.slice(block.from * 3, block.to * 3), 3));
+    own.setAttribute("aBake", new InstancedBufferAttribute(near.light.slice(block.from * 3, block.to * 3), 3));
+    const figures = new InstancedMesh(own, near.material, count);
+    figures.instanceMatrix.array.set(near.matrices.subarray(block.from * 16, block.to * 16));
+    figures.instanceMatrix.needsUpdate = true;
+    figures.boundingSphere = block.sphere;
+    figures.matrixAutoUpdate = false;
+    near.group.add(figures);
+    block.figures = figures;
+    return figures;
+  }
 
   // A goal: everybody up, for a few seconds, then back down
   useFrame(() => {
-    const uniforms = material.userData.uniforms as { uJump: { value: number }; uTime: { value: number } };
     const since = (performance.now() - useWorld.getState().cheerAt) / 1000;
     const jump = since >= 0 && since < CHEER_SECONDS ? Math.min(1, since * 4) * Math.min(1, (CHEER_SECONDS - since) * 1.5) : 0;
     uniforms.uJump.value = jump;
     uniforms.uTime.value = atmo.time;
     if (jump > 0) stir();
+
+    // Swap figures in and cut-outs out where the stands are near and in
+    // view. Blocks behind or beside the camera keep their cut-outs.
+    frame.current = (frame.current + 1) % CHECK_EVERY;
+    if (frame.current !== 0) return;
+    view.matrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    view.frustum.setFromProjectionMatrix(view.matrix);
+    let changed = false;
+    for (const block of blocks) {
+      const isNear = camera.position.distanceTo(block.sphere.center) - block.sphere.radius < NEAR && view.frustum.intersectsSphere(block.sphere);
+      if (isNear === block.isNear) continue;
+      block.isNear = isNear;
+      changed = true;
+      near.hide.array.fill(isNear ? 1 : 0, block.from, block.to);
+      if (isNear) figuresFor(block).visible = true;
+      else if (block.figures) block.figures.visible = false;
+    }
+    if (changed) near.hide.needsUpdate = true;
   });
 
   if (quality === "low") return null;
-  return <primitive object={mesh} />;
+  return (
+    <>
+      <primitive object={mesh} />
+      <primitive object={near.group} />
+    </>
+  );
 }
