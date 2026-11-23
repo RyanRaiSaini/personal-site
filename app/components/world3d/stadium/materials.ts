@@ -1,4 +1,4 @@
-import { Color, DoubleSide, MeshBasicMaterial, MeshStandardMaterial, RepeatWrapping, SRGBColorSpace, TextureLoader, type Material, type Texture } from "three";
+import { DoubleSide, MeshBasicMaterial, MeshStandardMaterial, RepeatWrapping, SRGBColorSpace, TextureLoader, type Material, type Texture } from "three";
 import { withBakedLight } from "./bakedLight";
 
 // ------------------------------------------------------------------
@@ -84,39 +84,6 @@ export const SEAT_COLOR = "#22398a";
 
 export type StadiumMaterials = Record<string, Material>;
 
-// The LED ribbons along the tier fronts: switched on, showing no words
-// and no sponsors (the site's rule), only the club's blues with a slow
-// sweep of light running round the bowl, as ribbon boards do between
-// adverts. `ribbonClock` is moved on each frame by StadiumModel.tsx.
-export const ribbonClock = { value: 0 };
-const RIBBON = { deep: "#0a1a52", bright: "#2a5ee8", sweep: 0.9 };
-
-function ribbonMaterial() {
-  const material = new MeshStandardMaterial({ color: "#04060a", roughness: 0.3 });
-  material.onBeforeCompile = (shader) => {
-    shader.uniforms.uClock = ribbonClock;
-    shader.uniforms.uDeep = { value: new Color(RIBBON.deep) };
-    shader.uniforms.uBright = { value: new Color(RIBBON.bright) };
-    shader.vertexShader = shader.vertexShader
-      .replace("#include <common>", "#include <common>\nvarying vec3 vRibbon;")
-      .replace("#include <worldpos_vertex>", "#include <worldpos_vertex>\nvRibbon = ( modelMatrix * vec4( transformed, 1.0 ) ).xyz;");
-    shader.fragmentShader = shader.fragmentShader.replace("#include <common>", "#include <common>\nvarying vec3 vRibbon;\nuniform float uClock;\nuniform vec3 uDeep;\nuniform vec3 uBright;").replace(
-      "#include <emissivemap_fragment>",
-      `#include <emissivemap_fragment>
-      // round the bowl: 0 to 1 once round
-      float round = atan( vRibbon.z, vRibbon.x ) / 6.2832 + 0.5;
-      // A steady glow with one broad, soft swell of light drifting slowly
-      // round. Nothing finer: fine stripes or a lamp grid are smaller than
-      // a pixel from across the bowl and flicker as they move (they did,
-      // as flashes of blue, on 2026-11-24).
-      float swell = 0.5 + 0.5 * sin( ( round * 2.0 - uClock * 0.02 ) * 6.2832 );
-      vec3 led = mix( uDeep, uBright, 0.45 + 0.3 * swell );
-      totalEmissiveRadiance = led * ${RIBBON.sweep.toFixed(2)};`,
-    );
-  };
-  material.customProgramCacheKey = () => "stadium-ribbon-v2";
-  return material;
-}
 
 export function makeMaterials(): StadiumMaterials {
   const made: StadiumMaterials = {};
@@ -135,7 +102,8 @@ export function makeMaterials(): StadiumMaterials {
     }
     made[name] = withBakedLight(material);
   }
-  made.Ribbon = ribbonMaterial();
+  // (The tier-front ribbons stay dark: lit, they ran round the stadium as
+  // bright blue lines, which Ryan did not want, 2026-11-24.)
   // Doorways into the dark: no light of their own, no reflections
   made.Void = new MeshBasicMaterial({ color: "#030304" });
   // Clear glass guards along the tier fronts and round the entrances:

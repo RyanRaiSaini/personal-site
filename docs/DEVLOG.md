@@ -341,3 +341,9 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 
 - **Four floodlight shadows under every player at night,** long and thin, pointing to the ground's four corners whichever way he faces; by day only a faint shade at his feet, as the sun throws his real shadow (`shadowTexture` and the `shade` group in `players/Player.tsx`).
 - **The ends behind the goals are blocks of club colour:** nearly everyone there in white or royal blue, the sides more mixed (`END_SHIRTS`, `END_FROM` in `stadium/Crowd.tsx`). The distant crowd is evened out less, so the shirts' colour shows; checked with the camera moving, flicker to or from blue stays at 0.05% of the stands.
+
+### No more blue lines; Canada and USA flags
+
+- **The tier-front ribbons are dark again.** Lit, they ran round the whole stadium as bright blue lines, which Ryan did not want; the ribbon shader is gone (`stadium/materials.ts`). The pitch boards stay lit, as he chose.
+- **Canada's and the United States' flags in the crowd,** alongside two plain club flags: about 38% Canada, 24% USA, the rest club. Every flag streams the same way, downwind, drooping in the lulls and standing out in the gusts (`KINDS`, `WIND` in `stadium/CrowdFlags.tsx`). Near the camera the cloth ripples; far off it only sways, so nothing shimmers.
+- Checked with the camera moving across all the stands: flicker to or from blue 0.00% (8 cm) and 0.05% (20 cm).

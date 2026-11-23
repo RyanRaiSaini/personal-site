@@ -8,7 +8,7 @@ import { useWorld, type Show } from "../../../lib/store";
 import { atmo } from "../atmosphere/state";
 import { canvasTexture } from "../textures/canvas";
 import { ledStrip, useDisplayFont, type StripSegment } from "../textures/text";
-import { makeMaterials, ribbonClock, type StadiumMaterials } from "./materials";
+import { makeMaterials, type StadiumMaterials } from "./materials";
 import { perimeter } from "./path";
 import { loadSeatData } from "./seatData";
 import Crowd from "./Crowd";
@@ -232,8 +232,6 @@ export default function StadiumModel() {
   const parkedX = -openHalf - roof.panelWidth / 2 - 2.5;
 
   useFrame((_, delta) => {
-    // the LED ribbons' sweep of light (materials.ts)
-    ribbonClock.value = atmo.time;
     // Panels leave the stack one after another, the far one first
     const n = parts.panels.length;
     parts.panels.forEach(({ node, closedX }, k) => {
