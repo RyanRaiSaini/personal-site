@@ -356,3 +356,8 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 
 - **Nine fans in the ticket office's queues,** standing in their own clothes, in single file down the middle of each lane, evenly spaced and facing the window (`FANS`, `STEP`, `LANES` in `rooms/Queue.tsx`). They are the crowd's two Mixamo men, rendered standing from four sides by `build_crowd.py --stand` (`npm run crowd:build:queue`, then `npm run crowd:pack`) into `public/stadium/crowd/queue-*`, recoloured like the clerks (`rooms/clerk.ts`), each with a soft shadow at his feet.
 - Two new pictures in the fixed set, `ticket-office` and `ticket-queue` (`scripts/shots.mjs`).
+
+### National flags in the crowd instead of plain ones (2026-11-24, Ryan asked)
+
+- **The plain club flags are gone.** In their place, the big footballing nations: Spain, Portugal, Argentina, Uruguay, Brazil, France, England, Germany, Italy and the Netherlands, alongside Canada (still the most common) and the USA (`KINDS` in `stadium/CrowdFlags.tsx`). Emblems are simplified (a small shield for Spain and Portugal, a plain sun for Argentina and Uruguay), as they read from the stands. National flags only: a club's flag would carry its crest.
+- A few more flags overall (`SHARE` 0.45% to 0.6% of the taken seats). Distant flags still only sway, so nothing shimmers.

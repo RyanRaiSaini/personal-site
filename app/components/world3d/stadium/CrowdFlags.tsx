@@ -14,9 +14,11 @@ import { loadSeatData } from "./seatData";
 // ------------------------------------------------------------------
 // Flags in the crowd: here and there a fan holds one up on a pole, and
 // it streams out on the wind. Canada's and the United States' flags
-// (Ryan asked for them on 2026-11-24) and two plain club flags in the
-// club's colours (no crests, no words). Every flag streams the same way,
-// downwind (WIND).
+// (Ryan asked for them on 2026-11-24) and the big footballing nations'
+// (Spain, Portugal, Argentina, Uruguay, Brazil, France, England,
+// Germany, Italy, the Netherlands; he asked on 2026-11-24 too). National
+// flags only: a club's flag would carry its crest. Every flag streams
+// the same way, downwind (WIND).
 //
 // All of them are one instanced mesh, their pictures side by side in one
 // texture (KINDS). The waving is worked out on the graphics card; near
@@ -27,7 +29,7 @@ import { loadSeatData } from "./seatData";
 // To have more or fewer, change SHARE; the mix of flags is in KINDS.
 // ------------------------------------------------------------------
 
-const SHARE = 0.0045; // of the taken seats
+const SHARE = 0.006; // of the taken seats
 const FLAG = { width: 1.3, height: 0.65, pole: 2.3 };
 // the way the wind blows across the ground (x, z), the same for every flag
 const WIND = { x: 0.85, z: 0.53 };
@@ -42,11 +44,56 @@ const LEAF: [number, number][] = [
 ];
 
 const RED = "#d52b1e";
+
+// equal stripes across, top to bottom
+function stripes(ctx: CanvasRenderingContext2D, x: number, w: number, h: number, colours: string[]) {
+  colours.forEach((colour, i) => {
+    ctx.fillStyle = colour;
+    ctx.fillRect(x, (i * h) / colours.length, w, h / colours.length + 0.5);
+  });
+}
+// equal bands down, hoist to fly
+function bands(ctx: CanvasRenderingContext2D, x: number, w: number, h: number, colours: string[]) {
+  colours.forEach((colour, i) => {
+    ctx.fillStyle = colour;
+    ctx.fillRect(x + (i * w) / colours.length, 0, w / colours.length + 0.5, h);
+  });
+}
+// a sun with straight rays (Argentina's and Uruguay's)
+function sun(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
+  ctx.fillStyle = "#f6b40e";
+  ctx.strokeStyle = "#f6b40e";
+  ctx.lineWidth = r * 0.22;
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * Math.PI * 2;
+    const reach = i % 2 ? 1.6 : 1.9;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+    ctx.lineTo(cx + Math.cos(a) * r * reach, cy + Math.sin(a) * r * reach);
+    ctx.stroke();
+  }
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+}
+// a small plain shield: a coat of arms seen from the stands
+function shield(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, field: string, edge: string) {
+  ctx.fillStyle = edge;
+  ctx.beginPath();
+  ctx.moveTo(cx - r, cy - r);
+  ctx.lineTo(cx + r, cy - r);
+  ctx.lineTo(cx + r, cy + r * 0.3);
+  ctx.quadraticCurveTo(cx, cy + r * 1.5, cx - r, cy + r * 0.3);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = field;
+  ctx.fillRect(cx - r * 0.6, cy - r * 0.6, r * 1.2, r * 1.1);
+}
 const KINDS: Kind[] = [
   {
     // red, white, red in 1 : 2 : 1, the red maple leaf in the middle
     name: "Canada",
-    share: 0.38,
+    share: 0.2,
     draw: (ctx, x, w, h) => {
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(x, 0, w, h);
@@ -65,7 +112,7 @@ const KINDS: Kind[] = [
   {
     // thirteen stripes, red at top and bottom; a blue canton of fifty stars
     name: "United States",
-    share: 0.24,
+    share: 0.14,
     draw: (ctx, x, w, h) => {
       for (let i = 0; i < 13; i++) {
         ctx.fillStyle = i % 2 ? "#ffffff" : "#b31942";
@@ -89,27 +136,95 @@ const KINDS: Kind[] = [
     },
   },
   {
-    // the club: white with a navy band across the middle
-    name: "Club white",
-    share: 0.22,
+    // red, yellow (twice as tall), red; the arms simplified to a small shield
+    name: "Spain",
+    share: 0.13,
     draw: (ctx, x, w, h) => {
-      ctx.fillStyle = "#f4f4f0";
-      ctx.fillRect(x, 0, w, h);
-      ctx.fillStyle = "#17244d";
-      ctx.fillRect(x, h * 0.36, w, h * 0.28);
+      stripes(ctx, x, w, h, ["#aa151b", "#f1bf00", "#f1bf00", "#aa151b"]);
+      shield(ctx, x + w * 0.3, h / 2, h * 0.13, "#aa151b", "#f1bf00");
     },
   },
   {
-    // the club: navy with a gold band
-    name: "Club navy",
-    share: 0.16,
+    // green at the hoist, red; the armillary sphere and shield on the seam
+    name: "Portugal",
+    share: 0.08,
     draw: (ctx, x, w, h) => {
-      ctx.fillStyle = "#17244d";
+      ctx.fillStyle = "#da291c";
       ctx.fillRect(x, 0, w, h);
-      ctx.fillStyle = "#d6a93f";
-      ctx.fillRect(x, h * 0.36, w, h * 0.28);
+      ctx.fillStyle = "#046a38";
+      ctx.fillRect(x, 0, w * 0.4, h);
+      ctx.fillStyle = "#ffe900";
+      ctx.beginPath();
+      ctx.arc(x + w * 0.4, h / 2, h * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+      shield(ctx, x + w * 0.4, h / 2, h * 0.12, "#ffffff", "#da291c");
     },
   },
+  {
+    // sky blue, white, sky blue; the golden sun in the middle
+    name: "Argentina",
+    share: 0.1,
+    draw: (ctx, x, w, h) => {
+      stripes(ctx, x, w, h, ["#74acdf", "#ffffff", "#74acdf"]);
+      sun(ctx, x + w / 2, h / 2, h * 0.11);
+    },
+  },
+  {
+    // nine stripes, white and blue; the sun on a white canton
+    name: "Uruguay",
+    share: 0.06,
+    draw: (ctx, x, w, h) => {
+      stripes(ctx, x, w, h, Array.from({ length: 9 }, (_, i) => (i % 2 ? "#0038a8" : "#ffffff")));
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(x, 0, w * 0.36, (h * 5) / 9);
+      sun(ctx, x + w * 0.18, (h * 5) / 18, h * 0.12);
+    },
+  },
+  {
+    // green, a yellow diamond, a blue globe with a white band
+    name: "Brazil",
+    share: 0.08,
+    draw: (ctx, x, w, h) => {
+      ctx.fillStyle = "#009739";
+      ctx.fillRect(x, 0, w, h);
+      ctx.fillStyle = "#fedd00";
+      ctx.beginPath();
+      ctx.moveTo(x + w * 0.08, h / 2);
+      ctx.lineTo(x + w / 2, h * 0.1);
+      ctx.lineTo(x + w * 0.92, h / 2);
+      ctx.lineTo(x + w / 2, h * 0.9);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "#012169";
+      ctx.beginPath();
+      ctx.arc(x + w / 2, h / 2, h * 0.24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.save();
+      ctx.clip();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = h * 0.05;
+      ctx.beginPath();
+      ctx.arc(x + w / 2 - h * 0.05, h * 1.1, h * 0.62, Math.PI * 1.2, Math.PI * 1.8);
+      ctx.stroke();
+      ctx.restore();
+    },
+  },
+  { name: "France", share: 0.06, draw: (ctx, x, w, h) => bands(ctx, x, w, h, ["#002395", "#ffffff", "#ed2939"]) },
+  {
+    // the red cross of St George on white
+    name: "England",
+    share: 0.06,
+    draw: (ctx, x, w, h) => {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(x, 0, w, h);
+      ctx.fillStyle = "#ce1124";
+      ctx.fillRect(x + w / 2 - h * 0.1, 0, h * 0.2, h);
+      ctx.fillRect(x, h * 0.4, w, h * 0.2);
+    },
+  },
+  { name: "Germany", share: 0.04, draw: (ctx, x, w, h) => stripes(ctx, x, w, h, ["#000000", "#dd0000", "#ffce00"]) },
+  { name: "Italy", share: 0.04, draw: (ctx, x, w, h) => bands(ctx, x, w, h, ["#009246", "#ffffff", "#ce2b37"]) },
+  { name: "Netherlands", share: 0.03, draw: (ctx, x, w, h) => stripes(ctx, x, w, h, ["#ae1c28", "#ffffff", "#21468b"]) },
 ];
 
 function flagPictures() {
@@ -191,7 +306,7 @@ export default function CrowdFlags() {
         if ( vMain < 0.5 ) diffuseColor.rgb = vec3( 0.06 );`,
       );
     };
-    material.customProgramCacheKey = () => "crowd-flags-v4";
+    material.customProgramCacheKey = () => "crowd-flags-v5";
     // the same worked-out light as the seats they are held over: in the
     // roof's shade by day, under the lamps at night
     withBakedLight(material, "seat");

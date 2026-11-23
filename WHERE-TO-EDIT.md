@@ -215,7 +215,7 @@ By day the stadium is lit by one photographed sky and one fixed sun. The real cl
 | The floodlights’ glare at night (size, strength, spacing) | `GLARE` | `app/components/world3d/stadium/FloodGlare.tsx` |
 | Smoke in the stands after a goal (where, how long, the wind) | `SOURCES`, `LAST`, `WIND` | `app/components/world3d/stadium/GoalSmoke.tsx` |
 | The television cameras along the far touchline | `ALONG` | `app/components/world3d/stadium/PitchCameras.tsx` |
-| Flags in the crowd (how many; which flags and how common: Canada, USA, club; the wind’s direction; how they wave) | `SHARE`, `KINDS`, `WIND`, the shader in `CrowdFlags` | `app/components/world3d/stadium/CrowdFlags.tsx` |
+| Flags in the crowd (how many; which flags and how common: Canada, USA, Spain, Portugal, Argentina, Uruguay, Brazil, France, England, Germany, Italy, the Netherlands; the wind’s direction; how they wave) | `SHARE`, `KINDS`, `WIND`, the shader in `CrowdFlags` | `app/components/world3d/stadium/CrowdFlags.tsx` |
 | The photographers behind each goal line (where they sit, their bibs) | `SPOTS`, `BACK`, `BIBS` | `app/components/world3d/stadium/Photographers.tsx` |
 | The boards round the pitch (switched-on LED, plain club blue, no words) | `LED` | `app/components/world3d/stadium/AdBoards.tsx` |
 | The flash interview on the pitch by the tunnel (backdrop, microphones on stands, camera and light, the email and LinkedIn boards); where it stands is `FLASH` in `stadium/dims.ts` | Contact | `app/components/world3d/stadium/FlashZone.tsx` |
