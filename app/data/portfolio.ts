@@ -530,6 +530,9 @@ export const resumeText = {
   open: "Open in a new tab",
   note: "A complete copy, including my telephone number, is available on request.",
   // the matchday board hanging in the ticket office
+  // the ticket office's player profile and banner
+  profileTitle: "Player profile",
+  banner: ["University of Waterloo", "Mathematics", "Brampton, Ontario"],
   board: {
     heading: "Today's fixture",
     fixture: "The Résumé Issue",

@@ -1,15 +1,15 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { SRGBColorSpace, TextureLoader, type Group, type Texture } from "three";
+import { useEffect, useMemo, useRef } from "react";
+import { type Group } from "three";
 import { news, profile } from "../../../data/portfolio";
 import { album } from "../../../data/photos";
 import { useWorld } from "../../../lib/store";
 import { atmo } from "../atmosphere/state";
 import { canvasTexture } from "../textures/canvas";
 import { useDisplayFont } from "../textures/text";
-import { Box, clickable, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign, Tripod, TvCamera } from "./common";
+import { Box, clickable, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign, Tripod, TvCamera, usePhoto } from "./common";
 
 // The press room (In the News). A press-conference desk in front of a
 // sponsor-style backdrop, lit like a set by two studio lights, with two
@@ -78,25 +78,6 @@ function basketballTexture() {
   );
 }
 
-function usePhoto(src: string): Texture | null {
-  const [texture, setTexture] = useState<Texture | null>(null);
-  useEffect(() => {
-    let alive = true;
-    let loaded: Texture | null = null;
-    new TextureLoader().load(src, (t) => {
-      t.colorSpace = SRGBColorSpace;
-      t.anisotropy = 8;
-      loaded = t;
-      if (alive) setTexture(t);
-      else t.dispose();
-    });
-    return () => {
-      alive = false;
-      loaded?.dispose();
-    };
-  }, [src]);
-  return texture;
-}
 
 // A framed photo with a picture light over it. Clicking opens the album.
 function Frame({ src, width, height, position, rotation }: { src: string; width: number; height: number; position: [number, number, number]; rotation: [number, number, number] }) {

@@ -20,7 +20,8 @@ const MARKS: Record<Exclude<SceneId, "bowl">, Mark> = {
   trophy: { at: [2.5, 0, 1.0], facing: Math.PI * 0.86, doing: (time) => standing(time, ["folded"]) },
   // behind the desk, on the little stage
   press: { at: [0, 0.22, -3.55], facing: 0, doing: (time) => playing("sit", time) },
-  tickets: { at: [-1.5, 0, -1.6], facing: Math.PI * 0.94, doing: (time) => standing(time) },
+  // in the left queue, looking across at the programme
+  tickets: { at: [-2.55, 0, -0.5], facing: Math.PI * 0.86, doing: (time) => standing(time) },
   mixed: { at: [0.1, 0, -1.5], facing: 0.08, doing: (time) => standing(time, ["hips"]) },
 };
 

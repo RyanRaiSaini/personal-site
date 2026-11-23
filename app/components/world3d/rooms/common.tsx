@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { DoubleSide, type CanvasTexture } from "three";
+import { useEffect, useMemo, useState } from "react";
+import { DoubleSide, SRGBColorSpace, TextureLoader, type CanvasTexture, type Texture } from "three";
 import { canvasTexture, grain } from "../textures/canvas";
 import { useDisplayFont } from "../textures/text";
 
@@ -246,4 +246,25 @@ export function TvCamera({ position, turn, low = 0 }: { position: [number, numbe
       </group>
     </group>
   );
+}
+
+// A photo from public/photos as a texture, once it has loaded
+export function usePhoto(src: string): Texture | null {
+  const [texture, setTexture] = useState<Texture | null>(null);
+  useEffect(() => {
+    let alive = true;
+    let loaded: Texture | null = null;
+    new TextureLoader().load(src, (t) => {
+      t.colorSpace = SRGBColorSpace;
+      t.anisotropy = 8;
+      loaded = t;
+      if (alive) setTexture(t);
+      else t.dispose();
+    });
+    return () => {
+      alive = false;
+      loaded?.dispose();
+    };
+  }, [src]);
+  return texture;
 }
