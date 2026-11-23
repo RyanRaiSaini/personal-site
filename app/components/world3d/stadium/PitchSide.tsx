@@ -2,7 +2,7 @@
 
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { AdditiveBlending, BoxGeometry, Color, CylinderGeometry, DoubleSide, Float32BufferAttribute, PlaneGeometry, RepeatWrapping, SRGBColorSpace, TextureLoader, type BufferGeometry, type Group, type MeshBasicMaterial } from "three";
+import { AdditiveBlending, BoxGeometry, Color, CylinderGeometry, DoubleSide, Float32BufferAttribute, MeshStandardMaterial, PlaneGeometry, RepeatWrapping, SRGBColorSpace, TextureLoader, type BufferGeometry, type Group, type MeshBasicMaterial } from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { atmo } from "../atmosphere/state";
 import { disposeSurface, surfaceMaterial } from "../rooms/surfaces";
@@ -25,10 +25,31 @@ export const CORNERS: [number, number][] = [
   [-PITCH.halfLength, PITCH.halfWidth],
 ];
 
+// The flags' cloth ripples, a wave running out from the pole (one clock
+// for all four, moved by the first flag each frame)
+const flagClock = { value: 0 };
+function clothMaterial() {
+  const material = new MeshStandardMaterial({ color: "#f7f7f5", side: DoubleSide, roughness: 0.8 });
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uClock = flagClock;
+    shader.vertexShader = shader.vertexShader.replace("#include <common>", "#include <common>\nuniform float uClock;").replace(
+      "#include <begin_vertex>",
+      `#include <begin_vertex>
+      float out_ = ( position.x + 0.2 ) / 0.4;
+      transformed.z += out_ * ( 0.035 * sin( out_ * 7.0 - uClock * 6.0 ) + 0.015 * sin( out_ * 13.0 - uClock * 9.0 ) );`,
+    );
+  };
+  material.customProgramCacheKey = () => "corner-flag-cloth";
+  return material;
+}
+
 function CornerFlag({ x, z, index }: { x: number; z: number; index: number }) {
   const flag = useRef<Group>(null);
+  const cloth = useMemo(() => clothMaterial(), []);
+  useEffect(() => () => cloth.dispose(), [cloth]);
   useFrame(() => {
     if (flag.current) flag.current.rotation.y = Math.sin(atmo.time * 1.7 + index * 1.3) * 0.5 + index;
+    if (index === 0) flagClock.value = atmo.time;
   });
   return (
     <group position={[x, 0, z]}>
@@ -37,9 +58,8 @@ function CornerFlag({ x, z, index }: { x: number; z: number; index: number }) {
         <meshStandardMaterial color="#f5d04a" roughness={0.5} />
       </mesh>
       <group ref={flag} position={[0, 1.34, 0]}>
-        <mesh position={[0.2, 0, 0]} castShadow>
-          <planeGeometry args={[0.4, 0.3]} />
-          <meshStandardMaterial color="#f7f7f5" side={DoubleSide} roughness={0.8} />
+        <mesh position={[0.2, 0, 0]} material={cloth} castShadow>
+          <planeGeometry args={[0.4, 0.3, 10, 2]} />
         </mesh>
       </group>
     </group>

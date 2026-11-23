@@ -63,35 +63,54 @@ export function ballTexture() {
   return canvasTexture(
     256,
     128,
+    // A modern match ball: white, a few large curved panels whose seams
+    // show as fine grey lines, and bold printed shapes in the club's
+    // colours across them (no maker's mark, no logo)
     (ctx, w, h) => {
-      ctx.fillStyle = "#f6f6f3";
+      ctx.fillStyle = "#f7f7f4";
       ctx.fillRect(0, 0, w, h);
-      // dark five-sided patches, spread round the ball
-      ctx.fillStyle = "#16181d";
-      const spots: [number, number][] = [
-        [0.08, 0.5],
-        [0.33, 0.28],
-        [0.33, 0.74],
-        [0.58, 0.5],
-        [0.83, 0.28],
-        [0.83, 0.74],
-        [0.2, 0.06],
-        [0.7, 0.95],
+      // the printed shapes: long curved strokes, as on today's balls
+      const strokes: { colour: string; y: number; phase: number; width: number }[] = [
+        { colour: "#17244d", y: 0.3, phase: 0, width: 11 },
+        { colour: "#2f4fb3", y: 0.55, phase: 1.7, width: 8 },
+        { colour: "#d6a93f", y: 0.75, phase: 3.1, width: 6 },
+        { colour: "#17244d", y: 0.12, phase: 4.4, width: 5 },
       ];
-      for (const [u, v] of spots) {
+      ctx.lineCap = "round";
+      for (const s of strokes) {
+        ctx.strokeStyle = s.colour;
+        ctx.lineWidth = s.width;
+        for (let piece = 0; piece < 3; piece++) {
+          ctx.beginPath();
+          const from = (piece / 3) * w + 6;
+          const to = from + w / 3 - 26;
+          for (let x = from; x <= to; x += 4) {
+            const y = (s.y + 0.09 * Math.sin((x / w) * Math.PI * 4 + s.phase)) * h;
+            if (x === from) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+      }
+      // the panel seams: fine, curving, faintly shadowed
+      ctx.strokeStyle = "rgba(60,64,72,0.45)";
+      ctx.lineWidth = 1.4;
+      for (let k = 0; k < 6; k++) {
         ctx.beginPath();
-        for (let i = 0; i < 5; i++) {
-          const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
-          const x = u * w + Math.cos(a) * 15;
-          const y = v * h + Math.sin(a) * 13;
-          if (i === 0) ctx.moveTo(x, y);
+        for (let y = 0; y <= h; y += 3) {
+          const x = (k / 6) * w + 14 * Math.sin((y / h) * Math.PI * 2 + k);
+          if (y === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        ctx.closePath();
-        ctx.fill();
+        ctx.stroke();
+      }
+      for (const y of [h * 0.33, h * 0.67]) {
+        ctx.beginPath();
+        for (let x = 0; x <= w; x += 3) ctx.lineTo(x, y + 6 * Math.sin((x / w) * Math.PI * 6));
+        ctx.stroke();
       }
     },
-    { repeat: false },
+    { repeat: false, anisotropy: 8 },
   );
 }
 
