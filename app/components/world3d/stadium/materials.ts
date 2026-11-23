@@ -103,8 +103,10 @@ export function makeMaterials(): StadiumMaterials {
   }
   // Doorways into the dark: no light of their own, no reflections
   made.Void = new MeshBasicMaterial({ color: "#030304" });
-  // Clear glass guards along the tier fronts and round the entrances
-  made.Glass = new MeshStandardMaterial({ color: "#d5e3ee", roughness: 0.08, metalness: 0, transparent: true, opacity: 0.12, side: DoubleSide, forceSinglePass: true, depthWrite: false, envMapIntensity: 0.55 });
+  // Clear glass guards along the tier fronts and round the entrances:
+  // nearly invisible head-on, a faint dark tint and the sky's reflection.
+  // (A pale tint read as a grey band in front of the first rows.)
+  made.Glass = new MeshStandardMaterial({ color: "#1c2833", roughness: 0.04, metalness: 0, transparent: true, opacity: 0.1, side: DoubleSide, forceSinglePass: true, depthWrite: false, envMapIntensity: 1.2 });
   // The sliding roof panels: white fabric that glows with the daylight behind it
   made.Membrane = new MeshStandardMaterial({ color: "#eef1f4", roughness: 0.85, metalness: 0, side: DoubleSide, emissive: "#f4f7fb", emissiveIntensity: 0.1 });
   // The floodlights' lamps: brighter than white, so they read as a light source

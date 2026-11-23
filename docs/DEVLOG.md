@@ -293,3 +293,9 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **Contact is out on the pitch:** a flash-interview backdrop on the grass between the tunnel and the home dugout, with three microphones on stands, a camera and a light, and boards with my email and LinkedIn either side. Number 8 stands in front of it, facing the camera, with the crowd behind. The dark mixed-zone room is gone (`stadium/FlashZone.tsx`; `FLASH` in `dims.ts`).
 - **Logos:** the Make-A-Wish and NBA logos head the "Make-A-Wish and the NBA" tab, on a white strip (`public/logos/`, sources in `docs/redesign/ASSETS.md`).
 - **The bowl, up close:** the pitch takes the grain of the photographed lawn near the camera, fading out in the distance (its colour still comes from the shader), and the dugout seats are padded leather.
+
+## 2026-11-24, more realism
+
+- **The glass on the front walls no longer reads as a grey band.** It was a pale tint lit by the sky, which washed out the first rows; it is now a faint dark tint with the sky's reflection, nearly invisible head-on, as stadium glass is (`Glass` in `stadium/materials.ts`).
+- **The boards round the pitch are switched-on LED screens** showing plain club blue, darker at the foot, with the grid of lamps visible up close. Still no words and no sponsors (`LED` in `stadium/AdBoards.tsx`).
+- **The crowd is never quite still:** each fan shifts slowly from side to side and settles, at his own pace (`stadium/Crowd.tsx`). It moves only while the picture is drawn, so the page still rests.

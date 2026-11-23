@@ -120,7 +120,15 @@ export default function Crowd() {
           transformed.x = ( fanUv.x - 0.5 ) * ${WIDTH.toFixed(3)};
           transformed.y = ${LIFT.toFixed(3)} + fanUv.y * ${HEIGHT.toFixed(3)};
           // up and down out of the seat, each fan in his own time
-          transformed.y += uJump * 0.32 * max( 0.0, sin( uTime * 8.5 + aFan.z * 6.2832 ) );`,
+          transformed.y += uJump * 0.32 * max( 0.0, sin( uTime * 8.5 + aFan.z * 6.2832 ) );
+          // nobody sits quite still: a slow shift from side to side and a
+          // small settle, each fan at his own pace (only while the picture
+          // is being drawn; it rests like everything else)
+          float own = aFan.z * 6.2832;
+          float pace = 0.35 + fract( aFan.z * 7.3 ) * 0.5;
+          float height = transformed.y / ${HEIGHT.toFixed(2)};
+          transformed.x += height * ( 0.045 * sin( uTime * pace + own ) + 0.012 * sin( uTime * 2.3 * pace + own * 3.0 ) );
+          transformed.y += 0.012 * sin( uTime * 0.8 * pace + own * 1.7 );`,
         )
         .replace(
           "#include <uv_vertex>",
@@ -155,7 +163,7 @@ export default function Crowd() {
         diffuseColor.a *= fan.a;`,
       );
     };
-    material.customProgramCacheKey = () => "crowd-v5";
+    material.customProgramCacheKey = () => "crowd-v6";
     withBakedLight(material, "seat");
 
     const n = seated.length;

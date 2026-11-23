@@ -1,17 +1,21 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { BufferGeometry, DoubleSide, Float32BufferAttribute } from "three";
+import { BufferGeometry, Color, DoubleSide, Float32BufferAttribute, MeshStandardMaterial } from "three";
 import { AD_BOARD, DUGOUT, PITCH, TUNNEL } from "./dims";
 
-// The boards round the pitch. They are switched off: plain dark screens
-// with no words and no sponsors on them, catching a little of the light
-// like any glossy panel does.
+// The boards round the pitch: LED screens, switched on but showing
+// nothing, no words and no sponsors (Ryan's rule): plain club blue,
+// darker at the foot, with the fine grid of lamps a real board has up
+// close. Before 2026-11-24 they were switched off, which read as black
+// boxes.
 //
-// To put something on them later, give the `boards` mesh a picture
-// (a `map`) in place of its plain colour.
+// To change the colour, change LED. To put something on them later,
+// give `ledColour` in the shader a picture.
 
 const H = AD_BOARD.height;
+// [foot, top] of the screens' glow, and how bright
+const LED = { foot: "#0b1d58", top: "#1f4fd1", strength: 0.75 };
 
 type Run = { from: [number, number]; to: [number, number] };
 
@@ -91,11 +95,34 @@ export default function AdBoards() {
     };
   }, [geometry]);
 
+  const screen = useMemo(() => {
+    const material = new MeshStandardMaterial({ color: "#05070b", roughness: 0.28, metalness: 0.1 });
+    material.onBeforeCompile = (shader) => {
+      shader.uniforms.uFoot = { value: new Color(LED.foot) };
+      shader.uniforms.uTop = { value: new Color(LED.top) };
+      shader.vertexShader = shader.vertexShader
+        .replace("#include <common>", "#include <common>\nvarying vec2 vBoard;")
+        .replace("#include <begin_vertex>", "#include <begin_vertex>\nvBoard = vec2( position.x + position.z, position.y );");
+      shader.fragmentShader = shader.fragmentShader.replace("#include <common>", "#include <common>\nvarying vec2 vBoard;\nuniform vec3 uFoot;\nuniform vec3 uTop;").replace(
+        "#include <emissivemap_fragment>",
+        `#include <emissivemap_fragment>
+        // the lamps: a grid every 10 mm, fading out with distance so it never shimmers
+        vec2 cell = fract( vBoard * 100.0 ) - 0.5;
+        float lamp = 1.0 - smoothstep( 0.25, 0.5, max( abs( cell.x ), abs( cell.y ) ) );
+        float far = smoothstep( 0.2, 0.6, fwidth( vBoard.x * 100.0 ) );
+        float lit = mix( 0.55 + 0.45 * lamp, 0.8, far );
+        float up = clamp( vBoard.y / ${H.toFixed(2)}, 0.0, 1.0 );
+        totalEmissiveRadiance = mix( uFoot, uTop, up ) * lit * ${LED.strength.toFixed(2)};`,
+      );
+    };
+    material.customProgramCacheKey = () => "ad-boards-led";
+    return material;
+  }, []);
+  useEffect(() => () => screen.dispose(), [screen]);
+
   return (
     <group>
-      <mesh geometry={geometry.boards} castShadow>
-        <meshStandardMaterial color="#090b10" roughness={0.32} metalness={0.15} />
-      </mesh>
+      <mesh geometry={geometry.boards} material={screen} castShadow />
       <mesh geometry={geometry.casing}>
         <meshStandardMaterial color="#0d0f14" roughness={0.7} side={DoubleSide} />
       </mesh>
