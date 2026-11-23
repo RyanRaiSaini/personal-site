@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { about, interests, profile } from "../../data/portfolio";
 import { headshot } from "../../data/photos";
-import { Block, Chips } from "./parts";
+import { Block, InlineList } from "./parts";
 
 // About: the centre circle. The words come from `about` and
 // `interests` in app/data/portfolio.ts.
@@ -32,7 +32,7 @@ export default function AboutContent() {
           <div className="facts-wide">
             <dt className="label">{about.courseworkTitle}</dt>
             <dd>
-              <Chips items={about.coursework} label={about.courseworkTitle} />
+              <InlineList items={about.coursework} label={about.courseworkTitle} />
             </dd>
           </div>
         </dl>

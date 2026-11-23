@@ -32,13 +32,13 @@ export function Stats({ items }: { items: { value: string; label: string }[] }) 
   );
 }
 
-export function Chips({ items, label }: { items: string[]; label: string }) {
+// A short list read as one line of text: "Python · OpenCV · FastAPI".
+// Plain words, not a row of boxes.
+export function InlineList({ items, label }: { items: string[]; label: string }) {
   return (
-    <ul role="list" aria-label={label} className="flex flex-wrap gap-1.5">
+    <ul role="list" aria-label={label} className="inline-list">
       {items.map((item) => (
-        <li key={item} className="chip">
-          {item}
-        </li>
+        <li key={item}>{item}</li>
       ))}
     </ul>
   );

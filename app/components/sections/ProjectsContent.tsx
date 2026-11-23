@@ -4,7 +4,7 @@ import { useState } from "react";
 import { projects, projectText } from "../../data/portfolio";
 import { useWorld } from "../../lib/store";
 import Tabs from "../ui/Tabs";
-import { Arrow, Bullets, Chips, ExternalLink, Stats } from "./parts";
+import { Arrow, Bullets, ExternalLink, InlineList, Stats } from "./parts";
 
 // Projects: the goal. Every project in `projects`
 // (app/data/portfolio.ts) is a goal. Opening one plays its replay in
@@ -13,7 +13,8 @@ import { Arrow, Bullets, Chips, ExternalLink, Stats } from "./parts";
 // An open project is split into two tabs, what it is and what I did,
 // so that it fits on a screen without a long scroll.
 export default function ProjectsContent() {
-  const [open, setOpen] = useState<string>(projects[0].id);
+  // all closed at first: opening a project is what plays the goal
+  const [open, setOpen] = useState<string>("");
 
   const choose = (id: string, title: string) => {
     const opening = open !== id;
@@ -36,7 +37,7 @@ export default function ProjectsContent() {
         const builtWith = (
           <div className="grid gap-2">
             <p className="label">{projectText.builtWith}</p>
-            <Chips items={project.technologies} label={projectText.builtWith} />
+            <InlineList items={project.technologies} label={projectText.builtWith} />
           </div>
         );
         const links = (

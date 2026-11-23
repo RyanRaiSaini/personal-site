@@ -1,6 +1,6 @@
 import { bench, skillGroups, skillsText, squad } from "../../data/portfolio";
 import Tabs from "../ui/Tabs";
-import { Chips } from "./parts";
+import { InlineList } from "./parts";
 
 // Skills: the dressing room. The starting eleven comes from `squad`
 // and the full lists from `skillGroups` (app/data/portfolio.ts).
@@ -40,7 +40,7 @@ export default function SkillsContent() {
 
       <div className="grid gap-2">
         <p className="label">{skillsText.bench}</p>
-        <Chips items={bench} label={skillsText.bench} />
+        <InlineList items={bench} label={skillsText.bench} />
       </div>
     </div>
   );
@@ -50,7 +50,7 @@ export default function SkillsContent() {
       {skillGroups.map((group) => (
         <div key={group.category} className="grid gap-2">
           <h3 className="label">{group.category}</h3>
-          <Chips items={group.skills} label={group.category} />
+          <InlineList items={group.skills} label={group.category} />
         </div>
       ))}
     </div>

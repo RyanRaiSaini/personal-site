@@ -208,15 +208,20 @@ body {
   color: var(--gold);
 }
 
-.chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.55rem;
-  border-radius: 6px;
-  border: 1px solid var(--line);
-  font-size: 0.8125rem;
+/* a short list as one line of text, its items parted by a dot
+   (in place of a row of boxed tags) */
+.inline-list {
+  font-size: 0.9375rem;
+  line-height: 1.6;
   color: var(--ink-soft);
-  white-space: nowrap;
+}
+.inline-list li {
+  display: inline;
+}
+.inline-list li + li::before {
+  content: "\00b7";
+  margin: 0 0.5em;
+  color: var(--ink-faint);
 }
 
 .link {

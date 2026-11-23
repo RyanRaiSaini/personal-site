@@ -1,5 +1,5 @@
 import { experience, experienceText } from "../../data/portfolio";
-import { Bullets, Chips, ExternalLink } from "./parts";
+import { Bullets, ExternalLink } from "./parts";
 
 // Experience: the dugout. Each role in `experience`
 // (app/data/portfolio.ts) is a signing.
@@ -35,7 +35,6 @@ export default function ExperienceContent() {
             </div>
             <p className="text-[0.9375rem] leading-[1.55] text-ink-soft">{job.summary}</p>
             <Bullets items={job.highlights} show={SHOWN} more={experienceText.more} />
-            <Chips items={job.tags} label={experienceText.skills} />
           </li>
         );
       })}

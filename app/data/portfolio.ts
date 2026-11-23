@@ -36,7 +36,6 @@ export type Experience = {
   kind: "work" | "leadership";
   summary: string;
   highlights: string[];
-  tags: string[];
 };
 
 export type Award = {
@@ -244,7 +243,6 @@ export const experienceText = {
   leadership: "Captaincy",
   // opens the rest of a role's points; {n} is how many there are in all
   more: "Show all {n} points",
-  skills: "Skills used",
 };
 
 export const experience: Experience[] = [
@@ -267,7 +265,6 @@ export const experience: Experience[] = [
       "Created a personalized email outreach program and supported onboarding for 50+ startups, coordinating introductions, follow-ups and program information.",
       "Identified and engaged startup founders and senior leaders of small and medium-sized businesses as attendees for 10+ in-person events planned for 2026 to 2029, and introduced prospective partners to BHive's partnership program, including discussions of sponsorships valued at $100,000 or more.",
     ],
-    tags: ["Python", "Java", "Excel", "Google Sheets", "AI research"],
   },
   {
     id: "bleeding-disorders-canada",
@@ -284,7 +281,6 @@ export const experience: Experience[] = [
       "Wrote and distributed website articles and community stories for more than 150 families and sponsors.",
       "Produced marketing materials and public calls for 125+ vendors, and coordinated sponsor communications and sponsorship arrangements.",
     ],
-    tags: ["Event logistics", "Writing", "Sponsor relations"],
   },
   {
     id: "make-a-wish",
@@ -301,7 +297,6 @@ export const experience: Experience[] = [
       "Spoke with more than 100 sponsors and contributed to fundraising events that raised more than $50,000 for wishes.",
       "Supported event safety protocols and assisted wish children and their families at Make-A-Wish events.",
     ],
-    tags: ["Leadership", "Public speaking", "Fundraising"],
   },
 ];
 
