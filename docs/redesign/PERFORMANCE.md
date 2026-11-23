@@ -84,6 +84,21 @@ The full-size overview reads lower here than in section 2 (27 against 39). The p
 
 Each picture of the overview is now about 213 drawing steps and 800,000 triangles; About is about 127 and 360,000.
 
+## 5. With the crowd and the floodlight beams (2026-11-22)
+
+Development server, on mains power, "medium" quality, 1280 x 720 at 1x, pointer moving. About 54,000 fans: flat cut-outs, and fans in the round in the blocks of seats near the camera that face it. Free memory on the laptop was low (under 1 GB), which the readings may understate.
+
+| View | Drawn / s | Fans in the round | Triangles |
+|---|---|---|---|
+| Overview | 52 to 57 | 615 | 0.9 to 1.0 million |
+| Overview at night (beams on) | 41 | | 1.4 million |
+| Close view of the main stand's lower tier | 60 | 2,720 | 1.07 million |
+| The GitHub board | 60 | 2,420 | 0.96 million |
+| About | 60 | | 0.47 million |
+| Any view, left alone | **0** | | |
+
+The "low" quality level hides the crowd and the beams.
+
 ## What each change was worth
 
 These were measured on one page, seconds apart, by switching one thing off at a time, so they can be compared with each other.

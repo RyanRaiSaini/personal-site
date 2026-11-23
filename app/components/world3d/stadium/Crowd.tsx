@@ -25,7 +25,8 @@ import { loadSeatData } from "./seatData";
 // by day and under the floodlights at night.
 //
 // Wherever the camera comes within NEAR metres of a block of seats that
-// is in view, the cut-outs there are swapped for fans in the round
+// is in view and faces it (the camera is on the pitch side, where the
+// fans' faces are), the cut-outs there are swapped for fans in the round
 // (fanFigure.ts), so close views of the stands show people, not cards. Each block's figures
 // are made the first time it is needed, and drawn only while it is near.
 //
@@ -307,7 +308,10 @@ export default function Crowd() {
     view.frustum.setFromProjectionMatrix(view.matrix);
     let changed = false;
     for (const block of blocks) {
-      const isNear = camera.position.distanceTo(block.sphere.center) - block.sphere.radius < NEAR && view.frustum.intersectsSphere(block.sphere);
+      const centre = block.sphere.center;
+      // the fans face the middle of the pitch: is the camera in front of them?
+      const facing = (camera.position.x - centre.x) * -centre.x + (camera.position.z - centre.z) * -centre.z > 0;
+      const isNear = facing && camera.position.distanceTo(centre) - block.sphere.radius < NEAR && view.frustum.intersectsSphere(block.sphere);
       if (isNear === block.isNear) continue;
       block.isNear = isNear;
       changed = true;
