@@ -566,6 +566,8 @@ export const panelText = {
 };
 
 export const contactText = {
+  // the flash-interview spot by the tunnel: the boards on the grass
+  zone: { email: "Email", linkedin: "LinkedIn", backdrop: "Contact" },
   lead: "Email is the most reliable way to reach me.",
   email: "Email",
   linkedin: "LinkedIn",

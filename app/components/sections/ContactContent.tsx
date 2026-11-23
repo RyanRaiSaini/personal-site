@@ -4,7 +4,7 @@ import { useState } from "react";
 import { contactText, profile } from "../../data/portfolio";
 import { Arrow, ExternalLink } from "./parts";
 
-// Contact: the mixed zone. Email and LinkedIn, and no form.
+// Contact: the flash interview by the tunnel. Email and LinkedIn, and no form.
 export default function ContactContent() {
   const [copied, setCopied] = useState(false);
 

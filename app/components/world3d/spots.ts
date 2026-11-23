@@ -23,7 +23,7 @@ export type Pose = {
   fov: number;
 };
 
-export type SceneId = "bowl" | "dressing" | "trophy" | "press" | "tickets" | "mixed";
+export type SceneId = "bowl" | "dressing" | "trophy" | "press" | "tickets";
 
 export type Spot = {
   scene: SceneId;
@@ -41,7 +41,6 @@ export const ROOM_ORIGIN: Record<Exclude<SceneId, "bowl">, Vec3> = {
   trophy: [300, 0, -600],
   press: [600, 0, -600],
   tickets: [900, 0, -600],
-  mixed: [1200, 0, -600],
 };
 
 function inRoom(room: Exclude<SceneId, "bowl">, v: Vec3): Vec3 {
@@ -108,11 +107,13 @@ export const SPOTS: Record<Exclude<SectionId, "home">, Spot> = {
     narrow: { position: inRoom("tickets", [0, 1.8, 7.6]), target: inRoom("tickets", [0, 2.75, -2]), fov: 64 },
     anchor: [66, 9.6, -44],
   },
+  // the flash interview by the tunnel (stadium/FlashZone.tsx), seen from
+  // its camera's side, out on the grass
   contact: {
-    scene: "mixed",
-    pose: { position: inRoom("mixed", [0.4, 1.7, 5.6]), target: inRoom("mixed", [0, 1.4, -2]), fov: 50 },
-    narrow: { position: inRoom("mixed", [0, 1.8, 6.2]), target: inRoom("mixed", [0, 1.9, -2]), fov: 66 },
-    anchor: [9, 3.2, -43.5],
+    scene: "bowl",
+    pose: { position: [6.6, 1.75, -29.6], target: [6.3, 1.35, -37.2], fov: 46 },
+    narrow: { position: [6.5, 1.9, -28.6], target: [6.3, 1.6, -37.2], fov: 60 },
+    anchor: [6.3, 3.2, -37.4],
   },
 };
 

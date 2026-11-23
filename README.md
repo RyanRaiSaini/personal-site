@@ -17,7 +17,7 @@ My portfolio, set inside a real-time 3D football stadium. I'm a Mathematics stud
 | The stands | GitHub: a scoreboard on the main stand shows my contributions |
 | The big screen | Now: live Brampton time and weather |
 | The ticket office | Résumé |
-| The mixed zone | Contact |
+| Pitch side, the flash interview | Contact |
 
 ## Highlights
 
@@ -62,7 +62,7 @@ app/
 │   ├── world/            # the page shell: tour or match view, live data, sound, name tags
 │   ├── world3d/          # the 3D world
 │   │   ├── stadium/      # the stadium model, its materials and light, seats, pitch, goals
-│   │   ├── rooms/        # dressing room, trophy room, press room, ticket office, mixed zone
+│   │   ├── rooms/        # dressing room, trophy room, press room, ticket office
 │   │   ├── players/      # the players, their moves and the goal scripts
 │   │   ├── atmosphere/   # sky, lights, weather
 │   │   ├── camera/       # the camera rig, the start screen's view and the walk-out

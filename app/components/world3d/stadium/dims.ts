@@ -54,3 +54,7 @@ export const SECOND_TIER = { d: 15.8, bottom: 11.4 } as const;
 export const TUNNEL = { halfWidth: 3, height: 3.1, length: 26 } as const;
 export const DUGOUT = { x: 15, width: 11, depth: 2.4, height: 2.3 } as const;
 export const AD_BOARD = { height: 0.95, offsetZ: 4.2, offsetX: 5.4 } as const;
+// The flash-interview backdrop (Contact): on the grass between the tunnel
+// and the home dugout, in front of the advertising boards, facing the
+// pitch. x and z are its middle, at the foot.
+export const FLASH = { x: 6.3, z: -37.4, width: 3.6, height: 2.3 } as const;

@@ -3,7 +3,6 @@
 import { useWorld } from "../../../lib/store";
 import { ROOM_ORIGIN, sceneOf, type SceneId } from "../spots";
 import DressingRoom from "./DressingRoom";
-import MixedZone from "./MixedZone";
 import PressRoom from "./PressRoom";
 import TicketOffice from "./TicketOffice";
 import TrophyRoom from "./TrophyRoom";
@@ -19,7 +18,6 @@ const ROOMS: { id: RoomId; Room: () => React.ReactNode }[] = [
   { id: "trophy", Room: TrophyRoom },
   { id: "press", Room: PressRoom },
   { id: "tickets", Room: TicketOffice },
-  { id: "mixed", Room: MixedZone },
 ];
 
 export default function Rooms({ children }: { children?: (room: RoomId) => React.ReactNode }) {

@@ -9,7 +9,7 @@ import { stir } from "../activity";
 import { atmo } from "../atmosphere/state";
 import { rig } from "../camera/CameraRig";
 import { clickable } from "../rooms/common";
-import { PITCH } from "../stadium/dims";
+import { FLASH, PITCH } from "../stadium/dims";
 import { netKick } from "../stadium/Goals";
 import { canvasTexture } from "../textures/canvas";
 import { KITS, type Kit } from "./kits";
@@ -41,6 +41,8 @@ const REST: Partial<Record<SectionId, { at: [number, number]; facing: number; st
   about: { at: [0, 0], facing: 0.62, stances: ["foot", "hips"] },
   projects: { at: [PITCH.halfLength - 13.4, 3.6], facing: Math.PI * 0.42, stances: ["hips"] },
   experience: { at: [-15.2, -38.3], facing: 0.55, stances: ["folded"] },
+  // in front of the flash-interview backdrop, facing its camera
+  contact: { at: [FLASH.x, FLASH.z + 1.45], facing: 0.06, stances: ["hips"] },
 };
 
 // How number 8 gets to his spot when the section changes. A long way
