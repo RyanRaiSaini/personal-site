@@ -47,6 +47,8 @@ next-env.d.ts
 /public/stadium/stadium.raw.glb
 # and the player model, likewise
 /public/players/player.raw.glb
+# and the crowd's pictures
+/public/stadium/crowd/*.raw.png
 # Blender scratch files
 __pycache__/
 *.blend1

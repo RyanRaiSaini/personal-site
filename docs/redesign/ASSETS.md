@@ -36,6 +36,18 @@ A second model, "santiago bernabeu" by Michael Persi (mikmikoni), CC BY 4.0, was
 | Licence | Adobe's [Mixamo FAQ](https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html) allows characters and animations to be used "royalty free for personal, commercial, and non-profit projects". A free Adobe account is needed to download them. |
 | What is not in this repo | The files as downloaded from Mixamo. They are kept in `C:\Users\ryanr\stadium-work\mixamo\` and can be downloaded again from Mixamo at any time. Only the rebuilt model is here; it is part of this site and is not offered for reuse on its own. |
 
+## The crowd (Mixamo)
+
+| | |
+|---|---|
+| What | The fans in the stands: pictures of two people sitting down, in four poses each |
+| Characters | "Remy" and "Bryce", from Adobe's [Mixamo](https://www.mixamo.com) library |
+| Movement | Mixamo motion capture: Sitting Idle and Victory (the raised arms) |
+| Made by | Seated and rendered in Blender 5.3 by [`blender/build_crowd.py`](../../blender/build_crowd.py), packed by [`scripts/pack-crowd.mjs`](../../scripts/pack-crowd.mjs). A second picture marks the shirt, skin, trousers and hair, so the site gives every fan his own colours. |
+| Web version | [`public/stadium/crowd/`](../../public/stadium/crowd/), about 180 KB |
+| Licence | As for the players above |
+| What is not in this repo | The Mixamo downloads, as above |
+
 No player's face is taken from a photograph. Each is told apart by his number, skin tone, hair, beard, height and celebration (`app/components/world3d/players/kits.ts`). The goalkeeper is nobody in particular.
 
 ## Surfaces and sky (Poly Haven)

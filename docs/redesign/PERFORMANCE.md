@@ -99,6 +99,8 @@ Development server, on mains power, "medium" quality, 1280 x 720 at 1x, pointer 
 
 The "low" quality level hides the crowd and the beams.
 
+On 2026-11-23 the crowd became rendered pictures of real people (no fans in the round). Overview, same set-up: about 52 pictures a second with the crowd, 59 with it hidden.
+
 ## What each change was worth
 
 These were measured on one page, seconds apart, by switching one thing off at a time, so they can be compared with each other.

@@ -245,3 +245,13 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - ~~The stadium is still empty: no crowd.~~ Done on 2026-11-22: see "A full ground" below.
 - The players share one face. Hair, beard, skin tone, height and build do the work of telling them apart.
 - The on-page résumé (the web version of the sheet) is still set in Times, not Computer Modern.
+
+## 2026-11-23, the realism night
+
+### A crowd of real people
+
+- The fans are no longer painted cut-outs. Two of Mixamo's stock characters are sat down by motion capture and rendered in Blender in four poses each (hands on knees, an arm up, both arms up, both arms high): `blender/build_crowd.py`, `npm run crowd:build`, then `npm run crowd:pack`.
+- A second picture marks each person's shirt, skin, trousers and hair, so every fan gets his own shirt colour, skin tone, trousers and hair colour. Half are drawn as in a mirror, so the two men make many more faces.
+- The fans in the round near the camera (`fanFigure.ts`) are gone: the rendered people look better up close than they did, and cost less.
+- Each fan's card is cut to the outline of the person on it (`boxes` in `crowd.json`). Only about a quarter of each cell is person, and the empty part costs as much to draw.
+- Cost, overview, 1280 x 720, development server, on mains: about 52 pictures a second with the crowd against 59 without it.
