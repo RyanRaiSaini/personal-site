@@ -12,6 +12,7 @@ import { makeMaterials, type StadiumMaterials } from "./materials";
 import { perimeter } from "./path";
 import { loadSeatData } from "./seatData";
 import Crowd from "./Crowd";
+import CrowdFlags from "./CrowdFlags";
 import FloodBeams from "./FloodBeams";
 import GithubBoard from "./GithubBoard";
 import Seats from "./Seats";
@@ -257,6 +258,7 @@ export default function StadiumModel() {
       <primitive object={gltf.scene} />
       <Seats detailedSeat={parts.seatDetailed} plainSeat={parts.seatPlain} />
       <Crowd />
+      <CrowdFlags />
       <GithubBoard />
       <FloodBeams />
     </group>
