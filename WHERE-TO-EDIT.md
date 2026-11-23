@@ -206,12 +206,14 @@ By day the stadium is lit by one photographed sky and one fixed sun. The real cl
 
 | Room | Section | File |
 |---|---|---|
-| Dressing room (lockers, boots, the match ball on the crest, the ball bag) | Skills | `app/components/world3d/rooms/DressingRoom.tsx` |
+| Dressing room (walnut lockers, leather backs and seats, lit name plates, towels, bottles, boots in `BOOTS` colours, the tactics board, the carpet, the match ball, the ball bag) | Skills | `app/components/world3d/rooms/DressingRoom.tsx` |
 | Trophy room (four cases, the cabinet, velvet ropes and runner) | Awards | `app/components/world3d/rooms/TrophyRoom.tsx` |
-| Press room (lighting rig, studio light, TV cameras, PRESS chairs) | In the News | `app/components/world3d/rooms/PressRoom.tsx` |
+| Press room (lighting rig, studio light, four TV cameras, PRESS chairs, the reporters in `REPORTERS`) | In the News | `app/components/world3d/rooms/PressRoom.tsx` |
 | Ticket office (lit windows, the club banner, the player profile with my photo, the scarf wall, the matchday board; the words are `resumeText.board`, `resumeText.banner` and `resumeText.profileTitle` in `portfolio.ts`) | Résumé | `app/components/world3d/rooms/TicketOffice.tsx` |
 | Mixed zone (interview board, barrier, broadcasters' microphones, TV camera) | Contact | `app/components/world3d/rooms/MixedZone.tsx` |
 | Shared building blocks (boxes, lit signs, the room shell, the TV camera on its tripod) | | `app/components/world3d/rooms/common.tsx` |
+| Real materials for the rooms (walnut, leather, marble, rubber, concrete, laminate, plaster, fabric, metal) and how a room uses one (`useSurface`, `floorSurface` on `Shell`, `material` on `Box`) | | `app/components/world3d/rooms/surfaces.ts` |
+| People in the rooms (the ticket clerks, the reporters): one of the crowd's rendered people, recoloured | `Person`, `personPicture` | `app/components/world3d/rooms/Person.tsx`, `rooms/clerk.ts` |
 
 The shirts in the dressing room come from `squad` and `bench`. The trophies come from `awards` (the first four). The programme cover in the ticket office and the signs in the mixed zone read from `profile`.
 

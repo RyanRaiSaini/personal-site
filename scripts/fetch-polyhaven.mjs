@@ -33,6 +33,16 @@ const TEXTURES = [
   { id: "painted_concrete_02", maps: ["diff", "nor", "arm"], size: "1k", use: "walls, tier fronts and undersides" },
   { id: "corrugated_iron_02", maps: ["nor", "arm"], size: "1k", use: "the roof's ceiling" },
   { id: "sparse_grass", maps: ["nor", "arm"], size: "1k", web: 512, use: "fine relief on the pitch" },
+  // the rooms (added 2026-11-23)
+  { id: "american_walnut_veneer", maps: ["diff", "nor", "arm"], size: "1k", web: 512, use: "the dressing room's lockers, wood trim" },
+  { id: "leather_white", maps: ["diff", "nor", "arm"], size: "1k", web: 512, use: "padded benches and seat backs" },
+  { id: "marble_01", maps: ["diff", "nor", "arm"], size: "1k", web: 512, use: "the trophy room's floor" },
+  { id: "rubber_tiles", maps: ["diff", "nor", "arm"], size: "1k", web: 512, use: "the dressing room's floor" },
+  { id: "smooth_concrete_floor", maps: ["diff", "nor", "arm"], size: "1k", web: 512, use: "the concourse floors (ticket office, mixed zone)" },
+  { id: "laminate_floor_02", maps: ["diff", "nor", "arm"], size: "1k", web: 512, use: "the press room's floor" },
+  { id: "painted_plaster_wall", maps: ["nor", "arm"], size: "1k", web: 512, use: "the rooms' walls, tinted in code" },
+  { id: "fabric_pattern_07", maps: ["nor", "arm"], size: "1k", web: 512, use: "carpets and runners, tinted in code" },
+  { id: "metal_plate", maps: ["nor", "arm"], size: "1k", web: 512, use: "rails, frames and fittings" },
 ];
 const SKY = { id: "kloofendal_48d_partly_cloudy_puresky", size: "4k", use: "daylight and the sky seen through the roof" };
 

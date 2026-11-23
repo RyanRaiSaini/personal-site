@@ -6,7 +6,6 @@ import { CatmullRomCurve3, ExtrudeGeometry, LatheGeometry, Shape, TubeGeometry, 
 import { awards } from "../../../data/portfolio";
 import { useWorld } from "../../../lib/store";
 import { atmo } from "../atmosphere/state";
-import { canvasTexture } from "../textures/canvas";
 import { Box, clickable, CREAM, Glow, GOLD, Shell, Sign } from "./common";
 
 // The trophy room (Awards). Each award in `awards`
@@ -291,32 +290,7 @@ function BigCup() {
   );
 }
 
-// Polished dark stone in large square tiles
-function floorTexture() {
-  return canvasTexture(512, 512, (ctx, w, h) => {
-    ctx.fillStyle = "#0c0d11";
-    ctx.fillRect(0, 0, w, h);
-    // a faint cloud, so the stone is not flat paint
-    const cloud = ctx.createRadialGradient(w * 0.3, h * 0.35, 10, w * 0.5, h * 0.5, w * 0.75);
-    cloud.addColorStop(0, "rgba(255,255,255,0.035)");
-    cloud.addColorStop(1, "rgba(255,255,255,0)");
-    ctx.fillStyle = cloud;
-    ctx.fillRect(0, 0, w, h);
-    // the joint between tiles
-    ctx.strokeStyle = "rgba(255,255,255,0.06)";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(1, 1, w - 2, h - 2);
-  });
-}
-
 export default function TrophyRoom() {
-  const stone = useMemo(() => {
-    const t = floorTexture();
-    t.repeat.set(6, 6);
-    return t;
-  }, []);
-  useEffect(() => () => stone.dispose(), [stone]);
-
   const places: { x: number; z: number; turn: number }[] = [
     { x: -2.4, z: -1.05, turn: 0.2 },
     { x: -0.8, z: -1.4, turn: 0.06 },
@@ -332,7 +306,7 @@ export default function TrophyRoom() {
       ))}
       <pointLight position={[0, 2.6, 4.5]} intensity={12} distance={14} decay={1.4} color="#ffe0b0" />
 
-      <Shell width={12} depth={12} back={4.5} height={3.6} floor="#0a0b0f" wall="#15120e" ceiling="#070709" floorMap={stone} floorRoughness={0.22} floorMetalness={0.2} />
+      <Shell width={12} depth={12} back={4.5} height={3.6} floor="#0a0b0f" wall="#15120e" ceiling="#070709" floorSurface={{ name: "marble", tile: 2.4, tint: "#3a3530", roughness: 0.35 }} />
 
       {/* slatted side walls with a warm line of light */}
       {[-1, 1].map((s) => (

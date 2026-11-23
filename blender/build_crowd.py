@@ -65,6 +65,8 @@ def parse_args():
     parser.add_argument("--source", required=True)
     parser.add_argument("--site")
     parser.add_argument("--probe")
+    # the same people seen from behind (the press room's seats face away)
+    parser.add_argument("--back", action="store_true")
     return parser.parse_args(argv)
 
 
@@ -230,8 +232,8 @@ def flat(name, colour):
     return mat
 
 
-def stage():
-    """A camera looking at him from the pitch, and soft daylight."""
+def stage(back=False):
+    """A camera looking at him from the pitch (or from behind), and soft daylight."""
     scene = bpy.context.scene
     scene.render.engine = "BLENDER_EEVEE"
     scene.render.film_transparent = True
@@ -253,8 +255,8 @@ def stage():
     camera = bpy.data.objects.new("Camera", bpy.data.cameras.new("Camera"))
     camera.data.type = "ORTHO"
     camera.data.ortho_scale = WORLD_H  # the taller side
-    camera.location = (0.0, -6.0, WORLD_H / 2)
-    camera.rotation_euler = (math.radians(90), 0.0, 0.0)
+    camera.location = (0.0, 6.0 if back else -6.0, WORLD_H / 2)
+    camera.rotation_euler = (math.radians(90), 0.0, math.radians(180) if back else 0.0)
     scene.collection.objects.link(camera)
     scene.camera = camera
     return scene
@@ -278,7 +280,7 @@ def build(args):
         arm, meshes = load_person(source, spec)
         sitting = clip(os.path.join(source, SITTING), arm)
         victory = clip(os.path.join(source, VICTORY), arm)
-        scene = stage()
+        scene = stage(args.back)
         by_name = {o.name: o for o in meshes}
         own = {o.name: [s.material for s in o.material_slots] for o in meshes}
         # the shirt and trousers keep their shading but lose their colour
@@ -312,7 +314,7 @@ def build(args):
             arm.location = (0.0, 0.0, 0.0)
             pose(arm, sitting, victory, spec_pose)
             settle(arm, meshes)
-            base = os.path.join(work, f"{person}-{spec_pose['name']}")
+            base = os.path.join(work, f"{person}-{spec_pose['name']}{'-back' if args.back else ''}")
             for name, obj in by_name.items():
                 for i, slot in enumerate(obj.material_slots):
                     slot.material = greys.get(name, own[name][i])
@@ -332,9 +334,10 @@ def build(args):
         return
 
     # one sheet of colour, one of masks, the cells side by side
+    name = "crowd-back" if args.back else "crowd"
     sheet_w = CELL_W * len(cells)
     for which in ("colour", "mask"):
-        sheet = bpy.data.images.new(f"crowd-{which}", sheet_w, CELL_H, alpha=True)
+        sheet = bpy.data.images.new(f"{name}-{which}", sheet_w, CELL_H, alpha=True)
         pixels = [0.0] * (sheet_w * CELL_H * 4)
         for c, (_, _, base) in enumerate(cells):
             cell = bpy.data.images.load(f"{base}-{which}.png")
@@ -345,10 +348,10 @@ def build(args):
                 start = (y * sheet_w + c * CELL_W) * 4
                 pixels[start:start + CELL_W * 4] = row
         sheet.pixels = pixels
-        sheet.filepath_raw = os.path.join(out, f"crowd-{which}.raw.png")
+        sheet.filepath_raw = os.path.join(out, f"{name}-{which}.raw.png")
         sheet.file_format = "PNG"
         sheet.save()
-    with open(os.path.join(out, "crowd.json"), "w") as f:
+    with open(os.path.join(out, f"{name}.json"), "w") as f:
         json.dump({"cells": [{"person": p, "pose": n} for p, n, _ in cells], "cell": [CELL_W, CELL_H], "metres": [WORLD_W, WORLD_H]}, f, indent=2)
     log(f"sheets written: {len(cells)} cells, {sheet_w} x {CELL_H}")
 

@@ -2,10 +2,7 @@
 
 import { profile, resumeText } from "../../../data/portfolio";
 import { headshot } from "../../../data/photos";
-import { useEffect, useState } from "react";
-import { DoubleSide, type Texture } from "three";
-import { HEIGHT, WIDTH } from "../stadium/Crowd";
-import { clerkPicture } from "./clerk";
+import Person from "./Person";
 import { Box, Glow, GOLD, NAVY, ROYAL, Shell, Sign, usePhoto } from "./common";
 
 // The ticket office (Résumé). Two lit windows in the concourse wall
@@ -20,37 +17,15 @@ import { Box, Glow, GOLD, NAVY, ROYAL, Shell, Sign, usePhoto } from "./common";
 const PAGE_SHAPE = 1200 / 1687;
 
 // The person serving at a window: one of the crowd's people, seated on a
-// stool behind the counter, in the club's staff polo (rooms/clerk.ts)
-function Clerk({ which, mirrored }: { which: 0 | 1; mirrored: boolean }) {
-  const [picture, setPicture] = useState<Texture | null>(null);
-  useEffect(() => {
-    let alive = true;
-    let made: Texture | null = null;
-    clerkPicture(which, NAVY, which ? 0.55 : 0.2)
-      .then((texture) => {
-        made = texture;
-        if (alive) setPicture(texture);
-        else texture.dispose();
-      })
-      .catch(() => undefined);
-    return () => {
-      alive = false;
-      made?.dispose();
-    };
-  }, [which]);
-  if (!picture) return null;
-  return (
-    <mesh position={[mirrored ? 0.25 : -0.25, 0.68 + HEIGHT / 2, -0.035]} scale={[mirrored ? -1 : 1, 1, 1]}>
-      <planeGeometry args={[WIDTH, HEIGHT]} />
-      <meshStandardMaterial map={picture} alphaTest={0.45} roughness={0.85} side={DoubleSide} />
-    </mesh>
-  );
+// stool behind the counter, in the club's navy staff polo (Person.tsx)
+function Clerk({ which }: { which: 0 | 1 }) {
+  return <Person look={{ man: which, shirt: NAVY, skin: which ? 0.55 : 0.2 }} position={[which ? 0.25 : -0.25, 0, -0.035]} lift={0.68} mirrored={which === 1} />;
 }
 
 function Window({ x, clerk }: { x: number; clerk: 0 | 1 }) {
   return (
     <group position={[x, 0, -4.4]}>
-      <Clerk which={clerk} mirrored={clerk === 1} />
+      <Clerk which={clerk} />
       {/* the booth: a warm room behind glass (kept in front of the wall, or the wall hides it) */}
       <Box size={[2.2, 1.5, 0.02]} position={[0, 1.85, -0.06]} color="#f1cf96" emissive="#f4b864" emissiveIntensity={0.9} roughness={0.9} />
       <Box size={[2.2, 0.3, 0.02]} position={[0, 2.45, -0.05]} color="#2a2f3a" roughness={0.7} />
@@ -250,7 +225,7 @@ export default function TicketOffice() {
       <pointLight position={[0, 2.7, 2]} intensity={16} distance={14} decay={1.5} color="#fff3e0" />
       <pointLight position={[0, 2.0, -2.6]} intensity={8} distance={7} decay={1.7} color="#ffd79a" />
 
-      <Shell width={13} depth={12} back={4.5} height={3.8} floor="#3d414b" wall="#1c3c94" ceiling="#1a1e28" floorRoughness={0.6} floorMetalness={0.05} />
+      <Shell width={13} depth={12} back={4.5} height={3.8} floor="#3d414b" wall="#1c3c94" ceiling="#1a1e28" floorSurface={{ name: "concrete", tile: 4, tint: "#8f98a6", roughness: 0.4, grey: true }} />
       {/* panels of light in the ceiling, as down a concourse */}
       {[-3.9, 0, 3.9].map((x) => [-2.4, 1.2, 4.6].map((z) => <Glow key={`${x}${z}`} size={[1.6, 0.02, 0.5]} position={[x, 3.78, z]} color={[0.72, 0.7, 0.66]} />))}
 

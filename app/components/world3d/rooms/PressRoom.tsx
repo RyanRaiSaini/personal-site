@@ -10,6 +10,8 @@ import { atmo } from "../atmosphere/state";
 import { canvasTexture } from "../textures/canvas";
 import { useDisplayFont } from "../textures/text";
 import { Box, clickable, CREAM, Glow, GOLD, NAVY, ROYAL, Shell, Sign, Tripod, TvCamera, usePhoto } from "./common";
+import { POSE } from "./clerk";
+import Person from "./Person";
 
 // The press room (In the News). A press-conference desk in front of a
 // sponsor-style backdrop, lit like a set by two studio lights, with two
@@ -196,6 +198,20 @@ function Basketball({ position }: { position: [number, number, number] }) {
   );
 }
 
+// The reporters in the chairs, seen from behind: [seat, row] (seats run
+// left to right, rows front to back), which of the two men, his shirt,
+// skin and hair, and whether his hand is up with a question
+const REPORTERS: { seat: number; row: number; man: 0 | 1; shirt: string; skin: number; hair: string; hand?: boolean; mirrored?: boolean }[] = [
+  { seat: 0, row: 0, man: 1, shirt: "#2b2f3a", skin: 0.15, hair: "#2a1d14" },
+  { seat: 1, row: 0, man: 0, shirt: "#e9e6df", skin: 0.6, hair: "#0e0b09", mirrored: true },
+  { seat: 3, row: 0, man: 0, shirt: "#6b7f99", skin: 0.3, hair: "#4a3422", hand: true },
+  { seat: 5, row: 0, man: 1, shirt: "#8a2b2b", skin: 0.85, hair: "#0e0b09", mirrored: true },
+  { seat: 0, row: 1, man: 0, shirt: "#1c2a4a", skin: 0.45, hair: "#1a120c" },
+  { seat: 2, row: 1, man: 1, shirt: "#d8d2c4", skin: 0.2, hair: "#6b5030", mirrored: true },
+  { seat: 4, row: 1, man: 1, shirt: "#3d5a3a", skin: 0.7, hair: "#0e0b09" },
+  { seat: 5, row: 1, man: 0, shirt: "#c9c3b5", skin: 0.1, hair: "#8a8580", mirrored: true },
+];
+
 export default function PressRoom() {
   const family = useDisplayFont();
   const backdrop = useMemo(() => {
@@ -217,7 +233,7 @@ export default function PressRoom() {
       <pointLight position={[0, 2.7, -1.2]} intensity={18} distance={9} decay={1.6} color="#fff6e8" />
       <pointLight position={[0, 2.9, 3]} intensity={6} distance={10} decay={1.7} color="#dfe6ff" />
 
-      <Shell width={12.6} depth={12} back={4.5} height={3.6} floor="#1a1d24" wall="#20242d" ceiling="#0c0e12" floorRoughness={0.6} />
+      <Shell width={12.6} depth={12} back={4.5} height={3.6} floor="#1a1d24" wall="#20242d" ceiling="#0c0e12" floorSurface={{ name: "laminate", tile: 2.5, tint: "#6d6258", roughness: 0.6 }} />
 
       {/* ceiling light panels */}
       {[-3, 0, 3].map((x) => [-2, 1.5].map((z) => <Glow key={`${x}${z}`} size={[1.5, 0.02, 0.7]} position={[x, 3.58, z]} color={[0.55, 0.56, 0.6]} />))}
@@ -229,6 +245,9 @@ export default function PressRoom() {
       <StudioLight position={[3.05, 0, -1.55]} turn={1.13} />
       <TvCamera position={[3.25, 0, -0.25]} turn={0.87} />
       <TvCamera position={[0, 0, 3.3]} turn={0} low={0.2} />
+      {/* and the pool cameras: one on the left, one at the back corner */}
+      <TvCamera position={[-3.3, 0, -0.1]} turn={-0.87} />
+      <TvCamera position={[-2.6, 0, 3.7]} turn={-0.35} low={0.1} />
 
       {/* carpet under the reporters' chairs, edged in gold */}
       <Box size={[6.2, 0.012, 3.4]} position={[0, 0.006, 1.9]} color="#15214a" roughness={0.95} />
@@ -275,8 +294,11 @@ export default function PressRoom() {
         border={GOLD}
       />
 
-      {/* rows of chairs for the reporters */}
+      {/* rows of chairs for the reporters, most of them taken */}
       {rows.map((z) => seats.map((x) => <Chair key={`${x}${z}`} x={x} z={z} />))}
+      {REPORTERS.map((r) => (
+        <Person key={`${r.seat}${r.row}`} look={{ sheet: "crowd-back", man: r.man, pose: r.hand ? POSE.armUp : POSE.sit, shirt: r.shirt, skin: r.skin, hair: r.hair }} position={[seats[r.seat], 0, rows[r.row] - 0.02]} mirrored={r.mirrored} />
+      ))}
       {/* left on the end of the desk, where it can't be missed */}
       <Basketball position={[-1.95, 1.132, -3.0]} />
 

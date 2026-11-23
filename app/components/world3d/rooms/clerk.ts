@@ -1,22 +1,53 @@
 import { CanvasTexture, Color, SRGBColorSpace, type Texture } from "three";
-import { CELLS, loadSheets } from "../stadium/Crowd";
 
 // ------------------------------------------------------------------
-// A person to sit behind a counter: one of the crowd's rendered people
-// (blender/build_crowd.py), sitting, recoloured as staff. The crowd's
-// second picture marks the shirt, skin, trousers and hair, so the shirt
-// can be any colour.
+// People for the rooms: the crowd's rendered people (blender/build_crowd.py),
+// seated, recoloured as whoever they need to be: a clerk at a ticket
+// window, a reporter in the press room. The second picture of each sheet
+// marks the shirt, skin, trousers and hair, so those can be any colour.
+//
+// Two sheets: "crowd" sees them from the front, "crowd-back" from
+// behind. Each has eight cells: the two men, in four poses each.
 // ------------------------------------------------------------------
 
-const SITTING = [0, 4]; // the two men, hands on knees (crowd.json)
+export const PERSON = { width: 1.097, height: 1.8 }; // metres, as rendered
+const CELLS = 8;
+// [man, pose] -> cell: poses are sit, arms up, arm up, arms high
+export const POSE = { sit: 0, armUp: 2 } as const;
 
-export async function clerkPicture(which: 0 | 1, shirt: string, skin = 0.25): Promise<Texture> {
-  const { colour, mask } = await loadSheets();
-  const picture = colour.image as HTMLImageElement;
-  const parts = mask.image as HTMLImageElement;
+type Sheet = "crowd" | "crowd-back";
+const sheets = new Map<Sheet, Promise<[HTMLImageElement, HTMLImageElement]>>();
+function loadImage(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
+  });
+}
+function load(sheet: Sheet) {
+  let pair = sheets.get(sheet);
+  if (!pair) {
+    pair = Promise.all([loadImage(`/stadium/crowd/${sheet}-colour.webp`), loadImage(`/stadium/crowd/${sheet}-mask.webp`)]);
+    sheets.set(sheet, pair);
+  }
+  return pair;
+}
+
+export type PersonLook = {
+  sheet?: Sheet;
+  man: 0 | 1;
+  pose?: number; // POSE.sit or POSE.armUp
+  shirt: string;
+  skin?: number; // 0 fair to 1 dark
+  hair?: string;
+};
+
+export async function personPicture({ sheet = "crowd", man, pose = POSE.sit, shirt, skin = 0.25, hair }: PersonLook): Promise<Texture> {
+  const [picture, parts] = await load(sheet);
   const cellW = picture.width / CELLS;
   const cellH = picture.height;
-  const cell = SITTING[which];
+  const cell = man * 4 + pose;
 
   const canvas = document.createElement("canvas");
   canvas.width = cellW;
@@ -33,15 +64,20 @@ export async function clerkPicture(which: 0 | 1, shirt: string, skin = 0.25): Pr
   const shirtRGB = [tint.r, tint.g, tint.b].map((v) => Math.min(1.6, v * 1.45));
   // the pictured men are fair: darken toward the chosen tone, as the crowd does
   const skinRGB = [1 - skin * 0.66, 1 - skin * 0.76, 1 - skin * 0.81];
+  const hairColour = hair ? new Color(hair).convertSRGBToLinear() : null;
   const toLinear = (v: number) => Math.pow(v / 255, 2.2);
   const toByte = (v: number) => Math.round(255 * Math.pow(Math.min(1, v), 1 / 2.2));
   for (let i = 0; i < px.length; i += 4) {
     const r = where[i] / 255;
     const g = where[i + 1] / 255;
+    const b = where[i + 2] / 255;
+    // blue: full for trousers, half for hair
+    const isHair = hairColour && b > 0.55 && b < 0.85 ? 1 : 0;
+    const shade = 0.3 * toLinear(px[i]) + 0.59 * toLinear(px[i + 1]) + 0.11 * toLinear(px[i + 2]);
     for (let c = 0; c < 3; c++) {
-      const lin = toLinear(px[i + c]);
-      const mixed = lin * (1 + (shirtRGB[c] - 1) * r) * (1 + (skinRGB[c] - 1) * g);
-      px[i + c] = toByte(mixed);
+      let lin = toLinear(px[i + c]) * (1 + (shirtRGB[c] - 1) * r) * (1 + (skinRGB[c] - 1) * g);
+      if (isHair && hairColour) lin = [hairColour.r, hairColour.g, hairColour.b][c] * (0.6 + 2.2 * shade);
+      px[i + c] = toByte(lin);
     }
   }
   ctx.putImageData(image, 0, 0);

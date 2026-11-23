@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { DoubleSide, SRGBColorSpace, TextureLoader, type CanvasTexture, type Texture } from "three";
-import { canvasTexture, grain } from "../textures/canvas";
+import { DoubleSide, SRGBColorSpace, TextureLoader, type CanvasTexture, type Material, type Texture } from "three";
+import { useSurface, type SurfaceName } from "./surfaces";
+import { canvasTexture } from "../textures/canvas";
 import { useDisplayFont } from "../textures/text";
 
 // Pieces every room is built from: a painted box, a flat sign with
@@ -25,9 +26,17 @@ type BoxProps = {
   emissiveIntensity?: number;
   opacity?: number;
   shadow?: boolean;
+  // a ready-made material (a real surface from surfaces.ts) instead of a plain colour
+  material?: Material;
 };
 
-export function Box({ size, position, rotation, color = "#888", roughness = 0.7, metalness = 0, emissive, emissiveIntensity = 1, opacity, shadow = false }: BoxProps) {
+export function Box({ size, position, rotation, color = "#888", roughness = 0.7, metalness = 0, emissive, emissiveIntensity = 1, opacity, shadow = false, material }: BoxProps) {
+  if (material)
+    return (
+      <mesh position={position} rotation={rotation} castShadow={shadow} receiveShadow={shadow} material={material}>
+        <boxGeometry args={size} />
+      </mesh>
+    );
   return (
     <mesh position={position} rotation={rotation} castShadow={shadow} receiveShadow={shadow}>
       <boxGeometry args={size} />
@@ -139,48 +148,42 @@ type ShellProps = {
   floorRoughness?: number;
   floorMetalness?: number;
   floorMap?: CanvasTexture | null;
+  // a real floor (surfaces.ts): which, and how many metres one picture covers
+  floorSurface?: { name: SurfaceName; tile: number; tint?: string; roughness?: number; grey?: boolean };
 };
 
 // The empty room: floor, four walls and a ceiling, seen from inside
-export function Shell({ width, depth, back, height, floor, wall, ceiling, floorRoughness = 0.8, floorMetalness = 0, floorMap = null }: ShellProps) {
+export function Shell({ width, depth, back, height, floor, wall, ceiling, floorRoughness = 0.8, floorMetalness = 0, floorMap = null, floorSurface }: ShellProps) {
   const centreZ = -back + depth / 2;
-  const plaster = useMemo(
-    () =>
-      canvasTexture(128, 128, (ctx, w, h) => {
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, w, h);
-        grain(ctx, w, h, 9, 61);
-      }),
-    [],
-  );
-  useEffect(() => () => plaster.dispose(), [plaster]);
+  // the walls: real painted plaster, in the room's colour; each wall
+  // repeats it about every two metres
+  const plasterLong = useSurface("plaster", { repeat: [width / 2, height / 2], tint: wall, roughness: 0.95, bumps: 0.6 });
+  const plasterSide = useSurface("plaster", { repeat: [depth / 2, height / 2], tint: wall, roughness: 0.95, bumps: 0.6 });
+  const ceilingFinish = useSurface("plaster", { repeat: [width / 3, depth / 3], tint: ceiling, roughness: 1, bumps: 0.4 });
+  const tile = floorSurface?.tile ?? 1;
+  const realFloor = useSurface(floorSurface?.name ?? "concrete", { repeat: [width / tile, depth / tile], tint: floorSurface?.tint, roughness: floorSurface?.roughness, grey: floorSurface?.grey });
 
   return (
     <group>
-      <mesh position={[0, 0, centreZ]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0, centreZ]} rotation={[-Math.PI / 2, 0, 0]} material={floorSurface ? realFloor : undefined}>
         <planeGeometry args={[width, depth]} />
-        <meshStandardMaterial color={floorMap ? "#ffffff" : floor} map={floorMap ?? undefined} roughness={floorRoughness} metalness={floorMetalness} />
+        {!floorSurface && <meshStandardMaterial color={floorMap ? "#ffffff" : floor} map={floorMap ?? undefined} roughness={floorRoughness} metalness={floorMetalness} />}
       </mesh>
-      <mesh position={[0, height, centreZ]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh position={[0, height, centreZ]} rotation={[Math.PI / 2, 0, 0]} material={ceilingFinish}>
         <planeGeometry args={[width, depth]} />
-        <meshStandardMaterial color={ceiling} roughness={0.9} />
       </mesh>
       {/* back, front, left, right */}
-      <mesh position={[0, height / 2, -back]}>
+      <mesh position={[0, height / 2, -back]} material={plasterLong}>
         <planeGeometry args={[width, height]} />
-        <meshStandardMaterial color={wall} map={plaster} roughness={0.85} />
       </mesh>
-      <mesh position={[0, height / 2, -back + depth]} rotation={[0, Math.PI, 0]}>
+      <mesh position={[0, height / 2, -back + depth]} rotation={[0, Math.PI, 0]} material={plasterLong}>
         <planeGeometry args={[width, height]} />
-        <meshStandardMaterial color={wall} map={plaster} roughness={0.85} />
       </mesh>
-      <mesh position={[-width / 2, height / 2, centreZ]} rotation={[0, Math.PI / 2, 0]}>
+      <mesh position={[-width / 2, height / 2, centreZ]} rotation={[0, Math.PI / 2, 0]} material={plasterSide}>
         <planeGeometry args={[depth, height]} />
-        <meshStandardMaterial color={wall} map={plaster} roughness={0.85} />
       </mesh>
-      <mesh position={[width / 2, height / 2, centreZ]} rotation={[0, -Math.PI / 2, 0]}>
+      <mesh position={[width / 2, height / 2, centreZ]} rotation={[0, -Math.PI / 2, 0]} material={plasterSide}>
         <planeGeometry args={[depth, height]} />
-        <meshStandardMaterial color={wall} map={plaster} roughness={0.85} />
       </mesh>
     </group>
   );

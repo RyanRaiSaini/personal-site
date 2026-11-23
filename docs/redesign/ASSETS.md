@@ -60,12 +60,22 @@ All from [Poly Haven](https://polyhaven.com), all [CC0](https://polyhaven.com/li
 | Painted Concrete 02 | <https://polyhaven.com/a/painted_concrete_02> | Walls, tier fronts, undersides, the wall round the pitch | `textures/painted_concrete_02_{diff,nor,arm}.webp` | 1024 × 1024 |
 | Corrugated Iron 02 | <https://polyhaven.com/a/corrugated_iron_02> | The roof deck (bumps and roughness only) | `textures/corrugated_iron_02_{nor,arm}.webp` | 1024 × 1024 |
 | Sparse Grass | <https://polyhaven.com/a/sparse_grass> | Blade detail on the pitch (bumps and roughness only) | `textures/sparse_grass_{nor,arm}.webp` | 1024 × 1024 |
+| American Walnut Veneer | <https://polyhaven.com/a/american_walnut_veneer> | The dressing room's lockers | `textures/american_walnut_veneer_{diff,nor,arm}.webp` | 512 × 512 |
+| Leather White | <https://polyhaven.com/a/leather_white> | Padded locker backs and seats | `textures/leather_white_{diff,nor,arm}.webp` | 512 × 512 |
+| Marble 01 | <https://polyhaven.com/a/marble_01> | The trophy room's floor | `textures/marble_01_{diff,nor,arm}.webp` | 512 × 512 |
+| Rubber Tiles | <https://polyhaven.com/a/rubber_tiles> | The dressing room's floor | `textures/rubber_tiles_{diff,nor,arm}.webp` | 512 × 512 |
+| Smooth Concrete Floor | <https://polyhaven.com/a/smooth_concrete_floor> | The ticket office's floor (its colour taken out and set in code) | `textures/smooth_concrete_floor_{diff,nor,arm}.webp` | 512 × 512 |
+| Laminate Floor 02 | <https://polyhaven.com/a/laminate_floor_02> | The press room's floor | `textures/laminate_floor_02_{diff,nor,arm}.webp` | 512 × 512 |
+| Painted Plaster Wall | <https://polyhaven.com/a/painted_plaster_wall> | Every room's walls and ceiling, tinted in code (bumps and roughness only) | `textures/painted_plaster_wall_{nor,arm}.webp` | 512 × 512 |
+| Fabric Pattern 07 | <https://polyhaven.com/a/fabric_pattern_07> | The dressing room's carpet weave (bumps and roughness only) | `textures/fabric_pattern_07_{nor,arm}.webp` | 512 × 512 |
+| Metal Plate | <https://polyhaven.com/a/metal_plate> | Rails and fittings (bumps and roughness only) | `textures/metal_plate_{nor,arm}.webp` | 512 × 512 |
 | Kloofendal 48d Partly Cloudy (Pure Sky) | <https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky> | The daytime sky and the light it gives | `sky.jpg` (4096 × 1024, the picture), `sky-light.hdr` (512 × 256, the light) | as listed |
 
 How they are handled:
 
 - Downloaded at 1K by `npm run stadium:assets` (`scripts/fetch-polyhaven.mjs`) through Poly Haven's public API, and saved as WebP.
 - `diff` is colour (sRGB). `nor` is the bump direction and `arm` packs creases, roughness and metal into one picture; both are read as plain numbers, not colour.
+- The rooms' surfaces (added 2026-11-23) are made by `app/components/world3d/rooms/surfaces.ts`, which repeats each one to the size of what it covers.
 - Each texture is told how many metres of real surface it covers (`SURFACES` in `app/components/world3d/stadium/materials.ts`), and the model carries its surfaces' positions in metres, so the concrete's grain is life-size.
 - The sky photo fixes the sun's height (48 degrees). `blender/sky.py` cuts the light map from the full photo and clamps the sun's disc so reflections do not sparkle.
 
