@@ -15,13 +15,14 @@ import { loadSeatData } from "./seatData";
 // The crowd: a fan in most seats.
 //
 // Each fan is a picture of a real person sitting in a seat and facing
-// the pitch: two of Mixamo's stock characters, seated by motion capture
+// the pitch: four of Mixamo's stock characters, two men and two women,
+// seated by motion capture
 // and rendered in Blender in four poses (blender/build_crowd.py, into
 // public/stadium/crowd/). All of them are one instanced mesh, so the
 // whole crowd is a single drawing step. A second picture marks where
 // each person's shirt, skin, trousers and hair are, so every fan gets
-// his own shirt colour, skin tone, trousers and hair; half of them are
-// seen as in a mirror, so the two men make many more faces. They take
+// their own shirt colour, skin tone, trousers and hair; half of them
+// are seen as in a mirror, so the four make many more faces. They take
 // the same worked-out light as the seats (bakedLight.ts), so they sit
 // in the roof's shade by day and under the floodlights at night.
 //
@@ -66,12 +67,15 @@ const END_SHIRTS: [string, number][] = [
 const END_FROM = 56;
 
 // The crowd's two pictures (blender/build_crowd.py, packed by
-// scripts/pack-crowd.mjs): eight people side by side, two men in four
-// poses each, and the masks of their shirt (red), skin (green),
+// scripts/pack-crowd.mjs): sixteen people side by side, two men and two
+// women (WOMEN_FROM on) in four poses each, and the masks of their shirt (red), skin (green),
 // trousers (full blue) and hair (half blue)
 const SHEET = { colour: "/stadium/crowd/crowd-colour.webp", mask: "/stadium/crowd/crowd-mask.webp", plan: "/stadium/crowd/crowd.json" };
-export const CELLS = 8;
+export const CELLS = 16;
 const POSES_EACH = 4;
+// the first woman's cell; WOMEN is the share of fans who are women
+const WOMEN_FROM = 2 * POSES_EACH;
+const WOMEN = 0.4;
 
 // how much of his cell each person fills, [left, right, top] as shares of
 // it (written by scripts/pack-crowd.mjs): each fan's card is cut to that,
@@ -211,7 +215,7 @@ varying float vFar;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvaryi
         diffuseColor.a *= mix( texture2D( map, vMapUv ).a, 1.0, solid );`,
       );
     };
-    material.customProgramCacheKey = () => "crowd-v10";
+    material.customProgramCacheKey = () => "crowd-v11";
     withBakedLight(material, "seat");
 
     const n = seated.length;
@@ -242,10 +246,13 @@ varying float vFar;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvaryi
       while (index < palette.length - 1 && pick > palette[index][1]) pick -= palette[index++][1];
       colour.set(palette[index][0]).multiplyScalar(0.85 + 0.15 * hash(seat, 4));
       shirts.set([colour.r, colour.g, colour.b], k * 3);
-      // which of the two men, and how he sits: most with hands on knees,
-      // some with an arm up, a few with both
+      // which of the four people (a man or, for WOMEN of the fans, a
+      // woman), and how they sit: most with hands on knees, some with an
+      // arm up, a few with both
       const pose = hash(seat, 5);
-      const cell = (hash(seat, 12) < 0.5 ? 0 : POSES_EACH) + (pose < 0.7 ? 0 : pose < 0.82 ? 2 : pose < 0.91 ? 1 : 3);
+      const who = hash(seat, 12);
+      const person = who < WOMEN ? WOMEN_FROM + (who < WOMEN / 2 ? 0 : POSES_EACH) : who < WOMEN + (1 - WOMEN) / 2 ? 0 : POSES_EACH;
+      const cell = person + (pose < 0.7 ? 0 : pose < 0.82 ? 2 : pose < 0.91 ? 1 : 3);
       fans.set([cell, hash(seat, 6), hash(seat, 7)], k * 3);
       light.set([details[seat * 8 + 2] / 255, details[seat * 8 + 3] / 255, details[seat * 8 + 6] / 255], k * 3);
     });

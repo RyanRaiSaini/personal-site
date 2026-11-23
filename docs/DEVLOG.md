@@ -368,3 +368,12 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - Each queue now alternates men and women: four women among the nine (`FANS` in `rooms/Queue.tsx`).
 - People's trousers can now be coloured too, so the jeans are blue (`trousers` in `rooms/clerk.ts`).
 - Megan's download names her bones `mixamorig2:`; the builder renames them to match the clips.
+
+### Women in the crowd, and among the staff (2026-11-24, Ryan asked)
+
+- **Women in the stands:** Kate and Megan are rendered seated, from the front and from behind, in the same four poses as the men, so each crowd sheet now has sixteen cells (`build_crowd.py`). About 40% of the fans are women (`WOMEN` in `stadium/Crowd.tsx`).
+- **And among the people around the ground:** the left ticket clerk, three of the eight reporters (`REPORTERS` in `rooms/PressRoom.tsx`), some photographers, stewards and one camera operator.
+- **More life in the ticket office:** a fan browsing the club shop scarves, a steward in a high-visibility vest by the barriers, and a programme seller by the rack (`OTHERS` in `rooms/Queue.tsx`).
+- Checked with the camera moving across the stands: flicker to or from blue 0.01% (8 cm) and 0.04% (20 cm), the same as before.
+- Two phone pictures added to the fixed set, `phone-resume` and `phone-contact` (`scripts/shots.mjs`); the tour, résumé, contact and flat views all fit at phone width.
+- Seen only in very close views the site never reaches: some fans' hair shows as a flat grey cap (it is on the live site too, older than this change).

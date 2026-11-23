@@ -31,6 +31,38 @@
     {
       "person": "bryce",
       "pose": "arms-high"
+    },
+    {
+      "person": "kate",
+      "pose": "sit"
+    },
+    {
+      "person": "kate",
+      "pose": "arms-up"
+    },
+    {
+      "person": "kate",
+      "pose": "arm-up"
+    },
+    {
+      "person": "kate",
+      "pose": "arms-high"
+    },
+    {
+      "person": "megan",
+      "pose": "sit"
+    },
+    {
+      "person": "megan",
+      "pose": "arms-up"
+    },
+    {
+      "person": "megan",
+      "pose": "arm-up"
+    },
+    {
+      "person": "megan",
+      "pose": "arms-high"
     }
   ],
   "cell": [
@@ -81,6 +113,46 @@
       0.055,
       0.945,
       0.781
+    ],
+    [
+      0.184,
+      0.816,
+      0.726
+    ],
+    [
+      0.121,
+      0.879,
+      0.726
+    ],
+    [
+      0.133,
+      0.867,
+      0.726
+    ],
+    [
+      0.109,
+      0.891,
+      0.726
+    ],
+    [
+      0.203,
+      0.797,
+      0.705
+    ],
+    [
+      0.133,
+      0.867,
+      0.705
+    ],
+    [
+      0.152,
+      0.848,
+      0.705
+    ],
+    [
+      0.125,
+      0.875,
+      0.705
     ]
   ]
 }

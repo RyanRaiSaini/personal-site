@@ -23,7 +23,7 @@ function Photographer({ x, z, turn, i }: { x: number; z: number; turn: number; i
     <group position={[x, 0, z]} rotation={[0, turn, 0]}>
       {/* the stool */}
       <Box size={[0.36, 0.42, 0.32]} position={[0, 0.21, -0.12]} color="#1b1d22" roughness={0.6} />
-      <Person look={{ man: (i % 2) as 0 | 1, shirt: BIBS[i % BIBS.length], skin: [0.2, 0.55, 0.35, 0.8, 0.1, 0.45][i % 6] }} position={[0, -0.02, 0]} mirrored={i % 3 === 0} />
+      <Person look={{ man: ([0, 1, 2, 0, 1, 3] as const)[i % 6], shirt: BIBS[i % BIBS.length], skin: [0.2, 0.55, 0.35, 0.8, 0.1, 0.45][i % 6] }} position={[0, -0.02, 0]} mirrored={i % 3 === 0} />
       {/* the camera body and its long lens, held at the knees */}
       <Box size={[0.14, 0.12, 0.1]} position={[0.05, 0.72, 0.24]} color="#121316" roughness={0.4} />
       <mesh position={[0.05, 0.72, 0.42]} rotation={[Math.PI / 2, 0, 0]}>

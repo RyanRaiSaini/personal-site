@@ -8,18 +8,17 @@ import { CanvasTexture, Color, SRGBColorSpace, type Texture } from "three";
 //
 // Three sheets: "crowd" sees them seated from the front, "crowd-back"
 // from behind; "queue" has them standing (build_crowd.py --stand), each
-// seen from four sides (VIEW), and two women as well (WOMAN). Each person
-// has four cells side by side: the crowd sheets two men, the queue sheet
-// the two men and two women.
+// seen from four sides (VIEW). Every sheet has four people, four cells
+// each, side by side: the two men, then the two women (WOMAN).
 // ------------------------------------------------------------------
 
 export const PERSON = { width: 1.097, height: 1.8 }; // metres, as rendered
-const CELLS: Record<Sheet, number> = { crowd: 8, "crowd-back": 8, queue: 16 };
+const CELLS: Record<Sheet, number> = { crowd: 16, "crowd-back": 16, queue: 16 };
 // [man, pose] -> cell: poses are sit, arms up, arm up, arms high
 export const POSE = { sit: 0, armUp: 2 } as const;
 // on the "queue" sheet the four cells are the sides he is seen from
 export const VIEW = { back: 0, backQuarter: 1, frontQuarter: 2, front: 3 } as const;
-// on the "queue" sheet, people 2 and 3 are women (Kate and Megan)
+// on every sheet, people 2 and 3 are women (Kate and Megan)
 export const WOMAN = { shirtAndTrousers: 2, teeAndJeans: 3 } as const;
 
 type Sheet = "crowd" | "crowd-back" | "queue";
@@ -43,7 +42,7 @@ function load(sheet: Sheet) {
 
 export type PersonLook = {
   sheet?: Sheet;
-  man: 0 | 1 | 2 | 3; // which person: 0 and 1 the men; on "queue", 2 and 3 the women (WOMAN)
+  man: 0 | 1 | 2 | 3; // which person: 0 and 1 the men, 2 and 3 the women (WOMAN)
   pose?: number; // POSE.sit or POSE.armUp; on the "queue" sheet, a VIEW
   shirt: string;
   skin?: number; // 0 fair to 1 dark

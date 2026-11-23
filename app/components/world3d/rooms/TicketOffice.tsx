@@ -19,9 +19,10 @@ import { useSurface } from "./surfaces";
 const PAGE_SHAPE = 1200 / 1687;
 
 // The person serving at a window: one of the crowd's people, seated on a
-// stool behind the counter, in the club's navy staff polo (Person.tsx)
+// stool behind the counter, in the club's navy staff polo (Person.tsx); a
+// woman at the left window, a man at the right
 function Clerk({ which }: { which: 0 | 1 }) {
-  return <Person look={{ man: which, shirt: NAVY, skin: which ? 0.55 : 0.2 }} position={[which ? 0.25 : -0.25, 0, -0.035]} lift={0.68} mirrored={which === 1} />;
+  return <Person look={{ man: which ? 1 : 3, shirt: NAVY, skin: which ? 0.55 : 0.2, hair: which ? undefined : "#3b2414" }} position={[which ? 0.25 : -0.25, 0, -0.035]} lift={0.68} mirrored={which === 1} />;
 }
 
 function Window({ x, clerk }: { x: number; clerk: 0 | 1 }) {

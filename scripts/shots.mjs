@@ -68,6 +68,8 @@ const SHOTS = [
   { name: "live-panel", path: "/live", query: DAY },
   { name: "phone-match", path: "/match", query: "", viewport: PHONE, flat: true },
   { name: "phone-tour", path: "/", query: `view=tour&${DAY}`, viewport: PHONE },
+  { name: "phone-resume", path: "/resume", query: `view=tour&${DAY}`, viewport: PHONE },
+  { name: "phone-contact", path: "/contact", query: `view=tour&${DAY}`, viewport: PHONE },
 ];
 
 const HIDE_PAGE = `body * { visibility: hidden !important; } canvas { visibility: visible !important; }`;

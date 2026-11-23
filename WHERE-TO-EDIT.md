@@ -189,8 +189,8 @@ By day the stadium is lit by one photographed sky and one fixed sun. The real cl
 | Night sky colours, haze | the colour constants at the top | `app/components/world3d/atmosphere/AtmosphereDriver.tsx` |
 | Stars, and the painted clouds used at night and when overcast | | `app/components/world3d/atmosphere/Sky.tsx` |
 | The crowd: how full the ground is | `OCCUPANCY` | `app/components/world3d/stadium/crowdPlan.ts` |
-| The crowd: shirt colours, trousers, hair, how many raise an arm, how long they jump after a goal | `SHIRTS`, the shader's `vLegs` and `vHair`, the `cell` choice, `CHEER_SECONDS` | `app/components/world3d/stadium/Crowd.tsx` |
-| The crowd's people and poses (two Mixamo men, seated, four poses each) | `PEOPLE`, `POSES`; rebuild with `npm run crowd:build` then `npm run crowd:pack` | `blender/build_crowd.py`, `scripts/pack-crowd.mjs` |
+| The crowd: shirt colours, trousers, hair, how many are women, how many raise an arm, how long they jump after a goal | `SHIRTS`, `WOMEN`, the shader's `vLegs` and `vHair`, the `cell` choice, `CHEER_SECONDS` | `app/components/world3d/stadium/Crowd.tsx` |
+| The crowd's people and poses (two Mixamo men and two women, seated, four poses each) | `PEOPLE`, `WOMEN`, `POSES`; rebuild with `npm run crowd:build` then `npm run crowd:pack` | `blender/build_crowd.py`, `scripts/pack-crowd.mjs` |
 | The standing people in the ticket office's queues (the same two men and two women, Kate and Megan, seen from four sides) | `STAND_VIEWS`, `WOMEN`; rebuild with `npm run crowd:build:queue` then `npm run crowd:pack` | `blender/build_crowd.py`, `scripts/pack-crowd.mjs` |
 | The shape of a fan in the round (body, head, hair, arms, legs) and the raised arm | `fanGeometry`, `fanMaterial` | `app/components/world3d/stadium/fanFigure.ts` |
 | The colour a taken seat is darkened to | `TAKEN` | `app/components/world3d/stadium/Seats.tsx` |
@@ -222,7 +222,7 @@ By day the stadium is lit by one photographed sky and one fixed sun. The real cl
 | Shared building blocks (boxes, lit signs, the room shell, the TV camera on its tripod) | | `app/components/world3d/rooms/common.tsx` |
 | Real materials for the rooms (walnut, leather, marble, rubber, concrete, laminate, plaster, fabric, metal) and how a room uses one (`useSurface`, `floorSurface` on `Shell`, `material` on `Box`) | | `app/components/world3d/rooms/surfaces.ts` |
 | People in the rooms (the ticket clerks, the reporters): one of the crowd's rendered people, recoloured | `Person`, `personPicture` | `app/components/world3d/rooms/Person.tsx`, `rooms/clerk.ts` |
-| The fans queuing at the ticket windows: who stands where, man or woman, their shirts, trousers, skin and hair | `FANS`, `JEANS` | `app/components/world3d/rooms/Queue.tsx` |
+| The people in the ticket office: the queues (who stands where, man or woman, their shirts, trousers, skin and hair) and the others about the room (club shop, steward, programme seller) | `FANS`, `OTHERS`, `JEANS` | `app/components/world3d/rooms/Queue.tsx` |
 
 The shirts in the dressing room come from `squad` and `bench`. The trophies come from `awards` (the first four). The résumé picture in the ticket office comes from `npm run resume:image`; the boards at the flash interview read from `profile` and `contactText.zone`.
 

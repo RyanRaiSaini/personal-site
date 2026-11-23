@@ -200,16 +200,17 @@ function Basketball({ position }: { position: [number, number, number] }) {
 }
 
 // The reporters in the chairs, seen from behind: [seat, row] (seats run
-// left to right, rows front to back), which of the two men, his shirt,
-// skin and hair, and whether his hand is up with a question
-const REPORTERS: { seat: number; row: number; man: 0 | 1; shirt: string; skin: number; hair: string; hand?: boolean; mirrored?: boolean }[] = [
+// left to right, rows front to back), which of the four people (0 and 1
+// men, 2 and 3 women; rooms/clerk.ts), their shirt, skin and hair, and
+// whether a hand is up with a question
+const REPORTERS: { seat: number; row: number; man: 0 | 1 | 2 | 3; shirt: string; skin: number; hair: string; hand?: boolean; mirrored?: boolean }[] = [
   { seat: 0, row: 0, man: 1, shirt: "#2b2f3a", skin: 0.15, hair: "#2a1d14" },
   { seat: 1, row: 0, man: 0, shirt: "#e9e6df", skin: 0.6, hair: "#0e0b09", mirrored: true },
-  { seat: 3, row: 0, man: 0, shirt: "#6b7f99", skin: 0.3, hair: "#4a3422", hand: true },
+  { seat: 3, row: 0, man: 2, shirt: "#6b7f99", skin: 0.3, hair: "#4a3422", hand: true },
   { seat: 5, row: 0, man: 1, shirt: "#8a2b2b", skin: 0.85, hair: "#0e0b09", mirrored: true },
-  { seat: 0, row: 1, man: 0, shirt: "#1c2a4a", skin: 0.45, hair: "#1a120c" },
+  { seat: 0, row: 1, man: 3, shirt: "#1c2a4a", skin: 0.45, hair: "#1a120c" },
   { seat: 2, row: 1, man: 1, shirt: "#d8d2c4", skin: 0.2, hair: "#6b5030", mirrored: true },
-  { seat: 4, row: 1, man: 1, shirt: "#3d5a3a", skin: 0.7, hair: "#0e0b09" },
+  { seat: 4, row: 1, man: 2, shirt: "#3d5a3a", skin: 0.7, hair: "#0e0b09" },
   { seat: 5, row: 1, man: 0, shirt: "#c9c3b5", skin: 0.1, hair: "#8a8580", mirrored: true },
 ];
 

@@ -6,10 +6,10 @@ import { VIEW, WOMAN, type PersonLook } from "./clerk";
 import Person from "./Person";
 
 // ------------------------------------------------------------------
-// The fans queuing for tickets in the ticket office (Résumé): the
+// The people in the ticket office (Résumé): fans queuing for tickets, the
 // crowd's people, standing (build_crowd.py --stand), in their own
 // clothes, men and women, in single file, each facing the window,
-// seen from behind.
+// seen from behind; and a few others about the room (OTHERS).
 //
 // Each is a picture turned to face the room's camera (CAMERA, from the
 // résumé's pose in spots.ts), with a soft shadow under the feet.
@@ -47,6 +47,15 @@ const FANS: Fan[] = [
   { at: inLine(LANES.right, 3), look: { sheet: "queue", man: 1, pose: VIEW.back, shirt: "#4a5a3a", skin: 0.4, hair: "#1a120c" } },
 ];
 
+// the others in the room, out of the queues: a fan looking at the scarves
+// in the club shop, a steward in a high-visibility vest by the barriers,
+// and the programme seller beside the rack
+const OTHERS: Fan[] = [
+  { at: [5.55, 1.5], look: { sheet: "queue", man: WOMAN.teeAndJeans, pose: VIEW.backQuarter, shirt: "#2f4fb3", skin: 0.3, hair: "#3b2414", trousers: DARK_JEANS }, mirrored: true },
+  { at: [-2.1, 0.6], look: { sheet: "queue", man: 0, pose: VIEW.frontQuarter, shirt: "#e8f51c", skin: 0.7, hair: "#0e0b09", trousers: "#1a1c22" } },
+  { at: [-5.85, -1.2], look: { sheet: "queue", man: WOMAN.shirtAndTrousers, pose: VIEW.frontQuarter, shirt: "#17244d", skin: 0.45, hair: "#1a120c", trousers: "#1a1c22" }, mirrored: true },
+];
+
 export default function Queue() {
   // a soft round shadow, darkest under his feet
   const shadow = useMemo(
@@ -68,7 +77,7 @@ export default function Queue() {
   );
   return (
     <group>
-      {FANS.map(({ at: [x, z], look, mirrored }) => (
+      {[...FANS, ...OTHERS].map(({ at: [x, z], look, mirrored }) => (
         <group key={`${x}${z}`}>
           <Person look={look} position={[x, 0, z]} mirrored={mirrored} turn={Math.atan2(CAMERA.x - x, CAMERA.z - z)} />
           <mesh position={[x, 0.016, z]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={1}>

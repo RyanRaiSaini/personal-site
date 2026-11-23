@@ -29,7 +29,7 @@ function Steward({ x, z, turn, i }: { x: number; z: number; turn: number; i: num
       <Box size={[0.9, STEP, 0.8]} position={[0, STEP / 2, 0.05]} color="#3a3d44" roughness={0.9} />
       <Box size={[0.42, 0.04, 0.4]} position={[0, STEP + 0.44, 0.02]} color="#2a2d33" roughness={0.6} />
       <Box size={[0.42, 0.4, 0.03]} position={[0, STEP + 0.66, 0.2]} color="#2a2d33" roughness={0.6} />
-      <Person look={{ sheet: "crowd-back", man: (i % 2) as 0 | 1, pose: POSE.sit, shirt: VEST, skin: [0.15, 0.6, 0.35, 0.85, 0.25][i % 5], hair: ["#1a120c", "#0e0b09", "#4a3422", "#0e0b09", "#6b5030"][i % 5] }} position={[0, 0, 0]} lift={STEP} mirrored={i % 2 === 1} />
+      <Person look={{ sheet: "crowd-back", man: ([0, 2, 1, 3] as const)[i % 4], pose: POSE.sit, shirt: VEST, skin: [0.15, 0.6, 0.35, 0.85, 0.25][i % 5], hair: ["#1a120c", "#0e0b09", "#4a3422", "#0e0b09", "#6b5030"][i % 5] }} position={[0, 0, 0]} lift={STEP} mirrored={i % 2 === 1} />
     </group>
   );
 }

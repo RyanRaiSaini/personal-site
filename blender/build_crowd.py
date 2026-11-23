@@ -5,7 +5,8 @@
         --site    <the website's public/stadium/crowd folder> \\
         [--probe  <folder>: pictures of the clips' frames, to choose poses from]
 
-Two of Mixamo's stock characters, Remy and Bryce, are seated with the
+Four of Mixamo's stock characters, Remy and Bryce, Kate and Megan
+(WOMEN), are seated with the
 "sitting idle" motion capture; some raise an arm, or both, with the
 arms of the "victory" clip. Each pose of each person is rendered front
 on, as from the pitch, into one sheet of pictures (crowd-colour.webp).
@@ -41,8 +42,8 @@ PEOPLE = {
     "remy": {"file": "remy/Remy.fbx", "shirt": ["Tops"], "skin": ["Body"], "trousers": ["Bottoms"], "hair": ["Hair"], "drop": ["Eyelashes"]},
     "bryce": {"file": "bryce/Bryce.fbx", "shirt": ["Ch42_Shirt"], "skin": ["Ch42_Body1"], "trousers": ["Ch42_Shorts"], "hair": ["Ch42_Hair1"], "drop": ["Ch42__Eyelashes"]},
 }
-# the queues have women in them too (Mixamo's Kate and Megan), a
-# little shorter than the men
+# women too (Mixamo's Kate and Megan), a little shorter than the men:
+# every sheet has the two men's cells, then the two women's
 WOMEN = {
     "kate": {"file": "kate/Kate.fbx", "shirt": ["Ch21_Shirt"], "skin": ["Ch21_Body"], "trousers": ["Ch21_Pants"], "hair": ["Ch21_Hair"], "drop": ["Ch21_Eyelasshes"], "height": 1.68},
     "megan": {"file": "megan/Megan.fbx", "shirt": ["Ch22_Shirt"], "skin": ["Ch22_Body"], "trousers": ["Ch22_Pants"], "hair": ["Ch22_Hair"], "drop": ["Ch22_Eyelashes"], "height": 1.66},
@@ -306,7 +307,7 @@ def build(args):
     global CELL_W, CELL_H
     if args.stand:
         CELL_W, CELL_H = STAND_CELL
-    for person, spec in ({**PEOPLE, **WOMEN} if args.stand else PEOPLE).items():
+    for person, spec in {**PEOPLE, **WOMEN}.items():
         arm, meshes = load_person(source, spec)
         if args.stand:
             standing = clip(os.path.join(source, STANDING), arm)
