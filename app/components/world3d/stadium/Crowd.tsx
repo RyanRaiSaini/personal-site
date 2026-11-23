@@ -206,6 +206,8 @@ export default function Crowd() {
     const shirts = new Float32Array(n * 3);
     const fans = new Float32Array(n * 3);
     const light = new Float32Array(n * 3);
+    // for the figures in the round: hair colour, beanie, scarf, how far he sits turned
+    const looks = new Float32Array(n * 4);
     const matrix = new Matrix4();
     const colour = new Color();
     const weights = SHIRTS.reduce((sum, [, w]) => sum + w, 0);
@@ -229,6 +231,7 @@ export default function Crowd() {
       const pose = hash(seat, 5);
       fans.set([pose < 0.5 ? 0 : pose < 0.72 ? 3 : pose < 0.88 ? 2 : 1, hash(seat, 6), hash(seat, 7)], k * 3);
       light.set([details[seat * 8 + 2] / 255, details[seat * 8 + 3] / 255, details[seat * 8 + 6] / 255], k * 3);
+      looks.set([hash(seat, 8), hash(seat, 9) < 0.2 ? 1 : 0, hash(seat, 10) < 0.32 ? 1 : 0, (hash(seat, 11) - 0.5) * 0.5], k * 4);
     });
     mesh.instanceMatrix.needsUpdate = true;
     const geometry = mesh.geometry;
@@ -252,7 +255,7 @@ export default function Crowd() {
       figures: null as InstancedMesh | null,
       isNear: false,
     }));
-    const near = { group: new Group(), geometry: fanGeometry(), material: fanMaterial(uniforms), matrices: mesh.instanceMatrix.array as Float32Array, shirts, fans, light, hide };
+    const near = { group: new Group(), geometry: fanGeometry(), material: fanMaterial(uniforms), matrices: mesh.instanceMatrix.array as Float32Array, shirts, fans, light, looks, hide };
     near.group.name = "CrowdNear";
     // the crowd fills the whole bowl, so it is never all out of view
     mesh.frustumCulled = false;
@@ -282,6 +285,7 @@ export default function Crowd() {
     own.setAttribute("aShirt", new InstancedBufferAttribute(near.shirts.slice(block.from * 3, block.to * 3), 3));
     own.setAttribute("aFan", new InstancedBufferAttribute(near.fans.slice(block.from * 3, block.to * 3), 3));
     own.setAttribute("aBake", new InstancedBufferAttribute(near.light.slice(block.from * 3, block.to * 3), 3));
+    own.setAttribute("aLook", new InstancedBufferAttribute(near.looks.slice(block.from * 4, block.to * 4), 4));
     const figures = new InstancedMesh(own, near.material, count);
     figures.instanceMatrix.array.set(near.matrices.subarray(block.from * 16, block.to * 16));
     figures.instanceMatrix.needsUpdate = true;
