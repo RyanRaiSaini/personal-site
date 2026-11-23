@@ -79,6 +79,15 @@ How they are handled:
 - Each texture is told how many metres of real surface it covers (`SURFACES` in `app/components/world3d/stadium/materials.ts`), and the model carries its surfaces' positions in metres, so the concrete's grain is life-size.
 - The sky photo fixes the sun's height (48 degrees). `blender/sky.py` cuts the light map from the full photo and clamps the sun's disc so reflections do not sparkle.
 
+## Logos
+
+Shown at the top of the Awards section's "Make-A-Wish and the NBA" tab, beside Ryan's own involvement with both, at Ryan's request (2026-11-23). Both files are marked public domain on Wikimedia Commons; the marks themselves are the organisations' trademarks.
+
+| Logo | Source | File |
+|---|---|---|
+| Make-A-Wish (International) | <https://commons.wikimedia.org/wiki/File:Make-A-Wish_International_logo_RGB.png> | `public/logos/make-a-wish.png` |
+| NBA | <https://commons.wikimedia.org/wiki/File:National_Basketball_Association_logo_2017-present.svg> | `public/logos/nba.svg` |
+
 ## Fonts
 
 | Font | Source | Licence |

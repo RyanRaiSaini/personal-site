@@ -32,6 +32,13 @@ export default function AwardsContent() {
   // STARboard first, then the numbers and the photos, then the story in full
   const story = (
     <div className="grid gap-5">
+      {/* the two organisations, on a white strip so their colours read */}
+      <div className="flex items-center justify-center gap-8 rounded-lg bg-white px-6 py-4">
+        {makeAWish.logos.map((logo) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={logo.src} src={logo.src} alt={logo.alt} width={logo.width} height={logo.height} className="h-14 w-auto" />
+        ))}
+      </div>
       <div className="card grid gap-4 text-center sm:grid-cols-[9rem_1fr] sm:items-center sm:text-left">
         <Image src={starboardPortrait.src} alt={starboardPortrait.alt} width={starboardPortrait.width} height={starboardPortrait.height} placeholder="blur" blurDataURL={starboardPortrait.blur} className="mx-auto aspect-square w-36 rounded-lg object-cover" />
         <div className="min-w-0">

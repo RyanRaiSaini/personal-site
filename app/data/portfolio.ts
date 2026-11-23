@@ -362,6 +362,12 @@ export const makeAWish = {
     link: "View the board",
   },
   photosButton: "Photos and press",
+  // the two organisations' logos, at the top of the tab (public/logos;
+  // sources in docs/redesign/ASSETS.md)
+  logos: [
+    { src: "/logos/make-a-wish.png", alt: "Make-A-Wish", width: 900, height: 251 },
+    { src: "/logos/nba.svg", alt: "NBA", width: 915, height: 2079 },
+  ],
   starboardUrl: "https://makeawish.ca/about-us/our-people/starboard/",
 };
 
