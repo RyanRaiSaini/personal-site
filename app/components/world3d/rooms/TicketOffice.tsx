@@ -277,8 +277,8 @@ export default function TicketOffice() {
           line of light, clear of the sign */}
       <ResumeOnWall />
 
-      {/* a rack of programmes */}
-      <group position={[-5.6, 0, -2.4]} rotation={[0, 0.7, 0]}>
+      {/* a rack of programmes, against the club shop wall */}
+      <group position={[5.95, 0, -1.4]} rotation={[0, -Math.PI / 2, 0]}>
         <Box size={[0.9, 1.1, 0.4]} position={[0, 0.55, 0]} color="#16181d" metalness={0.4} roughness={0.5} />
         {[0, 1, 2].map((row) => (
           <group key={row} position={[0, 0.42 + row * 0.3, 0.21]} rotation={[-0.35, 0, 0]}>

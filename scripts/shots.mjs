@@ -52,6 +52,9 @@ const SHOTS = [
   { name: "pitch-level", path: "/", query: DAY, look: [-30, 1.7, 0, 40, 9, -6, 55], scene: true },
   { name: "night-overview", path: "/", query: NIGHT, look: [0, 23.5, 64, 0, 9.5, 0, 52], scene: true },
   { name: "night-pitch-level", path: "/", query: NIGHT, look: [-30, 1.7, 0, 40, 9, -6, 55], scene: true },
+  // the crowd up close: by night, and on its feet for a goal
+  { name: "night-crowd", path: "/", query: NIGHT, look: [8, 4, 30, 12, 5.0, 50, 14], scene: true },
+  { name: "goal-crowd", path: "/", query: DAY, look: [8, 4, 30, 12, 5.0, 50, 14], scene: true, cheer: true },
   { name: "day-roof-closed", path: "/", query: DAY.replace("roof=open", "roof=closed"), look: [58, 26, 46, 0, 8, 0, 50], scene: true },
   { name: "about-panel", path: "/about", query: DAY },
   { name: "projects-panel", path: "/projects", query: DAY },
@@ -60,6 +63,9 @@ const SHOTS = [
   { name: "awards-panel", path: "/awards", query: DAY },
   { name: "news-panel", path: "/news", query: DAY },
   { name: "resume-panel", path: "/resume", query: DAY },
+  // the dressing room and trophy room from their own cameras (rooms at 0 and 300, 0, -600)
+  { name: "dressing-room", path: "/skills", query: DAY, look: [-0.6, 1.75, -593.6, -1.7, 1.35, -602, 58], scene: true },
+  { name: "trophy-room", path: "/awards", query: DAY, look: [300, 1.8, -593.4, 300, 1.45, -601.6, 48], scene: true },
   // the ticket office (its room is built at 900, 0, -600) and its queues
   { name: "ticket-office", path: "/resume", query: DAY, look: [900, 1.7, -593, 900, 1.7, -602, 46], scene: true },
   { name: "ticket-queue", path: "/resume", query: DAY, look: [898.6, 1.6, -597.4, 896.1, 1.15, -602.3, 40], scene: true },
@@ -127,6 +133,11 @@ async function main() {
         if (look) await page.evaluate((pose) => window.__look(...pose), look);
         // SHOTS_EVAL: a line of code to run in the page first, for trying a setting out
         if (process.env.SHOTS_EVAL) await page.evaluate(process.env.SHOTS_EVAL);
+        // a goal: the crowd jumps up; the picture is taken mid-celebration
+        if (shot.cheer) {
+          await page.evaluate(() => window.__world.getState().cheer());
+          await new Promise((r) => setTimeout(r, 900));
+        }
         if (shot.scene) await page.addStyleTag({ content: HIDE_PAGE });
         await sleep(shot.settle ?? 3500);
         await page.evaluate(() => window.__world.getState().setQuality("high"));

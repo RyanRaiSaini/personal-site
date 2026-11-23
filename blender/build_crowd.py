@@ -5,8 +5,8 @@
         --site    <the website's public/stadium/crowd folder> \\
         [--probe  <folder>: pictures of the clips' frames, to choose poses from]
 
-Four of Mixamo's stock characters, Remy and Bryce, Kate and Megan
-(WOMEN), are seated with the
+Seven of Mixamo's stock characters (ALL: three men and four women) are
+seated with the
 "sitting idle" motion capture; some raise an arm, or both, with the
 arms of the "victory" clip. Each pose of each person is rendered front
 on, as from the pitch, into one sheet of pictures (crowd-colour.webp).
@@ -48,6 +48,20 @@ WOMEN = {
     "kate": {"file": "kate/Kate.fbx", "shirt": ["Ch21_Shirt"], "skin": ["Ch21_Body"], "trousers": ["Ch21_Pants"], "hair": ["Ch21_Hair"], "drop": ["Ch21_Eyelasshes"], "height": 1.68},
     "megan": {"file": "megan/Megan.fbx", "shirt": ["Ch22_Shirt"], "skin": ["Ch22_Body"], "trousers": ["Ch22_Pants"], "hair": ["Ch22_Hair"], "drop": ["Ch22_Eyelashes"], "height": 1.66},
 }
+# more faces (added 2026-11-23): Suzie and Sophie, and Leonard. Sophie's
+# jumper and shorts are one mesh: `split` cuts it at a share of her
+# height, the part below becoming her trousers.
+MORE = {
+    "suzie": {"file": "suzie/Suzie.fbx", "shirt": ["Ch41_Coat", "Ch41_Shirt"], "skin": ["Ch41_Body"], "trousers": ["Ch41_Pants"], "hair": ["Ch41_Hair"], "drop": ["Ch41_Eyelashes"], "height": 1.67},
+    "sophie": {"file": "sophie/Sophie.fbx", "shirt": ["Ch02_Cloth"], "skin": ["Ch02_Body"], "trousers": ["Ch02_Cloth-lower"], "hair": ["Ch02_Hair"], "drop": ["Ch02_Eyelashes"], "height": 1.65, "split": {"Ch02_Cloth": 0.52}},
+    "leonard": {"file": "leonard/Leonard.fbx", "shirt": ["Ch31_Sweater", "Ch31_Collar"], "skin": ["Ch31_Body"], "trousers": ["Ch31_Pants"], "hair": ["Ch31_Hair"], "drop": ["Ch31_Eyelashes"]},
+}
+# every sheet holds the people in this order, four cells each, sixteen
+# cells to a row (a picture wider than 4096 pixels is too wide for
+# some phones): the men Remy and Bryce, the women Kate, Megan, Suzie and
+# Sophie, then Leonard
+ALL = {**PEOPLE, **WOMEN, **MORE}
+COLUMNS = 16
 SITTING = "extra/sitting idle.fbx"
 VICTORY = "extra/victory.fbx"
 
@@ -170,7 +184,29 @@ def load_person(source, spec):
                 mat.surface_render_method = "DITHERED"
     bpy.context.view_layer.update()
     zs = [(o.matrix_world @ v.co).z for o in meshes for v in o.data.vertices]
-    arm.scale = arm.scale * (spec.get("height", HEIGHT) / (max(zs) - min(zs)))
+    low = min(zs)
+    tall = max(zs) - low
+    # a mesh that is two garments: the faces below the cut become their own object
+    for name, share in spec.get("split", {}).items():
+        obj = bpy.data.objects.get(name)
+        if not obj:
+            continue
+        cut = low + share * tall
+        bpy.ops.object.select_all(action="DESELECT")
+        bpy.context.view_layer.objects.active = obj
+        obj.select_set(True)
+        bpy.ops.object.mode_set(mode="EDIT")
+        bpy.ops.mesh.select_all(action="DESELECT")
+        bpy.ops.object.mode_set(mode="OBJECT")
+        for poly in obj.data.polygons:
+            poly.select = (obj.matrix_world @ poly.center).z < cut
+        bpy.ops.object.mode_set(mode="EDIT")
+        bpy.ops.mesh.separate(type="SELECTED")
+        bpy.ops.object.mode_set(mode="OBJECT")
+        lower = next(o for o in bpy.context.selected_objects if o is not obj)
+        lower.name = f"{name}-lower"
+        meshes.append(lower)
+    arm.scale = arm.scale * (spec.get("height", HEIGHT) / tall)
     bpy.context.view_layer.update()
     return arm, meshes
 
@@ -307,7 +343,7 @@ def build(args):
     global CELL_W, CELL_H
     if args.stand:
         CELL_W, CELL_H = STAND_CELL
-    for person, spec in {**PEOPLE, **WOMEN}.items():
+    for person, spec in ALL.items():
         arm, meshes = load_person(source, spec)
         if args.stand:
             standing = clip(os.path.join(source, STANDING), arm)
@@ -379,27 +415,33 @@ def build(args):
         log("probe pictures written")
         return
 
-    # one sheet of colour, one of masks, the cells side by side
+    # one sheet of colour, one of masks: the cells in rows of COLUMNS, the
+    # first row at the top
     name = "queue" if args.stand else "crowd-back" if args.back else "crowd"
-    sheet_w = CELL_W * len(cells)
+    columns = min(12 if args.stand else COLUMNS, len(cells))
+    rows = (len(cells) + columns - 1) // columns
+    sheet_w = CELL_W * columns
+    sheet_h = CELL_H * rows
     for which in ("colour", "mask"):
-        sheet = bpy.data.images.new(f"{name}-{which}", sheet_w, CELL_H, alpha=True)
-        pixels = [0.0] * (sheet_w * CELL_H * 4)
+        sheet = bpy.data.images.new(f"{name}-{which}", sheet_w, sheet_h, alpha=True)
+        pixels = [0.0] * (sheet_w * sheet_h * 4)
         for c, (_, _, base) in enumerate(cells):
             cell = bpy.data.images.load(f"{base}-{which}.png")
             data = list(cell.pixels)
-
+            # Blender's pictures run from the bottom row up
+            x0 = (c % columns) * CELL_W
+            y0 = (rows - 1 - c // columns) * CELL_H
             for y in range(CELL_H):
                 row = data[y * CELL_W * 4:(y + 1) * CELL_W * 4]
-                start = (y * sheet_w + c * CELL_W) * 4
+                start = ((y0 + y) * sheet_w + x0) * 4
                 pixels[start:start + CELL_W * 4] = row
         sheet.pixels = pixels
         sheet.filepath_raw = os.path.join(out, f"{name}-{which}.raw.png")
         sheet.file_format = "PNG"
         sheet.save()
     with open(os.path.join(out, f"{name}.json"), "w") as f:
-        json.dump({"cells": [{"person": p, "pose": n} for p, n, _ in cells], "cell": [CELL_W, CELL_H], "metres": [WORLD_W, WORLD_H]}, f, indent=2)
-    log(f"sheets written: {len(cells)} cells, {sheet_w} x {CELL_H}")
+        json.dump({"cells": [{"person": p, "pose": n} for p, n, _ in cells], "cell": [CELL_W, CELL_H], "columns": columns, "metres": [WORLD_W, WORLD_H]}, f, indent=2)
+    log(f"sheets written: {len(cells)} cells, {sheet_w} x {sheet_h}")
 
 
 if __name__ == "__main__":

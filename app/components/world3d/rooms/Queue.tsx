@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { canvasTexture } from "../textures/canvas";
-import { VIEW, WOMAN, type PersonLook } from "./clerk";
+import { LEONARD, VIEW, WOMAN, type PersonLook } from "./clerk";
 import Person from "./Person";
 
 // ------------------------------------------------------------------
@@ -21,7 +21,7 @@ import Person from "./Person";
 
 const CAMERA = { x: 0, z: 7 };
 
-type Fan = { at: [number, number]; look: PersonLook; mirrored?: boolean };
+export type Fan = { at: [number, number]; look: PersonLook; mirrored?: boolean };
 
 // each queue is one straight line down the middle of its lane, a step
 // (STEP) between people, everyone facing the window
@@ -39,25 +39,32 @@ const FANS: Fan[] = [
   { at: inLine(LANES.left, 1), look: { sheet: "queue", man: WOMAN.teeAndJeans, pose: VIEW.back, shirt: "#f2f2ee", skin: 0.2, hair: "#4a2c16", trousers: JEANS } },
   { at: inLine(LANES.left, 2), look: { sheet: "queue", man: 0, pose: VIEW.back, shirt: "#1d2b57", skin: 0.55, hair: "#140f0c" } },
   { at: inLine(LANES.left, 3), look: { sheet: "queue", man: WOMAN.shirtAndTrousers, pose: VIEW.back, shirt: "#7a1626", skin: 0.6, hair: "#120d0a", trousers: "#1a1c22" }, mirrored: true },
-  { at: inLine(LANES.left, 4), look: { sheet: "queue", man: 1, pose: VIEW.back, shirt: "#9fb7d9", skin: 0.6, hair: "#120d0a" } },
+  { at: inLine(LANES.left, 4), look: { sheet: "queue", man: LEONARD, pose: VIEW.back, shirt: "#9fb7d9", skin: 0.6, hair: "#120d0a", trousers: DARK_JEANS } },
   // the right queue
   { at: inLine(LANES.right, 0), look: { sheet: "queue", man: WOMAN.shirtAndTrousers, pose: VIEW.back, shirt: "#e9e6dc", skin: 0.1, hair: "#8a6a3e", trousers: DARK_JEANS } },
   { at: inLine(LANES.right, 1), look: { sheet: "queue", man: 0, pose: VIEW.back, shirt: "#26314a", skin: 0.25, hair: "#8a6a3e" }, mirrored: true },
   { at: inLine(LANES.right, 2), look: { sheet: "queue", man: WOMAN.teeAndJeans, pose: VIEW.back, shirt: "#15171c", skin: 0.8, hair: "#0e0b09", trousers: JEANS }, mirrored: true },
-  { at: inLine(LANES.right, 3), look: { sheet: "queue", man: 1, pose: VIEW.back, shirt: "#4a5a3a", skin: 0.4, hair: "#1a120c" } },
+  { at: inLine(LANES.right, 3), look: { sheet: "queue", man: WOMAN.jumper, pose: VIEW.back, shirt: "#4a5a3a", skin: 0.4, hair: "#1a120c" } },
 ];
 
 // the others in the room, out of the queues: a fan looking at the scarves
 // in the club shop, a steward in a high-visibility vest by the barriers,
-// and the programme seller beside the rack
+// and the programme seller beside her rack in the shop (TicketOffice.tsx)
 const OTHERS: Fan[] = [
   { at: [5.55, 1.5], look: { sheet: "queue", man: WOMAN.teeAndJeans, pose: VIEW.backQuarter, shirt: "#2f4fb3", skin: 0.3, hair: "#3b2414", trousers: DARK_JEANS }, mirrored: true },
   { at: [-2.1, 0.6], look: { sheet: "queue", man: 0, pose: VIEW.frontQuarter, shirt: "#e8f51c", skin: 0.7, hair: "#0e0b09", trousers: "#1a1c22" } },
-  { at: [-5.85, -1.2], look: { sheet: "queue", man: WOMAN.shirtAndTrousers, pose: VIEW.frontQuarter, shirt: "#17244d", skin: 0.45, hair: "#1a120c", trousers: "#1a1c22" }, mirrored: true },
+  { at: [5.2, -2.3], look: { sheet: "queue", man: WOMAN.topAndTrousers, pose: VIEW.frontQuarter, shirt: "#17244d", skin: 0.45, hair: "#1a120c", trousers: "#1a1c22" }, mirrored: true },
 ];
 
 export default function Queue() {
-  // a soft round shadow, darkest under his feet
+  return <People people={[...FANS, ...OTHERS]} camera={CAMERA} />;
+}
+
+// Standing people in a room, each a picture turned to face the room's
+// camera (`camera`: x and z in the room), with a soft shadow at the feet.
+// The other rooms use it too (DressingRoom.tsx, TrophyRoom.tsx).
+export function People({ people, camera }: { people: Fan[]; camera: { x: number; z: number } }) {
+  // a soft round shadow, darkest under the feet
   const shadow = useMemo(
     () =>
       canvasTexture(
@@ -77,9 +84,9 @@ export default function Queue() {
   );
   return (
     <group>
-      {[...FANS, ...OTHERS].map(({ at: [x, z], look, mirrored }) => (
+      {people.map(({ at: [x, z], look, mirrored }) => (
         <group key={`${x}${z}`}>
-          <Person look={look} position={[x, 0, z]} mirrored={mirrored} turn={Math.atan2(CAMERA.x - x, CAMERA.z - z)} />
+          <Person look={look} position={[x, 0, z]} mirrored={mirrored} turn={Math.atan2(camera.x - x, camera.z - z)} />
           <mesh position={[x, 0.016, z]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={1}>
             <planeGeometry args={[0.75, 0.5]} />
             <meshBasicMaterial map={shadow} transparent depthWrite={false} toneMapped={false} />

@@ -6,7 +6,9 @@ import { CatmullRomCurve3, ExtrudeGeometry, LatheGeometry, Shape, TubeGeometry, 
 import { awards } from "../../../data/portfolio";
 import { useWorld } from "../../../lib/store";
 import { atmo } from "../atmosphere/state";
+import { LEONARD, VIEW, WOMAN } from "./clerk";
 import { Box, clickable, CREAM, Glow, GOLD, Shell, Sign } from "./common";
+import { People, type Fan } from "./Queue";
 
 // The trophy room (Awards). Each award in `awards`
 // (app/data/portfolio.ts) stands in its own lit case. The big cabinet
@@ -290,6 +292,13 @@ function BigCup() {
   );
 }
 
+// Two visitors looking at the cases from the ends of the row, clear of
+// the plaques (Queue.tsx's People), seen from behind. The camera's place is the room's in spots.ts.
+const VISITORS: Fan[] = [
+  { at: [3.55, 0.35], look: { sheet: "queue", man: LEONARD, pose: VIEW.backQuarter, shirt: "#2f3f5c", skin: 0.35, hair: "#1a120c", trousers: "#2a2a2e" } },
+  { at: [-2.3, 0.45], look: { sheet: "queue", man: WOMAN.jumper, pose: VIEW.back, shirt: "#e9e6dc", skin: 0.15, hair: "#5a3a1e" } },
+];
+
 export default function TrophyRoom() {
   const places: { x: number; z: number; turn: number }[] = [
     { x: -2.4, z: -1.05, turn: 0.2 },
@@ -342,6 +351,7 @@ export default function TrophyRoom() {
 
       <Cabinet />
       {places.map((p, i) => (awards[i] ? <Case key={awards[i].id} x={p.x} z={p.z} turn={p.turn} index={i} /> : null))}
+      <People people={VISITORS} camera={{ x: 0, z: 6.6 }} />
       <BigCup />
     </group>
   );

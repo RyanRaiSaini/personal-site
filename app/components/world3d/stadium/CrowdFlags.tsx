@@ -29,7 +29,7 @@ import { loadSeatData } from "./seatData";
 // To have more or fewer, change SHARE; the mix of flags is in KINDS.
 // ------------------------------------------------------------------
 
-const SHARE = 0.006; // of the taken seats
+const SHARE = 0.0045; // of the taken seats (0.6% cost about six pictures a second)
 const FLAG = { width: 1.3, height: 0.65, pole: 2.3 };
 // the way the wind blows across the ground (x, z), the same for every flag
 const WIND = { x: 0.85, z: 0.53 };

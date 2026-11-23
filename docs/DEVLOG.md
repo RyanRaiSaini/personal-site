@@ -382,3 +382,12 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - Close up, many fans' dark hair showed as a flat grey cap. Painting the hair red showed every head of hair was found correctly; the grey was the sky's reflection, a faint sheen on each flat picture that is brighter than dark hair. The hair no longer takes it (`stadium/Crowd.tsx`, after `aomap_fragment`).
 - One man's hair had a gap showing his scalp, a pale spot on his fringe. When the pictures are packed, any small patch of skin with hair all round it is now marked as hair (`closeHairGaps` in `scripts/pack-crowd.mjs`).
 - Flicker on the stands unchanged: 0.01% to or from blue at 8 cm, 0.04% at 20 cm.
+
+### More faces, people in every room, and the speed back (2026-11-24)
+
+- **Seven people instead of four:** Mixamo's Suzie and Sophie (women) and Leonard (a man) join the crowd, the queues and the rooms, downloaded with Ryan signed in to Mixamo. Sophie's jumper and shorts are one mesh; the builder cuts it at the waist (`split` in `build_crowd.py`). James was tried and dropped: he is one single mesh, so his shirt, skin and hair cannot be told apart.
+- **The picture sheets are in rows** (sixteen cells to a row for the crowd, twelve for the standing people), so none is wider than 4096 pixels, which some phones cannot load (`COLUMNS` in `build_crowd.py`, `stadium/Crowd.tsx` and `rooms/clerk.ts`).
+- **Each person's own skin tone is measured** when the pictures are packed (`tones` in `scripts/pack-crowd.mjs`), and the crowd darkens each from there, since a picture can only be darkened.
+- **People in the dressing room** (the kit man at the lockers, a coach at the tactics board) and **the trophy room** (two visitors at the ends of the row of cases) (`STAFF`, `VISITORS`); the programme rack and its seller now stand in the club shop, in view. `People` in `rooms/Queue.tsx` draws standing people in any room.
+- **Speed:** a side-by-side measurement found the extra flags added on the same day cost about six pictures a second on the overview; the flags are back to their earlier number (`SHARE` 0.45% in `stadium/CrowdFlags.tsx`), every country kept. The women and the new faces cost nothing measurable. Production build, on mains power: overview 37 to 40 a second, About 60.
+- Checked at night and mid-goal (new pictures `night-crowd`, `goal-crowd`, `dressing-room`, `trophy-room` in `scripts/shots.mjs`). Flicker on the stands unchanged: 0.01% to or from blue at 8 cm, 0.04% at 20 cm.

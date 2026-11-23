@@ -83,15 +83,20 @@ for (const sheetName of ["crowd", "crowd-back", "queue"]) {
   }
 
   const { data, info } = await sharp(`${DIR}/${sheetName}-colour.raw.png`).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const mask = await sharp(`${DIR}/${sheetName}-mask.raw.png`).ensureAlpha().raw().toBuffer();
   const sheet = JSON.parse(readFileSync(`${DIR}/${sheetName}.json`, "utf8"));
   const [cellW, cellH] = sheet.cell;
+  // the cells sit in rows of `columns`, the first row at the top
+  const columns = sheet.columns ?? sheet.cells.length;
+  const corner = (c) => [(c % columns) * cellW, Math.floor(c / columns) * cellH];
   sheet.boxes = sheet.cells.map((_, c) => {
+    const [cx, cy] = corner(c);
     let x0 = cellW;
     let x1 = 0;
     let y0 = cellH;
-    for (let y = 0; y < info.height; y++)
+    for (let y = 0; y < cellH; y++)
       for (let x = 0; x < cellW; x++)
-        if (data[(y * info.width + c * cellW + x) * 4 + 3] > 8) {
+        if (data[((cy + y) * info.width + cx + x) * 4 + 3] > 8) {
           x0 = Math.min(x0, x);
           x1 = Math.max(x1, x + 1);
           y0 = Math.min(y0, y);
@@ -100,6 +105,32 @@ for (const sheetName of ["crowd", "crowd-back", "queue"]) {
     const share = (v, of) => Math.round((v / of) * 1000) / 1000;
     return [share(Math.max(0, x0 - MARGIN), cellW), share(Math.min(cellW, x1 + MARGIN), cellW), share(cellH - Math.max(0, y0 - MARGIN), cellH)];
   });
+  // How dark each person's own skin is, 0 (the fairest of them) to 1 (as
+  // dark as the site's darkest tone): the site can only darken a picture,
+  // so it darkens each from where they already are
+  const linear = (v) => Math.pow(v / 255, 2.2);
+  const brightness = sheet.cells.map((_, c) => {
+    const [cx, cy] = corner(c);
+    let sum = 0;
+    let n = 0;
+    for (let y = 0; y < cellH; y++)
+      for (let x = 0; x < cellW; x++) {
+        const i = ((cy + y) * info.width + cx + x) * 4;
+        if (mask[i + 1] > 200 && mask[i] < 40 && mask[i + 2] < 40 && data[i + 3] > 200) {
+          sum += 0.3 * linear(data[i]) + 0.59 * linear(data[i + 1]) + 0.11 * linear(data[i + 2]);
+          n++;
+        }
+      }
+    return n ? sum / n : 0;
+  });
+  // each person's average over their four cells; "fair" is the average of
+  // the first four people bar Remy (people 1 to 3), who were drawn as fair
+  // from the start and looked right (Remy's skin is lit far brighter)
+  const EACH = 4;
+  const person = (p) => brightness.slice(p * EACH, p * EACH + EACH).reduce((a, b) => a + b, 0) / EACH;
+  const fair = (person(1) + person(2) + person(3)) / 3;
+  // the site's darkest skin multiplies brightness by about 0.26
+  sheet.tones = sheet.cells.map((_, c) => Math.round(Math.min(1, Math.max(0, (1 - person(Math.floor(c / EACH)) / fair) / (1 - 0.26))) * 100) / 100);
   writeFileSync(`${DIR}/${sheetName}.json`, JSON.stringify(sheet, null, 2) + "\n");
-  console.log(sheetName, "outlines", JSON.stringify(sheet.boxes));
+  console.log(sheetName, "skin tones", JSON.stringify(sheet.tones));
 }

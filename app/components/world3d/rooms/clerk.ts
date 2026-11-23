@@ -8,18 +8,22 @@ import { CanvasTexture, Color, SRGBColorSpace, type Texture } from "three";
 //
 // Three sheets: "crowd" sees them seated from the front, "crowd-back"
 // from behind; "queue" has them standing (build_crowd.py --stand), each
-// seen from four sides (VIEW). Every sheet has four people, four cells
-// each, side by side: the two men, then the two women (WOMAN).
+// seen from four sides (VIEW). Every sheet has seven people, four cells
+// each, in rows: the men Remy and Bryce, the women (WOMAN), then Leonard.
 // ------------------------------------------------------------------
 
 export const PERSON = { width: 1.097, height: 1.8 }; // metres, as rendered
-const CELLS: Record<Sheet, number> = { crowd: 16, "crowd-back": 16, queue: 16 };
+// each sheet: its cells in rows of so many, the first row at the top
+const COLUMNS: Record<Sheet, number> = { crowd: 16, "crowd-back": 16, queue: 12 };
+const ROWS: Record<Sheet, number> = { crowd: 2, "crowd-back": 2, queue: 3 };
 // [man, pose] -> cell: poses are sit, arms up, arm up, arms high
 export const POSE = { sit: 0, armUp: 2 } as const;
 // on the "queue" sheet the four cells are the sides he is seen from
 export const VIEW = { back: 0, backQuarter: 1, frontQuarter: 2, front: 3 } as const;
-// on every sheet, people 2 and 3 are women (Kate and Megan)
-export const WOMAN = { shirtAndTrousers: 2, teeAndJeans: 3 } as const;
+// on every sheet, people 2 to 5 are women (Kate, Megan, Suzie, Sophie)
+export const WOMAN = { shirtAndTrousers: 2, teeAndJeans: 3, topAndTrousers: 4, jumper: 5 } as const;
+// and the third man, in a jumper over a collared shirt
+export const LEONARD = 6;
 
 type Sheet = "crowd" | "crowd-back" | "queue";
 const sheets = new Map<Sheet, Promise<[HTMLImageElement, HTMLImageElement]>>();
@@ -42,7 +46,7 @@ function load(sheet: Sheet) {
 
 export type PersonLook = {
   sheet?: Sheet;
-  man: 0 | 1 | 2 | 3; // which person: 0 and 1 the men, 2 and 3 the women (WOMAN)
+  man: 0 | 1 | 2 | 3 | 4 | 5 | 6; // which person: 0, 1 and 6 (LEONARD) men, 2 to 5 women (WOMAN)
   pose?: number; // POSE.sit or POSE.armUp; on the "queue" sheet, a VIEW
   shirt: string;
   skin?: number; // 0 fair to 1 dark
@@ -52,18 +56,20 @@ export type PersonLook = {
 
 export async function personPicture({ sheet = "crowd", man, pose = POSE.sit, shirt, skin = 0.25, hair, trousers }: PersonLook): Promise<Texture> {
   const [picture, parts] = await load(sheet);
-  const cellW = picture.width / CELLS[sheet];
-  const cellH = picture.height;
+  const cellW = picture.width / COLUMNS[sheet];
+  const cellH = picture.height / ROWS[sheet];
   const cell = man * 4 + pose;
+  const cellX = (cell % COLUMNS[sheet]) * cellW;
+  const cellY = Math.floor(cell / COLUMNS[sheet]) * cellH;
 
   const canvas = document.createElement("canvas");
   canvas.width = cellW;
   canvas.height = cellH;
   const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
-  ctx.drawImage(parts, cell * cellW, 0, cellW, cellH, 0, 0, cellW, cellH);
+  ctx.drawImage(parts, cellX, cellY, cellW, cellH, 0, 0, cellW, cellH);
   const where = ctx.getImageData(0, 0, cellW, cellH).data;
   ctx.clearRect(0, 0, cellW, cellH);
-  ctx.drawImage(picture, cell * cellW, 0, cellW, cellH, 0, 0, cellW, cellH);
+  ctx.drawImage(picture, cellX, cellY, cellW, cellH, 0, 0, cellW, cellH);
   const image = ctx.getImageData(0, 0, cellW, cellH);
   const px = image.data;
 

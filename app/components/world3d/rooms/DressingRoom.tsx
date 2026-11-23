@@ -9,6 +9,8 @@ import { ballTexture } from "../players/Cast";
 import { canvasTexture } from "../textures/canvas";
 import { useDisplayFont } from "../textures/text";
 import { Box, Glow, GOLD, NAVY, Shell, Sign } from "./common";
+import { VIEW, WOMAN } from "./clerk";
+import { People, type Fan } from "./Queue";
 import { useSurface } from "./surfaces";
 
 // The dressing room (Skills), dressed as a top club's is on matchday:
@@ -403,6 +405,14 @@ function carpetTexture(family: string | null) {
   );
 }
 
+// The staff in the room (Queue.tsx's People): the kit man at the lockers,
+// seen from behind, and a coach reading the tactics board, both in the
+// club's navy staff tops. The camera's place is the room's in spots.ts.
+const STAFF: Fan[] = [
+  { at: [2.9, -2.75], look: { sheet: "queue", man: 1, pose: VIEW.back, shirt: NAVY, skin: 0.5, hair: "#1a120c", trousers: "#1a1c22" } },
+  { at: [5.4, 0.5], look: { sheet: "queue", man: WOMAN.topAndTrousers, pose: VIEW.backQuarter, shirt: NAVY, skin: 0.3, hair: "#2a1c12", trousers: "#1a1c22" } },
+];
+
 export default function DressingRoom() {
   const family = useDisplayFont();
   const carpet = useMemo(() => carpetTexture(family), [family]);
@@ -482,6 +492,8 @@ export default function DressingRoom() {
         <Boots key={name} x={-5.7} z={3.4 - i * BAY} turn={Math.PI / 2 + ((i * 23) % 5) * 0.06 - 0.12} colours={BOOTS[(i * 4 + 3) % BOOTS.length]} />
       ))}
       <BallBag x={-5.4} z={4.6} />
+      {/* the kit man laying out the kit at the lockers, and a coach at the tactics board */}
+      <People people={STAFF} camera={{ x: -0.6, z: 6.4 }} />
     </group>
   );
 }

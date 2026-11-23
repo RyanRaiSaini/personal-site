@@ -2,7 +2,7 @@
 
 import { useFrame } from "@react-three/fiber";
 import { use, useEffect, useMemo } from "react";
-import { Color, DoubleSide, InstancedBufferAttribute, InstancedMesh, Matrix4, MeshStandardMaterial, NoColorSpace, PlaneGeometry, SRGBColorSpace, TextureLoader, Vector3, type Texture } from "three";
+import { Color, DoubleSide, InstancedBufferAttribute, InstancedMesh, Matrix4, MeshStandardMaterial, NoColorSpace, PlaneGeometry, SRGBColorSpace, TextureLoader, Vector4, type Texture } from "three";
 import { useWorld } from "../../../lib/store";
 import { stir } from "../activity";
 import { atmo } from "../atmosphere/state";
@@ -15,14 +15,14 @@ import { loadSeatData } from "./seatData";
 // The crowd: a fan in most seats.
 //
 // Each fan is a picture of a real person sitting in a seat and facing
-// the pitch: four of Mixamo's stock characters, two men and two women,
-// seated by motion capture
+// the pitch: seven of Mixamo's stock characters, three men and four
+// women, seated by motion capture
 // and rendered in Blender in four poses (blender/build_crowd.py, into
 // public/stadium/crowd/). All of them are one instanced mesh, so the
 // whole crowd is a single drawing step. A second picture marks where
 // each person's shirt, skin, trousers and hair are, so every fan gets
 // their own shirt colour, skin tone, trousers and hair; half of them
-// are seen as in a mirror, so the four make many more faces. They take
+// are seen as in a mirror, so the seven make many more faces. They take
 // the same worked-out light as the seats (bakedLight.ts), so they sit
 // in the roof's shade by day and under the floodlights at night.
 //
@@ -67,14 +67,18 @@ const END_SHIRTS: [string, number][] = [
 const END_FROM = 56;
 
 // The crowd's two pictures (blender/build_crowd.py, packed by
-// scripts/pack-crowd.mjs): sixteen people side by side, two men and two
-// women (WOMEN_FROM on) in four poses each, and the masks of their shirt (red), skin (green),
-// trousers (full blue) and hair (half blue)
+// scripts/pack-crowd.mjs): seven people, three men and four women, in
+// four poses each, in rows of COLUMNS cells; and the masks of their shirt
+// (red), skin (green), trousers (full blue) and hair (half blue)
 const SHEET = { colour: "/stadium/crowd/crowd-colour.webp", mask: "/stadium/crowd/crowd-mask.webp", plan: "/stadium/crowd/crowd.json" };
-export const CELLS = 16;
+export const CELLS = 28;
+const COLUMNS = 16;
+const ROWS = Math.ceil(CELLS / COLUMNS);
 const POSES_EACH = 4;
-// the first woman's cell; WOMEN is the share of fans who are women
-const WOMEN_FROM = 2 * POSES_EACH;
+// who is who, in the sheet's order (build_crowd.py's ALL); WOMEN is the
+// share of fans who are women
+const MEN = [0, 1, 6];
+const WOMEN_PEOPLE = [2, 3, 4, 5];
 const WOMEN = 0.4;
 
 // how much of his cell each person fills, [left, right, top] as shares of
@@ -82,14 +86,14 @@ const WOMEN = 0.4;
 // because the empty corners cost as much to draw as the person
 type Box = [number, number, number];
 
-let sheets: Promise<{ colour: Texture; mask: Texture; boxes: Box[] }> | null = null;
+let sheets: Promise<{ colour: Texture; mask: Texture; boxes: Box[]; tones: number[] }> | null = null;
 export function loadSheets() {
   sheets ??= (async () => {
     const loader = new TextureLoader();
     const [colour, mask, plan] = await Promise.all([
       loader.loadAsync(SHEET.colour),
       loader.loadAsync(SHEET.mask),
-      fetch(SHEET.plan).then((r) => r.json() as Promise<{ boxes: Box[] }>),
+      fetch(SHEET.plan).then((r) => r.json() as Promise<{ boxes: Box[]; tones: number[] }>),
     ]);
     colour.colorSpace = SRGBColorSpace;
     mask.colorSpace = NoColorSpace;
@@ -97,7 +101,7 @@ export function loadSheets() {
       texture.anisotropy = 4;
       texture.needsUpdate = true;
     }
-    return { colour, mask, boxes: plan.boxes };
+    return { colour, mask, boxes: plan.boxes, tones: plan.tones };
   })();
   return sheets;
 }
@@ -128,10 +132,11 @@ export default function Crowd() {
       shader.uniforms.uFocus = uniforms.uFocus;
       shader.uniforms.uSoft = uniforms.uSoft;
       shader.uniforms.uMask = { value: pictures.mask };
-      shader.uniforms.uBox = { value: pictures.boxes.map(([left, right, top]) => new Vector3(left, right, top)) };
+      // each cell's outline, and how dark the pictured person's own skin is
+      shader.uniforms.uBox = { value: pictures.boxes.map(([left, right, top], c) => new Vector4(left, right, top, pictures.tones[c] ?? 0)) };
       shader.vertexShader = shader.vertexShader
         .replace("#include <common>", `#include <common>\nattribute vec3 aShirt;\nattribute vec3 aFan;\nuniform float uJump;\nuniform float uTime;\nuniform float uFocus;\nuniform float uSoft;\nvarying float vBlur;
-varying float vFar;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvarying vec3 vSkin;\nvarying vec3 vLegs;\nvarying vec3 vHair;`)
+varying float vFar;\nuniform vec4 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvarying vec3 vSkin;\nvarying vec3 vLegs;\nvarying vec3 vHair;`)
         .replace(
           "#include <begin_vertex>",
           `#include <begin_vertex>
@@ -172,12 +177,17 @@ varying float vFar;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvaryi
         .replace(
           "#include <uv_vertex>",
           `#include <uv_vertex>
-          vec3 box = uBox[ int( aFan.x + 0.5 ) ];
+          vec4 box = uBox[ int( aFan.x + 0.5 ) ];
           vec2 fanUv = vec2( mix( box.x, box.y, uv.x ), uv.y * box.z );
-          vMapUv = vec2( ( fanUv.x + aFan.x ) / ${CELLS.toFixed(1)}, fanUv.y );
+          // the cell's place in the sheet: rows of ${COLUMNS}, the first at the top
+          float column = mod( aFan.x + 0.5, ${COLUMNS.toFixed(1)} ) - 0.5;
+          float row = floor( ( aFan.x + 0.5 ) / ${COLUMNS.toFixed(1)} );
+          vMapUv = vec2( ( fanUv.x + column ) / ${COLUMNS.toFixed(1)}, ( fanUv.y + ${(ROWS - 1).toFixed(1)} - row ) / ${ROWS.toFixed(1)} );
           vShirt = aShirt;
-          // the pictured men are fair: this darkens them to each fan's own tone
-          vSkin = mix( vec3( 1.0 ), vec3( 0.34, 0.24, 0.19 ), aFan.y );
+          // darkens the pictured person to each fan's own tone, from the
+          // tone they already have (box.w): a picture can only be darkened
+          float toward = clamp( ( aFan.y - box.w ) / max( 1.0 - box.w, 0.01 ), 0.0, 1.0 );
+          vSkin = mix( vec3( 1.0 ), vec3( 0.34, 0.24, 0.19 ), toward );
           // trousers: denim, black, khaki, grey, navy
           float t = fract( aFan.z * 13.7 );
           vLegs = t < 0.34 ? vec3( 0.09, 0.15, 0.32 ) : t < 0.56 ? vec3( 0.035, 0.035, 0.04 ) : t < 0.7 ? vec3( 0.36, 0.3, 0.19 ) : t < 0.85 ? vec3( 0.24, 0.24, 0.25 ) : vec3( 0.03, 0.05, 0.13 );
@@ -223,7 +233,7 @@ varying float vFar;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvaryi
         reflectedLight.directSpecular *= 1.0 - hair;`,
       );
     };
-    material.customProgramCacheKey = () => "crowd-v12";
+    material.customProgramCacheKey = () => "crowd-v13";
     withBakedLight(material, "seat");
 
     const n = seated.length;
@@ -259,7 +269,9 @@ varying float vFar;\nuniform vec3 uBox[ ${CELLS} ];\nvarying vec3 vShirt;\nvaryi
       // arm up, a few with both
       const pose = hash(seat, 5);
       const who = hash(seat, 12);
-      const person = who < WOMEN ? WOMEN_FROM + (who < WOMEN / 2 ? 0 : POSES_EACH) : who < WOMEN + (1 - WOMEN) / 2 ? 0 : POSES_EACH;
+      const among = who < WOMEN ? WOMEN_PEOPLE : MEN;
+      const within = who < WOMEN ? who / WOMEN : (who - WOMEN) / (1 - WOMEN);
+      const person = among[Math.min(among.length - 1, Math.floor(within * among.length))] * POSES_EACH;
       const cell = person + (pose < 0.7 ? 0 : pose < 0.82 ? 2 : pose < 0.91 ? 1 : 3);
       fans.set([cell, hash(seat, 6), hash(seat, 7)], k * 3);
       light.set([details[seat * 8 + 2] / 255, details[seat * 8 + 3] / 255, details[seat * 8 + 6] / 255], k * 3);
