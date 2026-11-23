@@ -105,17 +105,16 @@ function ribbonMaterial() {
       `#include <emissivemap_fragment>
       // round the bowl: 0 to 1 once round
       float round = atan( vRibbon.z, vRibbon.x ) / 6.2832 + 0.5;
-      // two bright sweeps chasing round, over slow diagonal bands
-      float sweep = pow( 0.5 + 0.5 * sin( ( round * 2.0 - uClock * 0.05 ) * 6.2832 ), 6.0 );
-      float bands = 0.5 + 0.5 * sin( round * 260.0 + vRibbon.y * 3.0 - uClock * 1.2 );
-      // the lamps' grid up close
-      vec2 cell = fract( vec2( round * 9000.0, vRibbon.y * 90.0 ) ) - 0.5;
-      float lamp = mix( 0.6 + 0.4 * ( 1.0 - smoothstep( 0.25, 0.5, max( abs( cell.x ), abs( cell.y ) ) ) ), 0.8, smoothstep( 0.2, 0.6, fwidth( round * 9000.0 ) ) );
-      vec3 led = mix( uDeep, uBright, 0.25 + 0.25 * bands + 0.5 * sweep );
-      totalEmissiveRadiance = led * lamp * ${RIBBON.sweep.toFixed(2)};`,
+      // A steady glow with one broad, soft swell of light drifting slowly
+      // round. Nothing finer: fine stripes or a lamp grid are smaller than
+      // a pixel from across the bowl and flicker as they move (they did,
+      // as flashes of blue, on 2026-11-24).
+      float swell = 0.5 + 0.5 * sin( ( round * 2.0 - uClock * 0.02 ) * 6.2832 );
+      vec3 led = mix( uDeep, uBright, 0.45 + 0.3 * swell );
+      totalEmissiveRadiance = led * ${RIBBON.sweep.toFixed(2)};`,
     );
   };
-  material.customProgramCacheKey = () => "stadium-ribbon";
+  material.customProgramCacheKey = () => "stadium-ribbon-v2";
   return material;
 }
 

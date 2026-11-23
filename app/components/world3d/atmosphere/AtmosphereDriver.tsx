@@ -38,7 +38,8 @@ const DUSK_HORIZON = new Color("#ff9456");
 const SUN_WARM = new Color("#ffb37a");
 const SUN_WHITE = new Color("#fff3df");
 const MOON = new Color("#9db8ff");
-const FOG_NIGHT = new Color("#080d1a");
+// at night the air under the floodlights glows a little, it is not black
+const FOG_NIGHT = new Color("#1b2436");
 const FOG_DAY = new Color("#c3d6ea");
 
 // How long the roof takes to open or close, in seconds
@@ -114,7 +115,8 @@ export default function AtmosphereDriver() {
 
     // Haze: thin and bright by day, a little thicker under floodlights
     atmo.fogColor.copy(FOG_NIGHT).lerp(FOG_DAY, Math.min(1, atmo.outdoor * 1.1));
-    atmo.fogDensity = 0.0021 - 0.0011 * Math.min(1, atmo.outdoor * 1.2) + atmo.precipitation * 0.0012;
+    // enough haze that the far stands sit back a little, as in a broadcast
+    atmo.fogDensity = 0.0036 - 0.0008 * Math.min(1, atmo.outdoor * 1.2) + atmo.precipitation * 0.0012;
 
     if (!(scene.fog instanceof FogExp2)) scene.fog = new FogExp2(atmo.fogColor.getHex(), atmo.fogDensity);
     const fog = scene.fog as FogExp2;

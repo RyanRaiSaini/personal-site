@@ -172,17 +172,20 @@ function grassMaterial() {
         diffuseColor.rgb = pitchColor(vPitch, vToCamera);
         // the photo's grain, strongest close by, gone in the distance
         // (0.245 is the photo's average brightness)
-        float grainNear = 1.0 - smoothstep(0.04, 0.6, fwidth(vPitch.x) + fwidth(vPitch.y));
+        // by distance from the camera, not by how stretched the grass is on
+        // screen: seen low along the pitch it is stretched even close by
+        float grassDistance = length(vToCamera);
+        float grainNear = 1.0 - smoothstep(6.0, 40.0, grassDistance);
         float grainHere = clamp(dot(texture2D(uGrain, vNormalMapUv).rgb, vec3(0.3, 0.59, 0.11)) / 0.245, 0.5, 1.6);
         diffuseColor.rgb *= mix(1.0, grainHere, 0.6 * grainNear);
         // and the lawn's larger texture across the middle distance, four
         // metres to a copy, so the pitch is never flat paint
-        float grainMid = smoothstep(0.01, 0.12, fwidth(vPitch.x) + fwidth(vPitch.y)) * (1.0 - smoothstep(0.8, 2.5, fwidth(vPitch.x) + fwidth(vPitch.y)));
+        float grainMid = smoothstep(4.0, 15.0, grassDistance) * (1.0 - smoothstep(60.0, 120.0, grassDistance));
         float grainWide = clamp(dot(texture2D(uGrain, vNormalMapUv * 0.37).rgb, vec3(0.3, 0.59, 0.11)) / 0.245, 0.6, 1.4);
         diffuseColor.rgb *= mix(1.0, grainWide, 0.45 * grainMid);`,
       );
   };
-  material.customProgramCacheKey = () => "pitch-grass-v5";
+  material.customProgramCacheKey = () => "pitch-grass-v6";
   material.userData.textures = [relief, finish, grain];
   // lit like the ground it is: the roof's shadow and the open sky above come from the ground picture
   return withBakedLight(material, "ground");

@@ -127,11 +127,16 @@ export default function Crowd() {
           // nobody sits quite still: a slow shift from side to side and a
           // small settle, each fan at his own pace (only while the picture
           // is being drawn; it rests like everything else)
+          // Only near the camera: a fan far off is a few pixels wide, and
+          // moving him by part of a pixel flips those pixels between him
+          // and the blue seat behind, which flickers (it did, 2026-11-24)
+          vec3 seatAt = ( modelMatrix * instanceMatrix * vec4( 0.0, 0.0, 0.0, 1.0 ) ).xyz;
+          float near = 1.0 - smoothstep( 12.0, 30.0, distance( seatAt, cameraPosition ) );
           float own = aFan.z * 6.2832;
           float pace = 0.35 + fract( aFan.z * 7.3 ) * 0.5;
           float height = transformed.y / ${HEIGHT.toFixed(2)};
-          transformed.x += height * ( 0.045 * sin( uTime * pace + own ) + 0.012 * sin( uTime * 2.3 * pace + own * 3.0 ) );
-          transformed.y += 0.012 * sin( uTime * 0.8 * pace + own * 1.7 );`,
+          transformed.x += near * height * ( 0.045 * sin( uTime * pace + own ) + 0.012 * sin( uTime * 2.3 * pace + own * 3.0 ) );
+          transformed.y += near * 0.012 * sin( uTime * 0.8 * pace + own * 1.7 );`,
         )
         .replace(
           "#include <project_vertex>",
@@ -170,10 +175,12 @@ export default function Crowd() {
         float shade = dot( fan.rgb, vec3( 0.3, 0.59, 0.11 ) );
         body = mix( body, vHair * ( 0.6 + 2.2 * shade ), hair );
         diffuseColor.rgb *= body;
-        diffuseColor.a *= fan.a;`,
+        // the outline from the sharp picture: a softened outline cut off at
+        // the alpha test would make fans vanish and reappear over their seats
+        diffuseColor.a *= texture2D( map, vMapUv ).a;`,
       );
     };
-    material.customProgramCacheKey = () => "crowd-v7";
+    material.customProgramCacheKey = () => "crowd-v8";
     withBakedLight(material, "seat");
 
     const n = seated.length;

@@ -318,3 +318,9 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **Smoke when a goal goes in:** blue and white plumes billow up from four places in the lower stands and drift off on the wind over about 13 seconds (`stadium/GoalSmoke.tsx`; `SOURCES`, `LAST`, `WIND`).
 - **The flags** take the same worked-out light as the seats they are held over, so they sit in the roof's shade instead of glowing, and are smaller.
 - **The grass grain** reaches further from the camera and is stronger in the middle distance.
+
+### Fixed: blue flicker in the stands (2026-11-24, reported by Ryan)
+
+- On loading, the stands flashed blue. Three things moved by less than a pixel at a distance and shimmered: the tier ribbons' fine moving stripes and lamp grid, the crowd's sway (a fan far off is a few pixels wide, so moving him flips those pixels between him and the blue seat behind), and the out-of-focus softening, which also softened each fan's outline so that fans vanished and reappeared over their seats as the focus changed during the walk-out.
+- Now the ribbons are a steady glow with one broad, slow swell; only fans within about 30 m of the camera sway; and the softening never touches a fan's outline. Measured on the overview, sharp pixel changes in the stands between frames fell from 0.35% to 0.09% (what is left is the flags waving).
+- The haze in the bowl is also stronger, so the far stands sit back as in a broadcast, and at night it glows faintly instead of darkening.
