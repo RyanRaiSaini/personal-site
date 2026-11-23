@@ -200,6 +200,16 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **Mixed zone:** four broadcasters' microphones (plain coloured cubes, no names) clamped to the barrier, and a TV camera on the player; the pole microphones and the glaring ceiling strips are gone.
 - **Press room:** a lighting rig over the stage, a softbox, two broadcast cameras with red lights, a centre aisle, a navy carpet and PRESS on the chair backs; the ceiling panels are dimmed so the light falls on the desk.
 
+### Overnight polish (2026-11-22 to 23)
+
+- **The ticket office** (Ryan: "hideous"). The lit booths behind the windows sat behind the back wall, so the windows were grey; they glow now, with a clerk inside. Club-blue walls with a navy band, ceiling panels of light, carpeted queues with gold GATE A markings, a club banner, a framed player profile with my photo, and a scarf wall. Number 8 stands in the queue.
+- **The trophy room** is the HALL OF HONOURS, with SALA DE TROFEOS beneath.
+- **The flat view's name** is centred and much larger.
+- **The near crowd** reads as different people: rounded figures, five hair colours, beanies, club scarves, each fan turned his own way.
+- **The players' beards** have a fine hair grain instead of a flat black shape; eyes a touch softer.
+- **The panels and the home card** are match-broadcast graphics: deep royal in either theme, a header bar with a slanted title and a gold sash, angled corners, tinted blocks and slanted tabs instead of grey-outlined boxes.
+- **Fixed:** Projects opened with the first project already open, so opening it did not play the goal; the boxed tags are gone (lists read as one line of text, and Experience drops its tag rows).
+
 ### A full ground (2026-11-22)
 
 - About 54,000 fans now sit in 86% of the seats (`stadium/Crowd.tsx`). Each is a flat cut-out facing the pitch, all drawn in one step: four poses (arms down, an arm up, arms folded, clapping), seven shirt colours led by the home white, a range of skin tones, a little variation in size. They take the same worked-out light as the seats, so they sit in the roof's shade by day and under the floodlights at night.

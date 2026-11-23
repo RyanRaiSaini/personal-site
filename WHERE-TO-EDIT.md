@@ -86,7 +86,7 @@ Each section has one file that lays out its content. They are used by both the 3
 | Now (clocks, weather, roof buttons) | `app/components/sections/LiveContent.tsx` |
 | Résumé | `app/components/sections/ResumeContent.tsx` |
 | Contact | `app/components/sections/ContactContent.tsx` |
-| Small shared pieces (a titled part, stat boxes, chips, quotes, links, and bullet lists that fold away behind "Show all") | `app/components/sections/parts.tsx` |
+| Small shared pieces (a titled part, stat boxes, short lists set as one line of text, quotes, links, and bullet lists that fold away behind "Show all") | `app/components/sections/parts.tsx` |
 | The tabs that split a long section in two (Projects, Skills, Awards, In the News) | `app/components/ui/Tabs.tsx` |
 
 | I want to change… | File |
@@ -116,7 +116,9 @@ Each section has one file that lays out its content. They are used by both the 3
 | Buttons | `.btn`, `.btn-primary`, `.icon-btn` | `app/globals.css` |
 | Menus and notes that sit over the stadium | `.glass` | `app/globals.css` |
 | The dark plates of the top bar and the home screen | `.plate`, `.wordmark`, `.top-links`, `.home-…` | `app/globals.css` |
-| A section's panel, and the sign above its title | `.panel`, `.sign` | `app/globals.css` |
+| A section's panel: its broadcast colours (set in the panel's own tokens, so they hold in either theme), the header bar with the slanted title, the angled corners, and the blocks and tabs inside | `.panel`, `.panel-head`, and the `.panel …` rules after them | `app/globals.css` |
+| The home screen's name card (same broadcast look) | `.home-plate` | `app/globals.css` |
+| The flat view's big centred name | `.match-name` | `app/globals.css` |
 | The gaps inside every section: between its parts, and between a heading and what follows | `--gap-block`, `--gap-item` in `.sec` | `app/globals.css` |
 | Headings, cards, labels, facts, quotes and tabs inside a section | `.part-title`, `.card`, `.label`, `.facts`, `.quote`, `.tabs…` | `app/globals.css` |
 | The start screen | `.start…` | `app/globals.css` |
@@ -205,7 +207,7 @@ By day the stadium is lit by one photographed sky and one fixed sun. The real cl
 | Dressing room (lockers, boots, the match ball on the crest, the ball bag) | Skills | `app/components/world3d/rooms/DressingRoom.tsx` |
 | Trophy room (four cases, the cabinet, velvet ropes and runner) | Awards | `app/components/world3d/rooms/TrophyRoom.tsx` |
 | Press room (lighting rig, studio light, TV cameras, PRESS chairs) | In the News | `app/components/world3d/rooms/PressRoom.tsx` |
-| Ticket office (the matchday board: its words are `resumeText.board` in `portfolio.ts`) | Résumé | `app/components/world3d/rooms/TicketOffice.tsx` |
+| Ticket office (lit windows, the club banner, the player profile with my photo, the scarf wall, the matchday board; the words are `resumeText.board`, `resumeText.banner` and `resumeText.profileTitle` in `portfolio.ts`) | Résumé | `app/components/world3d/rooms/TicketOffice.tsx` |
 | Mixed zone (interview board, barrier, broadcasters' microphones, TV camera) | Contact | `app/components/world3d/rooms/MixedZone.tsx` |
 | Shared building blocks (boxes, lit signs, the room shell, the TV camera on its tripod) | | `app/components/world3d/rooms/common.tsx` |
 
