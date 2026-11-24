@@ -44,7 +44,6 @@ const FANS: Fan[] = [
   { at: inLine(LANES.right, 0), look: { sheet: "queue", man: WOMAN.shirtAndTrousers, pose: VIEW.back, shirt: "#e9e6dc", skin: 0.1, hair: "#8a6a3e", trousers: DARK_JEANS } },
   { at: inLine(LANES.right, 1), look: { sheet: "queue", man: 0, pose: VIEW.back, shirt: "#26314a", skin: 0.25, hair: "#8a6a3e" }, mirrored: true },
   { at: inLine(LANES.right, 2), look: { sheet: "queue", man: WOMAN.teeAndJeans, pose: VIEW.back, shirt: "#15171c", skin: 0.8, hair: "#0e0b09", trousers: JEANS }, mirrored: true },
-  { at: inLine(LANES.right, 3), look: { sheet: "queue", man: WOMAN.jumper, pose: VIEW.back, shirt: "#4a5a3a", skin: 0.4, hair: "#1a120c" } },
 ];
 
 // the others in the room, out of the queues: a fan looking at the scarves
