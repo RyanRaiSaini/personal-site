@@ -52,7 +52,7 @@ const FANS: Fan[] = [
 // and the programme seller beside her rack in the shop (TicketOffice.tsx)
 const OTHERS: Fan[] = [
   { at: [5.55, 1.5], look: { sheet: "queue", man: WOMAN.teeAndJeans, pose: VIEW.backQuarter, shirt: "#2f4fb3", skin: 0.3, hair: "#3b2414", trousers: DARK_JEANS }, mirrored: true },
-  { at: [-2.1, 0.6], look: { sheet: "queue", man: 0, pose: VIEW.frontQuarter, shirt: "#e8f51c", skin: 0.7, hair: "#0e0b09", trousers: "#1a1c22" } },
+  { at: [2.55, -3.75], look: { sheet: "queue", man: 0, pose: VIEW.front, shirt: "#e8f51c", skin: 0.7, hair: "#0e0b09", trousers: "#1a1c22" } },
   { at: [5.2, -2.3], look: { sheet: "queue", man: WOMAN.topAndTrousers, pose: VIEW.frontQuarter, shirt: "#17244d", skin: 0.45, hair: "#1a120c", trousers: "#1a1c22" }, mirrored: true },
 ];
 

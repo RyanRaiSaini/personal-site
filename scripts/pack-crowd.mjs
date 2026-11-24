@@ -74,11 +74,22 @@ for (const sheetName of ["crowd", "crowd-back", "queue"]) {
   ]) {
     const from = `${DIR}/${sheetName}-${part}.raw.png`;
     const to = `${DIR}/${sheetName}-${part}.webp`;
+    // and a half-size copy for phones and the "low" setting (a quarter of
+    // the memory); the mask is shrunk without blending, so its colours stay
+    // exact labels
+    const small = to.replace(".webp", "-small.webp");
     if (part === "mask") {
       const { image, closed } = await closeHairGaps(from);
-      await image.webp(options).toFile(to);
+      const buffer = await image.png().toBuffer();
+      await sharp(buffer).webp(options).toFile(to);
+      const { width } = await sharp(buffer).metadata();
+      await sharp(buffer).resize(Math.round(width / 2), null, { kernel: "nearest" }).webp(options).toFile(small);
       console.log(`${sheetName}: ${closed} gaps in the hair closed`);
-    } else await sharp(from).webp(options).toFile(to);
+    } else {
+      await sharp(from).webp(options).toFile(to);
+      const { width } = await sharp(from).metadata();
+      await sharp(from).resize(Math.round(width / 2)).webp(options).toFile(small);
+    }
     console.log(`${to}  ${(statSync(from).size / 1024).toFixed(0)} KB -> ${(statSync(to).size / 1024).toFixed(0)} KB`);
   }
 

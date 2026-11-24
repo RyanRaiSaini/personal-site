@@ -223,7 +223,8 @@ By day the stadium is lit by one photographed sky and one fixed sun. The real cl
 | Real materials for the rooms (walnut, leather, marble, rubber, concrete, laminate, plaster, fabric, metal) and how a room uses one (`useSurface`, `floorSurface` on `Shell`, `material` on `Box`) | | `app/components/world3d/rooms/surfaces.ts` |
 | People in the rooms (the ticket clerks, the reporters): one of the crowd's rendered people, recoloured | `Person`, `personPicture` | `app/components/world3d/rooms/Person.tsx`, `rooms/clerk.ts` |
 | The people in the ticket office: the queues (who stands where, man or woman, their shirts, trousers, skin and hair) and the others about the room (club shop, steward, programme seller); `People` draws standing people in any room | `FANS`, `OTHERS`, `JEANS`, `People` |
-| The staff in the dressing room (kit man, coach) and the visitors in the trophy room | `STAFF`, `VISITORS` | `rooms/DressingRoom.tsx`, `rooms/TrophyRoom.tsx` | `app/components/world3d/rooms/Queue.tsx` |
+| The staff in the dressing room (kit man, coach) and the visitors in the trophy room | `STAFF`, `VISITORS` | `rooms/DressingRoom.tsx`, `rooms/TrophyRoom.tsx` |
+| Pitch side: coaching staff in the dugouts, the fourth official, the ball kids (no other players: they belong to the Easter eggs) | `BENCH_STAFF`, `FOURTH`, `BALL_KIDS` | `app/components/world3d/stadium/MatchStaff.tsx` | `app/components/world3d/rooms/Queue.tsx` |
 
 The shirts in the dressing room come from `squad` and `bench`. The trophies come from `awards` (the first four). The résumé picture in the ticket office comes from `npm run resume:image`; the boards at the flash interview read from `profile` and `contactText.zone`.
 

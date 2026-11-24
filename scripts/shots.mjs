@@ -54,6 +54,8 @@ const SHOTS = [
   { name: "night-pitch-level", path: "/", query: NIGHT, look: [-30, 1.7, 0, 40, 9, -6, 55], scene: true },
   // the crowd up close: by night, and on its feet for a goal
   { name: "night-crowd", path: "/", query: NIGHT, look: [8, 4, 30, 12, 5.0, 50, 14], scene: true },
+  { name: "low-crowd", path: "/", query: DAY.replace("quality=high", "quality=low"), look: [8, 4, 30, 12, 5.0, 50, 14], scene: true, keepQuality: true },
+  { name: "low-ticket-office", path: "/resume", query: DAY.replace("quality=high", "quality=low"), look: [900, 1.7, -593, 900, 1.7, -602, 46], scene: true, keepQuality: true },
   { name: "goal-crowd", path: "/", query: DAY, look: [8, 4, 30, 12, 5.0, 50, 14], scene: true, cheer: true },
   { name: "day-roof-closed", path: "/", query: DAY.replace("roof=open", "roof=closed"), look: [58, 26, 46, 0, 8, 0, 50], scene: true },
   { name: "about-panel", path: "/about", query: DAY },
@@ -127,7 +129,7 @@ async function main() {
       if (!shot.flat) {
         await page.waitForFunction((start) => window.__world && window.__world.getState().worldReady && (start || window.__world.getState().introDone), { timeout: Number(process.env.SHOTS_TIMEOUT ?? 90_000), polling: 250 }, Boolean(shot.start));
         // A slow first second can make the site lower its own quality; put it back
-        await page.evaluate(() => window.__world.getState().setQuality("high"));
+        if (!shot.keepQuality) await page.evaluate(() => window.__world.getState().setQuality("high"));
         // SHOTS_LOOK: try a different camera position, as x,y,z,targetX,targetY,targetZ,fieldOfView
         const look = process.env.SHOTS_LOOK ? process.env.SHOTS_LOOK.split(",").map(Number) : shot.look;
         if (look) await page.evaluate((pose) => window.__look(...pose), look);
@@ -140,7 +142,7 @@ async function main() {
         }
         if (shot.scene) await page.addStyleTag({ content: HIDE_PAGE });
         await sleep(shot.settle ?? 3500);
-        await page.evaluate(() => window.__world.getState().setQuality("high"));
+        if (!shot.keepQuality) await page.evaluate(() => window.__world.getState().setQuality("high"));
         await sleep(1200);
       } else {
         await sleep(1500);

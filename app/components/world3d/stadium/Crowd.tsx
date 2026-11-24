@@ -90,9 +90,11 @@ let sheets: Promise<{ colour: Texture; mask: Texture; boxes: Box[]; tones: numbe
 export function loadSheets() {
   sheets ??= (async () => {
     const loader = new TextureLoader();
+    // phones and the "low" setting: the half-size copies, a quarter of the memory
+    const size = useWorld.getState().quality === "low" ? "-small" : "";
     const [colour, mask, plan] = await Promise.all([
-      loader.loadAsync(SHEET.colour),
-      loader.loadAsync(SHEET.mask),
+      loader.loadAsync(SHEET.colour.replace(".webp", `${size}.webp`)),
+      loader.loadAsync(SHEET.mask.replace(".webp", `${size}.webp`)),
       fetch(SHEET.plan).then((r) => r.json() as Promise<{ boxes: Box[]; tones: number[] }>),
     ]);
     colour.colorSpace = SRGBColorSpace;

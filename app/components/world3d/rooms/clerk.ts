@@ -1,4 +1,5 @@
 import { CanvasTexture, Color, SRGBColorSpace, type Texture } from "three";
+import { useWorld } from "../../../lib/store";
 
 // ------------------------------------------------------------------
 // People for the rooms: the crowd's rendered people (blender/build_crowd.py),
@@ -38,7 +39,9 @@ function loadImage(src: string) {
 function load(sheet: Sheet) {
   let pair = sheets.get(sheet);
   if (!pair) {
-    pair = Promise.all([loadImage(`/stadium/crowd/${sheet}-colour.webp`), loadImage(`/stadium/crowd/${sheet}-mask.webp`)]);
+    // phones and the "low" setting: the half-size copies, a quarter of the memory
+    const size = useWorld.getState().quality === "low" ? "-small" : "";
+    pair = Promise.all([loadImage(`/stadium/crowd/${sheet}-colour${size}.webp`), loadImage(`/stadium/crowd/${sheet}-mask${size}.webp`)]);
     sheets.set(sheet, pair);
   }
   return pair;
