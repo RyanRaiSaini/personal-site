@@ -400,3 +400,13 @@ Ryan's go covered: a quieter sound, a second quote, tabs for the long sections, 
 - **The ticket-office steward** now stands by the right-hand window, clear of both queues from every angle (`OTHERS` in `rooms/Queue.tsx`).
 - **Pitch side:** coaching staff on both benches (three a side, in tracksuits; the shirt Easter egg on the south bench left clear), the fourth official in black between the dugouts, just off the tunnel mouth, and eight ball kids on stools along the touchlines, clear of the cameras, the flash interview and the photographers (`stadium/MatchStaff.tsx`). No other players: they belong to the Easter eggs.
 - **Flicker readings:** the moving-camera test must hold the quality level; the site lowers its own quality after a slow first second, and a thinner crowd reads differently. Held at medium, this version and the live one before it read the same: 0.02% of the stands to or from blue at 8 cm, 0.07% at 20 cm (the earlier 0.01% and 0.04% were taken after the site had lowered itself).
+
+### Faster on phones, and an accessibility pass (2026-11-24)
+
+Lighthouse (Google's audit, run with `npx lighthouse@13.6.0`, not added to the project) on the live site, phone profile: performance 40, accessibility 97, search 92; my name was painted 5.9 s in.
+
+- **Phones go straight to the flat page.** The phone page is /match, but the switch happened only after the whole 3D page's code had loaded and run. The script in `app/layout.tsx` that runs before the first paint now sends phones (and anyone who chose the flat view) asking for the home page straight to /match. After: name painted at 1.7 s, performance 69, accessibility 100, search 100 (it also removes the clash of two "canonical" addresses, / and /match, on one page).
+- **The GitHub calendar's numbers are readable** on every square: each green has its own text colour, per theme (`--level-ink-N` in `app/globals.css`, used in `sections/GithubContent.tsx`). Some were 1.1 : 1 against their square.
+- **The name button's spoken label** now includes what it shows: "Ryan Saini (RS), home" (`ui/SiteHeader.tsx`).
+- **Keyboard:** checked by driving the site with Tab and Esc. A skip link comes first; the top bar, the floating name tags (each shows a gold ring when focused), then the home card follow in order; an opened section moves focus to its title; Esc goes back to the stadium. Reduced motion is respected (no start screen, camera cuts instead of flights, players still).
+- Left as is: Lighthouse's desktop "blocking time" is the 3D stadium running without a graphics chip in its headless browser, which no visitor's laptop does; the name is painted at 0.5 s there. The redirect to /match costs a phone one extra request, far less than the wait it replaces.

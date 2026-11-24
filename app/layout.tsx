@@ -37,6 +37,10 @@ export const viewport: Viewport = {
 //  2. Intro. On the home page, once per visit, on screens big enough
 //     for the 3D tour, the visitor starts in the players' tunnel with a
 //     "Start the tour" button (app/lib/intro.ts has the steps).
+//  3. Phones (and anyone who chose the flat view) asking for the home
+//     page go straight to /match, before any of the 3D page's code
+//     loads: switching later, once it had run, put my name on a phone's
+//     screen about five seconds late.
 const bootScript = `(function(){try{var d=document.documentElement,q=new URLSearchParams(location.search);
 var r=q.get("roof")||localStorage.getItem("roof"),dark;
 if(r==="open")dark=false;else if(r==="closed")dark=true;else{
@@ -48,6 +52,7 @@ dark=h<up[m]||h>=down[m]}
 d.setAttribute("data-theme",dark?"dark":"light");
 var v=q.get("view")||localStorage.getItem("view"),phone=matchMedia("(pointer: coarse)").matches&&Math.min(screen.width,screen.height)<820;
 var tour=v==="tour"||(v!=="match"&&!phone);
+if(!tour&&location.pathname==="/"){location.replace("/match"+location.search+location.hash);return}
 var play=location.pathname==="/"&&tour&&!sessionStorage.getItem("intro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&!q.get("nointro");
 d.setAttribute("data-intro",play?"start":"done")}catch(e){document.documentElement.setAttribute("data-intro","done")}})()`;
 

@@ -106,7 +106,7 @@ export default function SiteHeader() {
 
   return (
     <header className="site-bar pointer-events-none fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-5">
-      <Link href={inMatch ? "/match" : "/"} data-tag-avoid className="plate wordmark pointer-events-auto" aria-label={`${profile.name}, home`}>
+      <Link href={inMatch ? "/match" : "/"} data-tag-avoid className="plate wordmark pointer-events-auto" aria-label={`${profile.shortName} (${initials}), home`}>
         {/* on a phone there is only room for the initials */}
         <span aria-hidden="true" className="sm:hidden">
           {initials}

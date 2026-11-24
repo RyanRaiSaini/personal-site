@@ -33,6 +33,12 @@
   --level-2: #006d32;
   --level-3: #26a641;
   --level-4: #39d353;
+  /* text on each square: light on the dark greens, dark on the bright */
+  --level-ink-0: #e2e7ef;
+  --level-ink-1: #e2e7ef;
+  --level-ink-2: #e2e7ef;
+  --level-ink-3: #06140a;
+  --level-ink-4: #06140a;
 }
 
 [data-theme="light"] {
@@ -59,6 +65,12 @@
   --level-2: #40c463;
   --level-3: #30a14e;
   --level-4: #216e39;
+  /* text on each square: dark on the pale greens, light on the darkest */
+  --level-ink-0: #1a2130;
+  --level-ink-1: #1a2130;
+  --level-ink-2: #0b1a10;
+  --level-ink-3: #06140a;
+  --level-ink-4: #f4f6f8;
 }
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -580,6 +592,12 @@ body {
   --level-2: #006d32;
   --level-3: #26a641;
   --level-4: #39d353;
+  /* text on each square: light on the dark greens, dark on the bright */
+  --level-ink-0: #e2e7ef;
+  --level-ink-1: #e2e7ef;
+  --level-ink-2: #e2e7ef;
+  --level-ink-3: #06140a;
+  --level-ink-4: #06140a;
   color: var(--ink);
   background:
     linear-gradient(115deg, transparent 0 62%, rgba(255, 255, 255, 0.025) 62% 70%, transparent 70%),

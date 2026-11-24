@@ -59,8 +59,17 @@ export default function GithubContent() {
                   const date = data.dates[from + i]?.[d] ?? "";
                   return (
                     <span key={`${i}-${d}`} title={describe(date, count) || undefined} className="flex aspect-square w-full flex-col items-center justify-center rounded-[5px]" style={{ background: level < 0 ? "transparent" : palette[Math.min(4, level)] }} data-day={DAY_NAMES[d]}>
-                      {level >= 0 && <span className="text-[0.62rem] leading-none text-ink-faint">{date.slice(8).replace(/^0/, "")}</span>}
-                      {count > 0 && <span className="mt-0.5 font-display text-lg font-bold leading-none text-ink">{count}</span>}
+                      {/* in each square's own readable colour (--level-ink-N in globals.css) */}
+                      {level >= 0 && (
+                        <span className="text-[0.62rem] leading-none" style={{ color: `var(--level-ink-${Math.min(4, level)})` }}>
+                          {date.slice(8).replace(/^0/, "")}
+                        </span>
+                      )}
+                      {count > 0 && (
+                        <span className="mt-0.5 font-display text-lg font-bold leading-none" style={{ color: `var(--level-ink-${Math.min(4, level)})` }}>
+                          {count}
+                        </span>
+                      )}
                     </span>
                   );
                 }),
