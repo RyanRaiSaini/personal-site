@@ -112,7 +112,7 @@ CMU Serif is used only to set the résumé PDF (`scripts/build-resume-pdf.mjs`),
 | | |
 |---|---|
 | What | The pictures shown with each project (`public/projects/`) |
-| Empyrean | Two crops of screenshots of the project's own live dashboard, which I built, from the team's public repository ([richardlancs/Empyrean](https://github.com/richardlancs/Empyrean), `docs/dashboard-redesign/bauhaus/screenshots/`). The crops leave out the status bar, which labels test modules "(fake)". |
+| Empyrean | The team's HackUMass XIV poster, from Ryan (a PDF), whole, and a close-up of its live camera frame. |
 | BHive | A diagram drawn for this site from the project's own description. No screenshot: the tool is internal to the City of Brampton. |
 | Personal website | Pictures of this site, taken with `npm run shots` and a goal replay caught mid-shot. |
 
