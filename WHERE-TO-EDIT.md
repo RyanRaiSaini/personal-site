@@ -240,6 +240,7 @@ Every player is a copy of one model (`public/players/player.glb`), moved by moti
 | The kit's colour for someone not in white (the goalkeeper) | `colour` in `KITS` | `app/components/world3d/players/kits.ts` |
 | A celebration | `celebration` in `GOALS`: a standing pose (`"wide"`, `"folded"`, `"hips"`) or the motion-captured `"victory"` | `app/components/world3d/players/shows.ts` |
 | Where a goal is scored from, how the scorer arrives, where he runs, how long he celebrates | `GOALS` (keep the running speeds human: the note at the top says how) | `app/components/world3d/players/shows.ts` |
+| Which corner of the net each project's replay goes into (top left, bottom left, top right, bottom right, in project order, then round again) | `SAINI_CORNERS` | `app/components/world3d/players/shows.ts` |
 | The goalkeeper: who he is, and which way he dives | `KITS.keeper`; `keeper` in `GOALS` (`"wrong"` or `"late"`). His dive was recorded one way only, so for the other he is shown as in a mirror (`keeperMirrored`), with his number printed to suit. | `players/kits.ts`, `players/shows.ts`, `players/Cast.tsx` |
 | Where number 8 stands in each outdoor section, and how he stands | `REST` | `app/components/world3d/players/Cast.tsx` |
 | Where number 8 is in each room, and what he is doing | `MARKS` | `app/components/world3d/players/RoomSaini.tsx` |
@@ -301,7 +302,8 @@ There are no audio files. Everything is generated in the browser, and it is sile
 | Question | Answer | File |
 |---|---|---|
 | Who gets the 3D tour and who gets the flat match view? | Phones and browsers without WebGL get the match view unless the visitor picks "3D tour". The choice is remembered. | `app/components/world/WorldShell.tsx` |
-| How good should the 3D be on this device? | Guessed from the device (three levels), then lowered if the frame rate drops below 24 | `app/lib/quality.ts`, `app/components/world3d/FrameGovernor.tsx` |
+| How good should the 3D be on this device? | Guessed from the device (three levels). While moving, the picture is drawn smaller (down to 70%) when a frame takes too long to draw, and back up when there is time to spare (dynamic resolution, `RESOLUTION`); then the level is lowered if the frame rate still drops below 24 | `app/lib/quality.ts`, `app/components/world3d/FrameGovernor.tsx` |
+| Parts of the stadium that never move, placed once and then skipped every frame | wrap them in `Frozen` (only things that never move) | `app/components/world3d/Frozen.tsx`, used in `world3d/Bowl.tsx` |
 | How often is the stadium redrawn? | Every frame while something moves or the visitor is doing something, 30 a second for a while after, then not at all until the next input. Never while the tab is hidden. | `REST_AFTER` in `app/components/world3d/FrameGovernor.tsx` |
 | What if the stadium fails to load? | A loading bar shows progress; after 12 seconds it offers the flat view; if the 3D breaks, the flat view opens by itself | `app/components/world/WorldShell.tsx` |
 | Light or dark on first load? | The roof follows Brampton: dark at night. Decided before the page paints. | the `bootScript` in `app/layout.tsx` |
@@ -320,7 +322,7 @@ Add these to the address to see a particular look without waiting for it:
 | `/?time=13:00&roof=open` | A sunny afternoon with the roof open |
 | `/?weather=snow&roof=open` | Snow falling through the open roof (`clear`, `cloudy`, `overcast`, `fog`, `rain`, `snow`, `storm`) |
 | `/?roof=closed` | Roof closed (dark theme) |
-| `/?quality=low` | The lightest 3D (also `medium`, `high`) |
+| `/?quality=low` | The lightest 3D (also `medium`, `high`); it also holds the picture size, switching off dynamic resolution, so test pictures and measurements stay comparable |
 | `/?nointro=1` | Skip the start screen and the walk-out |
 | `/?view=tour` or `/?view=match` | Force the 3D tour or the flat match view |
 

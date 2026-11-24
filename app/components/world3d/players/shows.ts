@@ -93,6 +93,29 @@ export const GOALS: Record<Scorer, GoalScript> = {
   },
 };
 
+// Number 8's replays go into a different corner of the net for each
+// project, in this order (as seen from the stand, from the left of the
+// goal to the right), then round again: top left, bottom left, top
+// right, bottom right. [x, height, z] inside the net, which is 7.32 m wide
+// and 2.44 m high. (Ryan asked for it on 2026-11-24.)
+export const SAINI_CORNERS: [number, number, number][] = [
+  [NORTH + 1.5, 1.95, -2.6],
+  [NORTH + 1.5, 0.35, -2.6],
+  [NORTH + 1.5, 1.95, 2.6],
+  [NORTH + 1.5, 0.35, 2.6],
+];
+
+// Number 8's replay into one of those corners
+export function sainiShot(corner: number): GoalScript {
+  const n = SAINI_CORNERS.length;
+  return { ...GOALS.saini, target: SAINI_CORNERS[((corner % n) + n) % n] };
+}
+
+// The script for a goal show: number 8's aimed at the show's corner
+export function scriptOf(scorer: Scorer, corner = 0): GoalScript {
+  return scorer === "saini" ? sainiShot(corner) : GOALS[scorer];
+}
+
 export const AWAY_AFTER = 0.42; // seconds after the strike before he turns away to celebrate
 export const BALL_FLIGHT = 0.5; // seconds from boot to net
 

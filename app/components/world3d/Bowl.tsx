@@ -3,6 +3,7 @@
 import FlashZone from "./stadium/FlashZone";
 import Photographers from "./stadium/Photographers";
 import Stewards from "./stadium/Stewards";
+import Frozen from "./Frozen";
 import MatchStaff from "./stadium/MatchStaff";
 import PitchCameras from "./stadium/PitchCameras";
 import { Suspense, useEffect } from "react";
@@ -38,7 +39,8 @@ function Loaded() {
 export default function Bowl({ children }: { children?: React.ReactNode }) {
   const inBowl = useWorld((s) => sceneOf(s.section) === "bowl");
   return (
-    <group visible={inBowl}>
+    // while a room is visited the stadium is hidden; skip working out its places too
+    <group visible={inBowl} matrixWorldAutoUpdate={inBowl}>
       <Sky />
       <Lights />
       <Suspense fallback={null}>
@@ -49,14 +51,17 @@ export default function Bowl({ children }: { children?: React.ReactNode }) {
       <GroundLit>
         <Goals />
         <PitchSide />
-        <AdBoards />
         <Cast />
         <BenchShirt />
-        <FlashZone />
-        <Photographers />
-        <Stewards />
-        <PitchCameras />
-        <MatchStaff />
+        {/* the parts that never move: placed once, then skipped every frame (Frozen.tsx) */}
+        <Frozen>
+          <AdBoards />
+          <FlashZone />
+          <Photographers />
+          <Stewards />
+          <PitchCameras />
+          <MatchStaff />
+        </Frozen>
       </GroundLit>
       <Precipitation />
       {children}

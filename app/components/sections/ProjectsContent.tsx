@@ -24,7 +24,8 @@ export default function ProjectsContent() {
     world.select("project", id);
     // The replay only plays in the 3D tour, and never over another show
     if (world.worldReady && world.section === "projects" && !world.show && !world.reducedMotion) {
-      world.startShow({ kind: "goal", scorer: "saini", label: title.toUpperCase() });
+      // each project into its own corner of the net (players/shows.ts, SAINI_CORNERS)
+      world.startShow({ kind: "goal", scorer: "saini", label: title.toUpperCase(), corner: Math.max(0, projects.findIndex((p) => p.id === id)) });
     }
   };
 

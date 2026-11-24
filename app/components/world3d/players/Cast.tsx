@@ -16,7 +16,7 @@ import { KITS, type Kit } from "./kits";
 import { blend, ease, playing, standing, type Layer, type Stance } from "./moves";
 import { loadPlayerNotes, travelAt, type ClipNote, type PlayerNotes } from "./notes";
 import Player, { type PlayerHandle } from "./Player";
-import { AWAY_AFTER, BALL_FLIGHT, GOALS, goalLength, showLength, type GoalScript, type Scorer } from "./shows";
+import { AWAY_AFTER, BALL_FLIGHT, GOALS, goalLength, SAINI_CORNERS, sainiShot, scriptOf, showLength, type GoalScript, type Scorer } from "./shows";
 
 // ------------------------------------------------------------------
 // The players out on the pitch, and the director of every goal.
@@ -255,6 +255,8 @@ export default function Cast() {
   // The goalkeeper is in goal for any goal whose script has one. While
   // Projects is open he waits in the north goal, ready for number 8's.
   const keeperIn: Scorer | null = show?.kind === "goal" ? (GOALS[show.scorer].keeper ? show.scorer : null) : section === "projects" ? "saini" : null;
+  // the script being played: number 8's aimed at this project's corner
+  const keeperScript = show?.kind === "goal" ? scriptOf(show.scorer, show.corner) : GOALS.saini;
   const idleNow = !show && introDone;
 
   // A new show starts with nobody having scored yet
@@ -264,7 +266,8 @@ export default function Cast() {
 
   const plans = useMemo(() => {
     if (!notes) return null;
-    return { saini: planOf(GOALS.saini, notes, KITS.saini), six: planOf(GOALS.six, notes, KITS.six), ten: planOf(GOALS.ten, notes, KITS.ten) };
+    // number 8 has a plan for each corner of the net (shows.ts, SAINI_CORNERS)
+    return { saini: SAINI_CORNERS.map((_, corner) => planOf(sainiShot(corner), notes, KITS.saini)), six: planOf(GOALS.six, notes, KITS.six), ten: planOf(GOALS.ten, notes, KITS.ten) };
   }, [notes]);
 
   const start = (scorer: "six" | "ten") => {
@@ -368,7 +371,7 @@ export default function Cast() {
     }
 
     const balls = { north: northBall.current, south: southBall.current };
-    const plan = goal && plans ? plans[goal.scorer] : null;
+    const plan = goal && plans ? (goal.scorer === "saini" ? plans.saini[(goal.corner ?? 0) % SAINI_CORNERS.length] : plans[goal.scorer]) : null;
 
     if (!goal || !plan || !notes) {
       // Everything back to its mark
@@ -393,7 +396,7 @@ export default function Cast() {
       return;
     }
 
-    const script = GOALS[goal.scorer];
+    const script = scriptOf(goal.scorer, goal.corner);
     const player = goal.scorer === "saini" ? me : guest.current;
     const ball = balls[script.goal];
     const t = (performance.now() - goal.startedAt) / 1000;
@@ -560,7 +563,7 @@ export default function Cast() {
     <group>
       <Player ref={saini} kit={KITS.saini} />
       {guestWho && <Player key={guestWho} ref={guest} kit={KITS[guestWho]} />}
-      {keeperIn && <Player key={keeperIn} ref={keeper} kit={KITS.keeper} mirrored={keeperMirrored(GOALS[keeperIn])} />}
+      {keeperIn && <Player key={keeperIn} ref={keeper} kit={KITS.keeper} mirrored={keeperMirrored(keeperScript)} />}
 
       {/* the ball under number 8's foot at the centre spot */}
       <group ref={centreBall} position={[-0.14, BALL_R, 0.27]}>

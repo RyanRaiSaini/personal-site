@@ -19,9 +19,17 @@ import { rig } from "./camera/CameraRig";
 //   rest     nothing is drawn at all until the visitor does something.
 //            Also whenever the tab is hidden.
 //
-// It also watches the frame rate while at "full", and steps the quality
-// level down if the machine cannot keep up: high, medium, low, and
-// last a smaller picture (`lean` in the store).
+// It also keeps the picture smooth on slower machines. First, dynamic
+// resolution, as games do: it times how long each picture takes to draw,
+// and when that is too long for a smooth frame rate it draws the picture
+// a little smaller (down to RESOLUTION.min of the full size), going back
+// up when there is time to spare. On a slow laptop the graphics chip
+// filling pixels was what held the frame rate down (2026-11-24): three
+// quarters of the resolution drew in about 16 ms instead of 26. Timing the
+// drawing, not counting frames, leaves alone laptops that cap the browser
+// at 30 to save battery. Then, if the frame rate still falls under SLOW,
+// it steps the quality level down: high, medium, low, and last a smaller
+// picture (`lean` in the store).
 //
 // To change how long the stadium keeps moving when left alone, change
 // REST_AFTER.
@@ -35,6 +43,9 @@ const REST_AFTER = { home: 45_000, section: 15_000, reducedMotion: 4_000, start:
 // Under this many frames a second at full rate, step the quality down.
 // (Some laptops cap browsers at 30 to save battery, so 30 must not count as slow.)
 const SLOW = 24;
+// Dynamic resolution: the share of the full picture size, and the drawing
+// times (ms a picture) that make it step down or back up
+const RESOLUTION = { min: 0.7, step: 0.1, slowerThan: 16, fasterThan: 8 };
 
 function paceNow(now: number): Pace {
   if (document.hidden) return "rest";
@@ -49,8 +60,40 @@ function paceNow(now: number): Pace {
   return since < limit ? "ambient" : "rest";
 }
 
+// The dynamic resolution's state: drawing time gathered since the last
+// judgement, the share of the full size now drawn, and the full size
+const drawing = { ms: 0, scale: 1, full: null as number | null };
+
 export default function FrameGovernor() {
   const invalidate = useThree((s) => s.invalidate);
+  const gl = useThree((s) => s.gl);
+  const setDpr = useThree((s) => s.setDpr);
+
+  // how long the drawing takes: the renderer's own draw call, timed. (On
+  // most machines the browser waits for the graphics chip inside it.)
+  useEffect(() => {
+    const draw = gl.render;
+    gl.render = function (scene, camera) {
+      const start = performance.now();
+      draw.call(this, scene, camera);
+      drawing.ms += performance.now() - start;
+    };
+    return () => {
+      gl.render = draw;
+    };
+  }, [gl]);
+
+  // a new quality level brings its own picture size: start again from full
+  useEffect(
+    () =>
+      useWorld.subscribe((state, before) => {
+        if (state.quality !== before.quality || state.lean !== before.lean) {
+          drawing.scale = 1;
+          drawing.full = null;
+        }
+      }),
+    [],
+  );
 
   // one more picture drawn
   useFrame(() => {
@@ -67,6 +110,8 @@ export default function FrameGovernor() {
     let fullTime = 0;
     let slowSpells = 0;
     let judgeAfter = performance.now() + 4000;
+    let framesAtStart = activity.frames;
+    const fixedSize = new URLSearchParams(window.location.search).has("quality");
 
     const judge = (now: number) => {
       if (lastFull && now - lastFull < 250 && now > judgeAfter) {
@@ -78,6 +123,27 @@ export default function FrameGovernor() {
       const rate = (fullFrames * 1000) / fullTime;
       fullFrames = 0;
       fullTime = 0;
+      const drawn = activity.frames - framesAtStart;
+      const perPicture = drawn > 0 ? drawing.ms / drawn : 0;
+      drawing.ms = 0;
+      framesAtStart = activity.frames;
+
+      // dynamic resolution first: a smaller picture when drawing is slow,
+      // back up when there is time to spare
+      // (not when the address sets the quality, ?quality=: the test
+      // pictures and measurements need the picture size to hold still)
+      const smaller = !fixedSize && perPicture > RESOLUTION.slowerThan && drawing.scale > RESOLUTION.min + 0.001;
+      const larger = !fixedSize && perPicture > 0 && perPicture < RESOLUTION.fasterThan && drawing.scale < 1;
+      if (smaller || larger) {
+        drawing.full ??= gl.getPixelRatio();
+        drawing.scale = smaller ? Math.max(RESOLUTION.min, drawing.scale - RESOLUTION.step) : Math.min(1, drawing.scale + RESOLUTION.step);
+        setDpr(drawing.full * drawing.scale);
+        // a new picture size stutters for a moment; do not count that
+        judgeAfter = now + 3000;
+        slowSpells = 0;
+        return;
+      }
+
       slowSpells = rate < SLOW ? slowSpells + 1 : 0;
       if (slowSpells < 2) return;
       slowSpells = 0;
@@ -138,7 +204,7 @@ export default function FrameGovernor() {
       document.removeEventListener("visibilitychange", input);
       unsubscribe();
     };
-  }, [invalidate]);
+  }, [invalidate, gl, setDpr]);
 
   return null;
 }
