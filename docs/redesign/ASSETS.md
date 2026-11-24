@@ -107,6 +107,15 @@ CMU Serif is used only to set the résumé PDF (`scripts/build-resume-pdf.mjs`),
 | Three.js, React Three Fiber, drei | Drawing it in the browser | Free, open source |
 | puppeteer-core with the Chrome already installed | Screenshots and measurements (`scripts/shots.mjs`, `scripts/measure.mjs`) | Free |
 
+## Project pictures
+
+| | |
+|---|---|
+| What | The pictures shown with each project (`public/projects/`) |
+| Empyrean | Two crops of screenshots of the project's own live dashboard, which I built, from the team's public repository ([richardlancs/Empyrean](https://github.com/richardlancs/Empyrean), `docs/dashboard-redesign/bauhaus/screenshots/`). The crops leave out the status bar, which labels test modules "(fake)". |
+| BHive | A diagram drawn for this site from the project's own description. No screenshot: the tool is internal to the City of Brampton. |
+| Personal website | Pictures of this site, taken with `npm run shots` and a goal replay caught mid-shot. |
+
 ## Not used, on purpose
 
 - No club crest, kit design, sponsor mark or anthem. The boards round the pitch and the ring of screens are blank.

@@ -22,6 +22,7 @@ After any change: save, check it at `http://localhost:3000` (run `npm run dev` f
 | Interests ("Away from the keyboard") | `interests` | `app/data/portfolio.ts` |
 | A project's title, summary, bullets, numbers, links | `projects` | `app/data/portfolio.ts` |
 | Add a project | add an entry to `projects` (copy an existing one) | `app/data/portfolio.ts` |
+| A project's pictures (shown large when it is opened, with captions and small ones to switch between) | `media` on the project: each picture's file, a description for screen readers, a caption, its width and height. Files go in `public/projects/`, about 1200 pixels wide, as WebP | `app/data/portfolio.ts`, `public/projects/` |
 | A job's title, dates, bullets | `experience` | `app/data/portfolio.ts` |
 | Awards and scholarships | `awards` | `app/data/portfolio.ts` |
 | The Make-A-Wish and NBA story, the quote, the list of people I met | `makeAWish` | `app/data/portfolio.ts` |

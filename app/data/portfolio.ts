@@ -22,7 +22,12 @@ export type Project = {
   links: Link[];
   status: "shipped" | "in-progress";
   minute: string; // the "match minute" shown next to the goal
+  // pictures shown when the project is opened, the first one large
+  // (files in public/projects/; width and height as saved)
+  media?: ProjectPicture[];
 };
+
+export type ProjectPicture = { src: string; alt: string; caption: string; width: number; height: number };
 
 export type Experience = {
   id: string;
@@ -195,6 +200,22 @@ export const projects: Project[] = [
     links: [{ label: "Code on GitHub", href: "https://github.com/richardlancs/Empyrean" }],
     status: "shipped",
     minute: "23'",
+    media: [
+      {
+        src: "/projects/empyrean-touch.webp",
+        alt: "The Empyrean dashboard. The camera view shows a ketchup bottle boxed in green and labelled “Touching Heinz ketchup”, with a coffee cup beside it; above, the dashboard shows “Heinz ketchup” in large type and that the name was spoken.",
+        caption: "The live dashboard I built: the wearer touches a bottle, the system names it by brand and says it aloud.",
+        width: 1200,
+        height: 780,
+      },
+      {
+        src: "/projects/empyrean-hazard.webp",
+        alt: "The Empyrean dashboard showing an active warning, “Vehicle: the hazard check reported a possible vehicle approaching”, above the object being touched.",
+        caption: "A hazard warning on the dashboard: a vehicle approaching, flagged while the wearer is holding an object.",
+        width: 1200,
+        height: 574,
+      },
+    ],
   },
   {
     id: "bhive-registry",
@@ -219,6 +240,15 @@ export const projects: Project[] = [
     links: [{ label: "About BHive", href: "https://thebhive.ca/" }],
     status: "shipped",
     minute: "45+2'",
+    media: [
+      {
+        src: "/projects/bhive-workflow.webp",
+        alt: "A five-step diagram: 6,000+ Brampton companies, then AI-assisted screening against each project's criteria, then one record per company with industry, headcount, revenue and sources, then a shared registry in Google Sheets, then outreach lists for each project.",
+        caption: "How the workflow runs, from a list of local companies to outreach lists. A diagram: the tool itself is internal.",
+        width: 1200,
+        height: 420,
+      },
+    ],
   },
   {
     id: "personal-site",
@@ -232,6 +262,36 @@ export const projects: Project[] = [
     links: [{ label: "Code on GitHub", href: "https://github.com/RyanRaiSaini/personal-site" }],
     status: "in-progress",
     minute: "67'",
+    media: [
+      {
+        src: "/projects/site-overview.webp",
+        alt: "The 3D stadium from high in the stands: a full crowd round a striped pitch under a partly open roof.",
+        caption: "The stadium, modelled to scale in Blender and drawn live in the browser, crowd and all.",
+        width: 1200,
+        height: 675,
+      },
+      {
+        src: "/projects/site-goal.webp",
+        alt: "Number 8 in a white kit has just struck the ball; the goalkeeper dives as it flies into the top corner of the net.",
+        caption: "Opening a project replays a goal, each into a different corner of the net.",
+        width: 1200,
+        height: 675,
+      },
+      {
+        src: "/projects/site-ticket-office.webp",
+        alt: "The ticket office: fans queuing at two lit windows, my framed résumé between them, scarves on the club shop wall.",
+        caption: "The ticket office, where the résumé hangs between the windows.",
+        width: 1200,
+        height: 675,
+      },
+      {
+        src: "/projects/site-dressing-room.webp",
+        alt: "The dressing room: wooden lockers with numbered white shirts, boots beneath, a tactics board on the wall.",
+        caption: "The dressing room, home of the Skills section.",
+        width: 1200,
+        height: 675,
+      },
+    ],
   },
 ];
 

@@ -419,3 +419,11 @@ Ryan found the stadium choppy on his laptop. Timing a frame on this laptop (Inte
 - **Things that never move are no longer recomputed every frame** (`Frozen.tsx`): the boards, the Contact backdrop, the photographers, stewards, TV cameras and match-day staff. Objects whose place was worked out every frame: 583 down to 219. Also, while a room is visited, the hidden stadium is skipped.
 - **Each project's replay goes into a different corner** (`SAINI_CORNERS` in `players/shows.ts`, Ryan's idea): top left, bottom left, top right, bottom right, in the order the projects are listed, then round again. The goalkeeper dives the right way each time. Opening a project passes its place in the list (`corner` on the show, `sections/ProjectsContent.tsx`).
 - Flicker on the stands, quality held at medium: 0.00 to 0.02% to or from blue, unchanged.
+
+### Pictures for every project (2026-11-24)
+
+Comparing the site with other portfolios and recruiter advice, the most repeated point was pictures: recruiters skim, and a picture makes a project land in seconds. The projects were text only.
+
+- **A gallery in each opened project** (`Gallery` in `sections/ProjectsContent.tsx`): one picture large with its caption, small ones beneath to switch between them, the large one opening full size in a new tab. They load only once a project is opened. Each picture has a description for screen readers.
+- **Empyrean:** the live dashboard I built, naming a touched bottle by brand, and a hazard warning. **BHive:** a five-step diagram of the workflow (the tool is internal). **Personal website:** the stadium, a goal replay, the ticket office and the dressing room. All seven come to about 330 KB.
+- A short video of the stadium was tried, recorded from the page in the headless browser; it dropped most frames during the camera's flight, so stills were used instead.

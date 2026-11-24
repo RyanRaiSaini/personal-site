@@ -1,10 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import { projects, projectText } from "../../data/portfolio";
+import { projects, projectText, type ProjectPicture } from "../../data/portfolio";
 import { useWorld } from "../../lib/store";
 import Tabs from "../ui/Tabs";
 import { Arrow, Bullets, ExternalLink, InlineList, Stats } from "./parts";
+
+// The pictures of an open project: one large, with its caption, and small
+// ones beneath to switch between them. The large one opens full size in a
+// new tab. They load only once the project is opened.
+function Gallery({ title, pictures }: { title: string; pictures: ProjectPicture[] }) {
+  const [shown, setShown] = useState(0);
+  const picture = pictures[shown] ?? pictures[0];
+  return (
+    <figure className="grid gap-2">
+      <a href={picture.src} target="_blank" rel="noopener" className="block overflow-hidden rounded-[8px] border border-line bg-black/30">
+        {/* eslint-disable-next-line @next/next/no-img-element -- plain pictures, already sized for the web */}
+        <img src={picture.src} alt={picture.alt} width={picture.width} height={picture.height} loading="lazy" decoding="async" className="block h-auto w-full" />
+        <span className="sr-only"> (opens the full-size picture in a new tab)</span>
+      </a>
+      <figcaption className="text-[0.875rem] leading-[1.5] text-ink-soft">{picture.caption}</figcaption>
+      {pictures.length > 1 && (
+        <div className="flex flex-wrap gap-2" role="group" aria-label={`${title}: pictures`}>
+          {pictures.map((p, i) => (
+            <button
+              key={p.src}
+              type="button"
+              onClick={() => setShown(i)}
+              aria-pressed={i === shown}
+              aria-label={`Picture ${i + 1} of ${pictures.length}: ${p.caption}`}
+              className={`overflow-hidden rounded-[6px] border-2 transition-colors ${i === shown ? "border-gold" : "border-line hover:border-ink-soft"}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- a small copy of the same picture */}
+              <img src={p.src} alt="" width={96} height={Math.round((96 * p.height) / p.width)} loading="lazy" decoding="async" className="block h-[54px] w-[96px] object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+    </figure>
+  );
+}
 
 // Projects: the goal. Every project in `projects`
 // (app/data/portfolio.ts) is a goal. Opening one plays its replay in
@@ -53,6 +88,7 @@ export default function ProjectsContent() {
         );
         const overview = (
           <div className="grid gap-4">
+            {project.media && project.media.length > 0 && <Gallery title={project.title} pictures={project.media} />}
             <p>{project.description}</p>
             {project.features.length > 0 && <Bullets items={project.features} />}
             {!hasResults && builtWith}
